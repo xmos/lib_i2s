@@ -1,0 +1,3 @@
+DEPENDENT_MODULES = lib_xassert
+
+VERSION = 3.0.0
