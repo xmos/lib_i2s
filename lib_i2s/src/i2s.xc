@@ -6,13 +6,13 @@
 
 static inline void setup_timed_input(in buffered port:32 p, unsigned t)
 {
-  asm volatile("setpt res[%0], %1" : : "r"(p), "r"(t));
+  asm volatile("setpt res[%0], %1" : : "r"(p), "r"(t):"memory");
 }
 
 static inline unsigned complete_timed_input(in buffered port:32 p)
 {
   unsigned val;
-  asm volatile("in %0, res[%1]":"=r"(val):"r"(p));
+  asm volatile("in %0, res[%1]":"=r"(val):"r"(p):"memory");
   return val;
 }
 
@@ -29,20 +29,21 @@ static inline unsigned complete_timed_input(in buffered port:32 p)
 #define I2S_MASTER_NUM_OUT 2
 #endif
 
+#define MCLKS_PER_32_BCLKS  64
+
 static inline void i2s_master_aux(
         client interface i2s_callback_if i_client,
         out buffered port:32 p_dout[num_out],
         size_t num_out,
         in buffered port:32 p_din[num_in],
         size_t num_in,
-        port p_bclk,
-        port p_lrclk,
+        out buffered port:32 p_bclk,
+        out buffered port:32 p_lrclk,
         clock bclk,
         const clock mclk,
         unsigned sample_frequency,
         unsigned master_clock_frequency
         )
-
 {
   unsigned master_to_word_clock_ratio = master_clock_frequency / sample_frequency;
   set_clock_src(bclk, p_bclk);
@@ -59,7 +60,7 @@ static inline void i2s_master_aux(
   // Start clock blocks after configuration
   start_clock(bclk);
 
-  int mclk_to_bclk_ratio = master_to_word_clock_ratio / 64;
+  int mclk_to_bclk_ratio = master_to_word_clock_ratio / MCLKS_PER_32_BCLKS;
 
   // This sections aligns the ports so that the dout/din ports are
   // inputting and outputting in sync,
@@ -74,6 +75,7 @@ static inline void i2s_master_aux(
 
   p_lrclk <: 0;
 
+  printintln(mclk_to_bclk_ratio);
   // Output 32 ticks
   for (size_t i=0;i<mclk_to_bclk_ratio;i++)  {
     switch (mclk_to_bclk_ratio) {
@@ -127,8 +129,6 @@ static inline void i2s_master_aux(
         #endif
         for (size_t k=0;k<2;k++) {
           p_bclk <: bclk_val;
-          if (k==0)
-            p_lrclk <: lrclk_val;
 
           #if I2S_MASTER_SPECIALIZE
           #pragma loop unroll
@@ -164,8 +164,6 @@ static inline void i2s_master_aux(
         #endif
         for (size_t k=0;k<4;k++) {
           p_bclk <: bclk_val;
-          if (k==0)
-            p_lrclk <: lrclk_val;
 
           #if I2S_MASTER_SPECIALIZE
           #pragma loop unroll
@@ -201,8 +199,6 @@ static inline void i2s_master_aux(
         #endif
         for (size_t k=0;k<8;k++) {
           p_bclk <: bclk_val;
-          if (k==0)
-            p_lrclk <: lrclk_val;
 
           #if I2S_MASTER_SPECIALIZE
           #pragma loop unroll
@@ -234,6 +230,7 @@ static inline void i2s_master_aux(
         unreachable();
         break;
       }
+      p_lrclk <: lrclk_val;
     }
   }
 
@@ -245,8 +242,8 @@ void i2s_master(
         size_t num_out,
         in buffered port:32 p_din[num_in],
         size_t num_in,
-        port p_bclk,
-        port p_lrclk,
+        out buffered port:32 p_bclk,
+        out buffered port:32 p_lrclk,
         clock bclk,
         const clock mclk,
         unsigned sample_frequency,

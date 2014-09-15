@@ -16,10 +16,14 @@ USED_MODULES = lib_i2s lib_audio_codec lib_i2c lib_gpio
 # XCC_XC_FLAGS, XCC_C_FLAGS, XCC_ASM_FLAGS, XCC_CPP_FLAGS
 # If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
 # xcc for the final link (mapping) stage.
-XCC_FLAGS = -O3 -report -save-temps
+XCC_FLAGS = -O3 -report -save-temps -g
 
 # The VERBOSE variable, if set to 1, enables verbose output from the make system.
 VERBOSE = 0
+
+
+test: bin/i2s_loopback_demo.xe
+	xsim bin/i2s_loopback_demo.xe --plugin LoopbackPort.dll '-port tile[0] XS1_PORT_1D 1 0 -port tile[1] XS1_PORT_1E 1 0'
 
 XMOS_MAKE_PATH ?= ../..
 -include $(XMOS_MAKE_PATH)/xcommon/module_xcommon/build/Makefile.common
