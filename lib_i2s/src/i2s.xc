@@ -138,7 +138,7 @@ static inline void i2s_master_aux(
             if (pnum < num_in) {
               #pragma xta endpoint "i2s_master_sample_input"
               unsigned sample = complete_timed_input(p_din[pnum]);
-              sample = (bitrev(sample) >> 8);
+              sample = (bitrev(sample));
               i_client.receive(pnum*2+lr, sample);
             }
           }
@@ -149,7 +149,7 @@ static inline void i2s_master_aux(
             int pnum = k*samples_per_bclk + j;
             if (pnum < num_out) {
               unsigned sample = i_client.send(pnum*2+lr);
-              sample = bitrev(sample << 8);
+              sample = bitrev(sample);
               #pragma xta endpoint "i2s_master_sample_output"
               p_dout[pnum] <: sample;
             }
@@ -173,7 +173,7 @@ static inline void i2s_master_aux(
             if (pnum < num_in) {
               #pragma xta endpoint "i2s_master_sample_input"
               unsigned sample = complete_timed_input(p_din[pnum]);
-              sample = (bitrev(sample) >> 8);
+              sample = (bitrev(sample));
               i_client.receive(pnum*2+lr, sample);
             }
           }
@@ -184,7 +184,7 @@ static inline void i2s_master_aux(
             int pnum = k*samples_per_bclk + j;
             if (pnum < num_out) {
               unsigned sample = i_client.send(pnum*2+lr);
-              sample = bitrev(sample << 8);
+              sample = bitrev(sample);
               #pragma xta endpoint "i2s_master_sample_output"
               p_dout[pnum] <: sample;
             }
@@ -208,7 +208,7 @@ static inline void i2s_master_aux(
             if (pnum < num_in) {
               #pragma xta endpoint "i2s_master_sample_input"
               unsigned sample = complete_timed_input(p_din[pnum]);
-              sample = (bitrev(sample) >> 8);
+              sample = (bitrev(sample));
               i_client.receive(pnum*2+lr, sample);
             }
           }
@@ -219,7 +219,7 @@ static inline void i2s_master_aux(
             int pnum = k*samples_per_bclk + j;
             if (pnum < num_out) {
               unsigned sample = i_client.send(pnum*2+lr);
-              sample = bitrev(sample << 8);
+              sample = bitrev(sample);
               #pragma xta endpoint "i2s_master_sample_output"
               p_dout[pnum] <: sample;
             }

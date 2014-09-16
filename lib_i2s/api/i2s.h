@@ -42,7 +42,10 @@ typedef interface i2s_callback_if {
    *   component.
    *
    *   \param index     The index of the sample in the frame.
-   *   \param sample    The sample data as a signed 32-bit value.
+   *   \param sample    The sample data as a signed 32-bit value. The component
+   *                    may not use all 32 bits of the value (for example, many
+   *                    I2S codecs are 24-bit), in which case the bottom bits
+   *                    are ignored.
    */
   void receive(size_t index, int32_t sample);
 
@@ -51,7 +54,10 @@ typedef interface i2s_callback_if {
    *  This callback will be called when the I2S component needs a new sample.
    *
    *  \param index      The index of the requested sample in the frame.
-   *  \returns          The sample data as a signed 32-bit value.
+   *  \returns          The sample data as a signed 32-bit value.  The component
+   *                    may not have 32-bits of accuracy (for example, many
+   *                    I2S codecs are 24-bit), in which case the bottom bits
+   *                    will be arbitrary values.
    */
   int32_t send(size_t index);
 
