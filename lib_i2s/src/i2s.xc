@@ -254,5 +254,11 @@ void i2s_master(
     i2s_master_aux(i_client, p_dout, num_out, p_din, num_in,
                    p_bclk, p_lrclk, bclk, mclk,
                    sample_frequency, master_clock_frequency);
+    for (size_t i = 0; i < num_out; i++)
+      clearbuf(p_dout[i]);
+    clearbuf(p_lrclk);
+    p_bclk <: 0;
+    stop_clock(bclk);
+    sync(p_bclk);
   }
 }
