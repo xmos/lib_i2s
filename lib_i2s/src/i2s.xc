@@ -3,6 +3,9 @@
 #include "xassert.h"
 #include "i2s.h"
 #include "print.h"
+#ifdef __i2s_callbacks_h_exists__
+#include "i2s_callbacks.h"
+#endif
 
 static inline void setup_timed_input(in buffered port:32 p, unsigned t)
 {
@@ -16,23 +19,31 @@ static inline unsigned complete_timed_input(in buffered port:32 p)
   return val;
 }
 
-
-#ifndef I2S_MASTER_SPECIALIZE
-#define I2S_MASTER_SPECIALIZE 0
+#ifdef I2S_MASTER_SPECIALIZE
+#define FULL_UNROLL 1
+#else
+#define FULL_UNROLL 0
+#define I2S_MASTER_SPECIALIZE
 #endif
 
-#ifndef I2S_MASTER_NUM_IN
-#define I2S_MASTER_NUM_IN 2
+
+#ifndef I2S_MASTER_SPECIALIZE_NUM_IN
+#define I2S_MASTER_SPECIALIZE_NUM_IN -1
 #endif
 
-#ifndef I2S_MASTER_NUM_OUT
-#define I2S_MASTER_NUM_OUT 2
+#ifndef I2S_MASTER_SPECIALIZE_NUM_OUT
+#define I2S_MASTER_SPECIALIZE_NUM_OUT -1
 #endif
 
 #define MCLKS_PER_32_BCLKS  64
 
+#define BITCLOCK_PATTERN_2 0x55555555
+#define BITCLOCK_PATTERN_4 0x33333333
+#define BITCLOCK_PATTERN_8 0x0f0f0f0f
+
+#pragma unsafe arrays
 static inline void i2s_master_aux(
-        client interface i2s_callback_if i_client,
+        client I2S_MASTER_SPECIALIZE interface i2s_callback_if i_client,
         out buffered port:32 p_dout[num_out],
         size_t num_out,
         in buffered port:32 p_din[num_in],
@@ -46,7 +57,20 @@ static inline void i2s_master_aux(
         )
 {
   unsigned master_to_word_clock_ratio = master_clock_frequency / sample_frequency;
-  set_clock_src(bclk, p_bclk);
+
+  if (I2S_MASTER_SPECIALIZE_NUM_IN != -1) {
+    if (I2S_MASTER_SPECIALIZE_NUM_IN != num_in)
+      fail("i2s_master called with num_in argument different to I2S_MASTER_SPECIALIZE_NUM_IN");
+    num_in = I2S_MASTER_SPECIALIZE_NUM_IN;
+  }
+
+  if (I2S_MASTER_SPECIALIZE_NUM_OUT != -1) {
+    if (I2S_MASTER_SPECIALIZE_NUM_OUT != num_out)
+      fail("i2s_master called with num_in argument different to I2S_MASTER_SPECIALIZE_NUM_IN");
+    num_out = I2S_MASTER_SPECIALIZE_NUM_OUT;
+  }
+
+  configure_clock_src(bclk, p_bclk);
   set_port_clock(p_bclk, mclk);
 
   set_port_clock(p_lrclk, bclk);
@@ -75,18 +99,17 @@ static inline void i2s_master_aux(
 
   p_lrclk <: 0;
 
-  printintln(mclk_to_bclk_ratio);
   // Output 32 ticks
   for (size_t i=0;i<mclk_to_bclk_ratio;i++)  {
     switch (mclk_to_bclk_ratio) {
     case 2:
-      p_bclk <: 0xaaaaaaaa;
+      p_bclk <: BITCLOCK_PATTERN_2;
       break;
     case 4:
-      p_bclk <: 0xcccccccc;
+      p_bclk <: BITCLOCK_PATTERN_4;
       break;
     case 8:
-      p_bclk <: 0xf0f0f0f0;
+      p_bclk <: BITCLOCK_PATTERN_8;
       break;
     default:
       fail("unknown master clock/word clock ratio");
@@ -101,36 +124,30 @@ static inline void i2s_master_aux(
 
   unsigned max_io_count = num_in > num_out ? num_in : num_out;
   unsigned int lrclk_val = 0x7FFFFFFF;
-
   // This is the master timing clock for the audio system. It is used to
   // timestamp every frame to aid any clock recovery mechanism attached to the
   // audio
   timer tmr;
   unsigned restart = 0;
-
   while (!restart) {
     unsigned int timestamp;
     tmr :> timestamp;
     i_client.frame_start(timestamp, restart);
 
-    #if I2S_MASTER_SPECIALIZE
     #pragma loop unroll
-    #endif
     for (size_t lr=0;lr<2;lr++) {
       // This assumes that there are 32 BCLKs in one half of an LRCLK
-      #pragma xta endpoint "i2s_master_lrclk_output"
       lrclk_val = ~lrclk_val;
+
       switch (mclk_to_bclk_ratio) {
       case 2:
-        unsigned bclk_val = 0xaaaaaaaa;
         unsigned samples_per_bclk = (max_io_count + 1) / 2;
-        #if I2S_MASTER_SPECIALIZE
+        unsigned bclk_val = BITCLOCK_PATTERN_2;
         #pragma loop unroll
-        #endif
         for (size_t k=0;k<2;k++) {
           p_bclk <: bclk_val;
 
-          #if I2S_MASTER_SPECIALIZE
+          #if FULL_UNROLL
           #pragma loop unroll
           #endif
           for (size_t j=0;j<samples_per_bclk;j++) {
@@ -138,15 +155,9 @@ static inline void i2s_master_aux(
             if (pnum < num_in) {
               #pragma xta endpoint "i2s_master_sample_input"
               unsigned sample = complete_timed_input(p_din[pnum]);
-              sample = (bitrev(sample));
+              sample = (bitrev(sample) << 1);
               i_client.receive(pnum*2+lr, sample);
             }
-          }
-          #if I2S_MASTER_SPECIALIZE
-          #pragma loop unroll
-          #endif
-          for (size_t j=0;j<samples_per_bclk;j++) {
-            int pnum = k*samples_per_bclk + j;
             if (pnum < num_out) {
               unsigned sample = i_client.send(pnum*2+lr);
               sample = bitrev(sample);
@@ -154,32 +165,27 @@ static inline void i2s_master_aux(
               p_dout[pnum] <: sample;
             }
           }
+
         }
         break;
       case 4:
-        unsigned bclk_val = 0xcccccccc;
-        unsigned samples_per_bclk = (max_io_count + 3) / 4;
-        #if I2S_MASTER_SPECIALIZE
+        unsigned bclk_val = BITCLOCK_PATTERN_4;
+        unsigned
+samples_per_bclk = (max_io_count + 3) / 4;
         #pragma loop unroll
-        #endif
         for (size_t k=0;k<4;k++) {
           p_bclk <: bclk_val;
 
-          #if I2S_MASTER_SPECIALIZE
-          #pragma loop unroll
-          #endif
           for (size_t j=0;j<samples_per_bclk;j++) {
             int pnum = k*samples_per_bclk + j;
             if (pnum < num_in) {
               #pragma xta endpoint "i2s_master_sample_input"
               unsigned sample = complete_timed_input(p_din[pnum]);
-              sample = (bitrev(sample));
+              sample = (bitrev(sample) << 1);
               i_client.receive(pnum*2+lr, sample);
             }
           }
-          #if I2S_MASTER_SPECIALIZE
-          #pragma loop unroll
-          #endif
+
           for (size_t j=0;j<samples_per_bclk;j++) {
             int pnum = k*samples_per_bclk + j;
             if (pnum < num_out) {
@@ -192,29 +198,22 @@ static inline void i2s_master_aux(
         }
         break;
       case 8:
-        unsigned bclk_val = 0xf0f0f0f0;
+        unsigned bclk_val = BITCLOCK_PATTERN_8;
         unsigned samples_per_bclk = (max_io_count + 7) / 8;
-        #if I2S_MASTER_SPECIALIZE
         #pragma loop unroll
-        #endif
         for (size_t k=0;k<8;k++) {
           p_bclk <: bclk_val;
 
-          #if I2S_MASTER_SPECIALIZE
-          #pragma loop unroll
-          #endif
           for (size_t j=0;j<samples_per_bclk;j++) {
             int pnum = k*samples_per_bclk + j;
             if (pnum < num_in) {
               #pragma xta endpoint "i2s_master_sample_input"
               unsigned sample = complete_timed_input(p_din[pnum]);
-              sample = (bitrev(sample));
+              sample = (bitrev(sample) << 1);
               i_client.receive(pnum*2+lr, sample);
             }
           }
-          #if I2S_MASTER_SPECIALIZE
-          #pragma loop unroll
-          #endif
+
           for (size_t j=0;j<samples_per_bclk;j++) {
             int pnum = k*samples_per_bclk + j;
             if (pnum < num_out) {
@@ -230,6 +229,7 @@ static inline void i2s_master_aux(
         unreachable();
         break;
       }
+      #pragma xta endpoint "i2s_master_lrclk_output"
       p_lrclk <: lrclk_val;
     }
   }
@@ -237,7 +237,7 @@ static inline void i2s_master_aux(
 }
 
 void i2s_master(
-        client interface i2s_callback_if i_client,
+        client I2S_MASTER_SPECIALIZE interface i2s_callback_if i_client,
         out buffered port:32 p_dout[num_out],
         size_t num_out,
         in buffered port:32 p_din[num_in],

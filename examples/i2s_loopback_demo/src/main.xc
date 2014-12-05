@@ -1,6 +1,5 @@
 #include <xs1.h>
 #include <i2s.h>
-#include <audio_codec.h>
 #include <i2c.h>
 #include <gpio.h>
 #include <print.h>
@@ -21,15 +20,129 @@ port p_gpio = XS1_PORT_8D;
 clock mclk = XS1_CLKBLK_1;
 clock bclk = XS1_CLKBLK_2;
 
+#define SAMPLE_FREQUENCY 48000
+#define MASTER_CLOCK_FREQUENCY 24576000
+#define CODEC_I2C_DEVICE_ADDR 0x48
+
+#define MCLK_FREQUENCY_48  24576000
+#define MCLK_FREQUENCY_441 22579200
+
+enum codec_mode_t {
+  CODEC_IS_I2S_MASTER,
+  CODEC_IS_I2S_SLAVE
+};
+
+#define CODEC_DEV_ID_ADDR           0x01
+#define CODEC_PWR_CTRL_ADDR         0x02
+#define CODEC_MODE_CTRL_ADDR        0x03
+#define CODEC_ADC_DAC_CTRL_ADDR     0x04
+#define CODEC_TRAN_CTRL_ADDR        0x05
+#define CODEC_MUTE_CTRL_ADDR        0x06
+#define CODEC_DACA_VOL_ADDR         0x07
+#define CODEC_DACB_VOL_ADDR         0x08
+
+void cs4270_reset(client i2c_master_if i2c, uint8_t device_addr,
+                 unsigned sample_frequency, unsigned master_clock_frequency,
+                 enum codec_mode_t codec_mode)
+{
+  /* Set power down bit in the CODEC over I2C */
+  i2c.write_reg(device_addr, CODEC_DEV_ID_ADDR, 0x01);
+
+  /* Now set all registers as we want them */
+
+
+  if (codec_mode == CODEC_IS_I2S_SLAVE) {
+    /* Mode Control Reg:
+       Set FM[1:0] as 11. This sets Slave mode.
+       Set MCLK_FREQ[2:0] as 010. This sets MCLK to 512Fs in Single,
+       256Fs in Double and 128Fs in Quad Speed Modes.
+       This means 24.576MHz for 48k and 22.5792MHz for 44.1k.
+       Set Popguard Transient Control.
+       So, write 0x35. */
+    i2c.write_reg(device_addr, CODEC_MODE_CTRL_ADDR, 0x35);
+  } else {
+    /* In master mode (i.e. Xcore is I2S slave) to avoid contention
+       configure one CODEC as master one the other as slave */
+
+    /* Set FM[1:0] Based on Single/Double/Quad mode
+       Set MCLK_FREQ[2:0] as 010. This sets MCLK to 512Fs in Single, 256Fs in Double and 128Fs in Quad Speed Modes.
+       This means 24.576MHz for 48k and 22.5792MHz for 44.1k.
+       Set Popguard Transient Control.*/
+
+    unsigned char val = 0b0101;
+
+    if(sample_frequency < 54000) {
+      // | with 0..
+    } else if(sample_frequency < 108000) {
+      val |= 0b00100000;
+    } else  {
+      val |= 0b00100000;
+    }
+    i2c.write_reg(device_addr, CODEC_MODE_CTRL_ADDR, val);
+  }
+
+  /* ADC & DAC Control Reg:
+     Leave HPF for ADC inputs continuously running.
+     Digital Loopback: OFF
+     DAC Digital Interface Format: I2S
+     ADC Digital Interface Format: I2S
+     So, write 0x09. */
+  i2c.write_reg(device_addr, CODEC_ADC_DAC_CTRL_ADDR, 0x09);
+
+  /* Transition Control Reg:
+     No De-emphasis. Don't invert any channels.
+     Independent vol controls. Soft Ramp and Zero Cross enabled.*/
+  i2c.write_reg(device_addr, CODEC_TRAN_CTRL_ADDR, 0x60);
+
+  /* Mute Control Reg: Turn off AUTO_MUTE */
+  i2c.write_reg(device_addr, CODEC_MUTE_CTRL_ADDR, 0x00);
+
+  /* DAC Chan A Volume Reg:
+     We don't require vol control so write 0x00 (0dB) */
+  i2c.write_reg(device_addr, CODEC_DACA_VOL_ADDR, 0x00);
+
+  /* DAC Chan B Volume Reg:
+     We don't require vol control so write 0x00 (0dB)  */
+  i2c.write_reg(device_addr, CODEC_DACB_VOL_ADDR, 0x00);
+
+  /* Clear power down bit in the CODEC over I2C */
+  i2c.write_reg(device_addr, CODEC_PWR_CTRL_ADDR, 0x00);
+}
+
+
+
 [[distributable]]
 static void i2s_loopback(server i2s_callback_if i2s,
-                         client audio_codec_config_if codec)
+                         client i2c_master_if i2c,
+                         client output_gpio_if codec_reset,
+                         client output_gpio_if clock_select)
 {
   int32_t samples[8];
   while (1) {
     select {
     case i2s.init(unsigned &sample_frequency, unsigned &master_clock_frequency):
-      //codec.reset(sample_frequency, master_clock_frequency);
+      /* Set CODEC in reset */
+      codec_reset.output(0);
+
+      /* Set master clock select appropriately */
+      if ((sample_frequency % 22050) == 0) {
+        master_clock_frequency = MCLK_FREQUENCY_441;
+        clock_select.output(0);
+      }
+      else {
+        master_clock_frequency = MCLK_FREQUENCY_48;
+        clock_select.output(1);
+      }
+
+      /* Hold in reset for 2ms while waiting for MCLK to stabilise */
+      delay_milliseconds(2);
+
+      /* CODEC out of reset */
+      codec_reset.output(1);
+
+      cs4270_reset(i2c, CODEC_I2C_DEVICE_ADDR,
+                   sample_frequency, master_clock_frequency,
+                   CODEC_IS_I2S_SLAVE);
       break;
 
     case i2s.frame_start(unsigned timestamp, unsigned &restart):
@@ -41,42 +154,31 @@ static void i2s_loopback(server i2s_callback_if i2s,
       break;
 
     case i2s.send(size_t index) -> int32_t sample:
-      sample = index ? 0 : ~0; //samples[index];
+      sample = samples[index];
       break;
     }
   }
 };
 
-#define SAMPLE_FREQUENCY 48000
-#define MASTER_CLOCK_FREQUENCY 24576000
-#define CODEC_I2C_DEVICE_ADDR 0x5d
 
-static unsigned gpio_pin_map[2] = {0, 1};
+static char gpio_pin_map[2] = {2, 1};
 
-void dummy_thread() {while(1);}
 int main() {
   interface i2s_callback_if i_i2s;
-  interface audio_codec_config_if i_codec;
   interface i2c_master_if i_i2c[1];
   interface output_gpio_if i_gpio[2];
-  //  configure_clock_src(mclk, p_mclk);
-  configure_clock_rate(mclk, 100, 4);
+  configure_clock_src(mclk, p_mclk);
   start_clock(mclk);
   par {
-    par (size_t i=0;i<5;i++)
-            dummy_thread();
     /* System setup, I2S + Codec control over I2C */
     i2s_master(i_i2s, p_dout, 4, p_din, 4,
                p_bclk, p_lrclk, bclk, mclk,
                SAMPLE_FREQUENCY, MASTER_CLOCK_FREQUENCY);
-    audio_codec_cs4270(i_codec, i_i2c[0],
-                       CODEC_I2C_DEVICE_ADDR, CODEC_IS_I2S_SLAVE,
-                       i_gpio[0], i_gpio[1]);
-    i2c_master(i_i2c, 1, p_sda, p_scl, 100000, I2C_DISABLE_MULTIMASTER);
-    multibit_output_gpio(i_gpio, 2, gpio_pin_map, p_gpio);
+    i2c_master(i_i2c, 1, p_sda, p_scl, 100000);
+    output_gpio(i_gpio, 2, p_gpio, gpio_pin_map);
 
     /* The application - loopback the I2S samples */
-    i2s_loopback(i_i2s, i_codec);
+    i2s_loopback(i_i2s, i_i2c[0], i_gpio[0], i_gpio[1]);
   }
   return 0;
 }

@@ -9,7 +9,7 @@ TARGET = SLICEKIT-L16
 APP_NAME = 
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = lib_i2s lib_audio_codec lib_i2c lib_gpio
+USED_MODULES = lib_i2s lib_i2c lib_gpio
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:
