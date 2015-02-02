@@ -89,14 +89,17 @@ class I2SMasterChecker(xmostest.SimThread):
         p_l_values = []
         p_r_values = []
         lrclk_val = -1
-        bit_val = 0x1
+        bit_val = 0x0
         test_ctr = 0
         while True:
             trigger_port_data = xsi.sample_port_pins(self._trigger_port)
             if (trigger_port_data == 0) : break
 
-        self.wait_for_port_pins_change([self._lrclk_port])
-        lrclk_val = self.get_port_val(xsi, self._lrclk_port)
+        while True:
+            self.wait_for_port_pins_change([self._lrclk_port])
+            lrclk_val = self.get_port_val(xsi, self._lrclk_port)
+            if lrclk_val == 1: break
+            
         while True:
             #print ("test_ctr: %d" % test_ctr)
             self.wait_for_port_pins_change([self._bclk_port])

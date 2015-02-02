@@ -3,7 +3,7 @@
 #include <print.h>
 #include <syscall.h>
 
-#define NUM_TEST_EVENTS (5)
+#define NUM_TEST_EVENTS (4)
 
 /* Ports and clocks used by the application */
 out buffered port:32 p_dout[4] = {XS1_PORT_1D, XS1_PORT_1E, XS1_PORT_1F, XS1_PORT_1G};
@@ -19,11 +19,6 @@ clock bclk = XS1_CLKBLK_2;
 out port p_trigger = XS1_PORT_1B;
 
 #define SAMPLE_FREQUENCY 48000
-#define MASTER_CLOCK_FREQUENCY 24576000
-
-#define MCLK_FREQUENCY_48  24576000
-#define MCLK_FREQUENCY_441 22579200
-
 
 void i2s_loopback(server i2s_callback_if i2s)
 {
@@ -34,6 +29,7 @@ void i2s_loopback(server i2s_callback_if i2s)
     select {
     case i2s.init(unsigned &sample_frequency, unsigned &master_clock_frequency):
       // Nothing to do on i2s init
+      printstr("MCF = "); printintln(master_clock_frequency);
       break;
 
     case i2s.frame_start(unsigned timestamp, unsigned &restart):
@@ -48,7 +44,7 @@ void i2s_loopback(server i2s_callback_if i2s)
 
     case i2s.send(size_t index) -> int32_t sample:
       sample = samples[index];
-      //printstr("Tx: ");printhexln(sample);
+      printstr("Tx: ");printhexln(sample);
       break;
     }
     

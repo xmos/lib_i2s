@@ -10,7 +10,10 @@ def do_master_test(clk_speed):
 
     xmostest.build('i2s_master_test')
 
-    binary = 'i2s_master_test/bin/tx_rx/i2s_master_test_tx_rx.xe'
+    if (clk_speed == 0x4):
+        binary = 'i2s_master_test/bin/clk_48/i2s_master_test_clk_48.xe'
+    elif (clk_speed == 0x2):
+        binary = 'i2s_master_test/bin/clk_441/i2s_master_test_clk_441.xe'
 
     master_clk = Clock("tile[0]:XS1_PORT_1M", clk_speed)
 
@@ -43,6 +46,7 @@ def do_master_test(clk_speed):
                               tester = tester)
 
 def runtest():
+    #for clk_speed in [4, 2]:
     for clk_speed in [4]:
         do_master_test(clk_speed)
 
