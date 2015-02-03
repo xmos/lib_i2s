@@ -1,7 +1,7 @@
 #include <xs1.h>
 #include <i2s.h>
-#include <print.h>
 #include <syscall.h>
+#include "debug_print.h"
 
 #define NUM_TEST_EVENTS (4)
 
@@ -27,8 +27,8 @@ void i2s_loopback(server i2s_callback_if i2s)
     select {
     case i2s.init(unsigned &sample_frequency, unsigned &master_clock_frequency):
       // Nothing to do on i2s init
-      printstr("Sample Frequency = "); printintln(sample_frequency);
-      printstr("Master Clock Frequency = "); printintln(master_clock_frequency);
+      debug_printf("Sample Frequency = %d\n", sample_frequency);
+      debug_printf("Master Clock Frequency = %d\n", master_clock_frequency);
       break;
 
     case i2s.frame_start(unsigned timestamp, unsigned &restart):
@@ -38,17 +38,17 @@ void i2s_loopback(server i2s_callback_if i2s)
 
     case i2s.receive(size_t index, int32_t sample):
       samples[index] = sample;
-      //printstr("Rx: ");printhexln(sample);
+      //debug_printf("I2S Rx_%d: %x\n", index, sample);
       break;
 
     case i2s.send(size_t index) -> int32_t sample:
       sample = samples[index];
-      printstr("Tx: ");printhexln(sample);
+      debug_printf("I2S Tx_%d: %x\n", index, sample);
       break;
     }
     
     if (num_events > NUM_TEST_EVENTS) {
-      //printstrln("num events reached");
+      //debug_printf("num events reached");
       p_trigger <: 1;
       _exit(0);
     }
@@ -63,7 +63,7 @@ int main() {
   start_clock(mclk);
   par {
     /* System setup, I2S + Codec control over I2C */
-    i2s_master(i_i2s, p_dout, 4, p_din, 4,
+    i2s_master(i_i2s, p_dout, NUM_CHANS, p_din, NUM_CHANS,
                p_bclk, p_lrclk, bclk, mclk,
                SAMPLE_FREQUENCY, MASTER_CLOCK_FREQUENCY);
 
