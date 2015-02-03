@@ -18,8 +18,6 @@ clock bclk = XS1_CLKBLK_2;
 
 out port p_trigger = XS1_PORT_1B;
 
-#define SAMPLE_FREQUENCY 48000
-
 void i2s_loopback(server i2s_callback_if i2s)
 {
   int32_t samples[8];
@@ -29,7 +27,8 @@ void i2s_loopback(server i2s_callback_if i2s)
     select {
     case i2s.init(unsigned &sample_frequency, unsigned &master_clock_frequency):
       // Nothing to do on i2s init
-      printstr("MCF = "); printintln(master_clock_frequency);
+      printstr("Sample Frequency = "); printintln(sample_frequency);
+      printstr("Master Clock Frequency = "); printintln(master_clock_frequency);
       break;
 
     case i2s.frame_start(unsigned timestamp, unsigned &restart):

@@ -46,7 +46,6 @@ def do_master_test(clk_speed):
                               tester = tester)
 
 def runtest():
-    #for clk_speed in [4, 2]:
-    for clk_speed in [4]:
+    for clk_speed in [4, 2]:
         do_master_test(clk_speed)
 
