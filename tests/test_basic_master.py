@@ -39,10 +39,11 @@ def do_master_test(num_in, num_out):
                               tester = tester)
 
 def runtest():
-  #do_master_test(4, 4)
-    for num_in in [0, 1, 2, 3, 4]:  
-      for num_out in [0, 1, 2, 3, 4]:
-        if num_in + num_out == 0:
-          continue
-        do_master_test(num_in, num_out)
+   do_master_test(4, 4)
+
+#    for num_in in [0, 1, 2, 3, 4]:  
+#      for num_out in [0, 1, 2, 3, 4]:
+#        if num_in + num_out == 0:
+#          continue
+#        do_master_test(num_in, num_out)
 

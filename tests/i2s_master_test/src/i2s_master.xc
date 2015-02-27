@@ -54,9 +54,9 @@ static void send_data_to_tester(
     setup_strobe_port <: 0;
     sync(setup_strobe_port);
 }
+
 static void broadcast(unsigned mclk_freq, unsigned mclk_bclk_ratio,
         unsigned num_in, unsigned num_out, int is_i2s_justified){
-    //printf("m:mclk_freq: %d mclk_bclk_ratio: %d num_in:%d num_out:%d\n", mclk_freq, mclk_bclk_ratio, num_in, num_out);
     setup_strobe_port <: 0;
     send_data_to_tester(setup_strobe_port, setup_data_port, mclk_freq>>16);
     send_data_to_tester(setup_strobe_port, setup_data_port, mclk_freq);
@@ -68,8 +68,7 @@ static void broadcast(unsigned mclk_freq, unsigned mclk_bclk_ratio,
 
 static int request_response(
         out port setup_strobe_port,
-        in port setup_resp_port
-){
+        in port setup_resp_port){
     int r=0;
     while(!r)
         setup_resp_port :> r;
@@ -91,7 +90,7 @@ void app(server interface i2s_callback_if i2s_i){
 
     int first_time = 1;
 
-    i2s_mode current_mode = e_i2s_mode;
+    i2s_mode current_mode = I2S_MODE_I2S;
     while(1){
         select {
         case i2s_i.receive(size_t index, int32_t sample):{
@@ -119,7 +118,7 @@ void app(server interface i2s_callback_if i2s_i){
             frames_recieved = 0;
             mode = current_mode;
             broadcast(mclock_freq[mclock_freq_index],
-                    mclk_bclk_ratio, NUM_IN, NUM_OUT, mode == e_i2s_mode);
+                    mclk_bclk_ratio, NUM_IN, NUM_OUT, mode == I2S_MODE_I2S);
 
             for(unsigned i=0;i<MAX_CHANNELS;i++){
                 tx_data_counter[i] = 0;
@@ -129,8 +128,8 @@ void app(server interface i2s_callback_if i2s_i){
             if (ratio == MAX_RATIO){
                 ratio = 1;
                 if(mclock_freq_index == NUM_MCLKS-1){
-                    if (mode == e_i2s_mode) {
-                        current_mode = e_right_justified;
+                    if (mode == I2S_MODE_I2S) {
+                        current_mode = I2S_MODE_LEFT_JUSTIFIED;
                         mclock_freq_index = 0;
                     } else {
                         _Exit(1);
@@ -149,7 +148,6 @@ void app(server interface i2s_callback_if i2s_i){
     }
 }
 
-
 int main(){
     interface i2s_callback_if i2s_i;
 
@@ -164,7 +162,6 @@ int main(){
                  p_bclk, p_lrclk, bclk, mclk);
       par(int i=0;i<7;i++)while(1);
     }
-
     return 0;
 }
 

@@ -5,9 +5,8 @@
 #include <stddef.h>
 
 typedef enum {
-    e_i2s_mode,
-    e_left_justified,
-    e_right_justified,
+    I2S_MODE_I2S,
+    I2S_MODE_LEFT_JUSTIFIED,
 } i2s_mode;
 
 /** Interface representing callback events that can occur during the

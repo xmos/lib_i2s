@@ -120,17 +120,18 @@ static void i2s_loopback(server i2s_callback_if i2s,
   int32_t samples[8];
   while (1) {
     select {
-    case i2s.init(unsigned &sample_frequency, unsigned &master_clock_frequency):
+    case i2s.init(unsigned & mclk_bclk_ratio, i2s_mode & mode):
       /* Set CODEC in reset */
       codec_reset.output(0);
 
+      mode = I2S_MODE_I2S;
+
       /* Set master clock select appropriately */
-      if ((sample_frequency % 22050) == 0) {
-        master_clock_frequency = MCLK_FREQUENCY_441;
+      mclk_bclk_ratio = (MASTER_CLOCK_FREQUENCY/SAMPLE_FREQUENCY)/32;
+
+      if ((SAMPLE_FREQUENCY % 22050) == 0) {
         clock_select.output(0);
-      }
-      else {
-        master_clock_frequency = MCLK_FREQUENCY_48;
+      }else {
         clock_select.output(1);
       }
 
@@ -141,7 +142,7 @@ static void i2s_loopback(server i2s_callback_if i2s,
       codec_reset.output(1);
 
       cs4270_reset(i2c, CODEC_I2C_DEVICE_ADDR,
-                   sample_frequency, master_clock_frequency,
+              SAMPLE_FREQUENCY, MASTER_CLOCK_FREQUENCY,
                    CODEC_IS_I2S_SLAVE);
       break;
 
@@ -172,8 +173,7 @@ int main() {
   par {
     /* System setup, I2S + Codec control over I2C */
     i2s_master(i_i2s, p_dout, 4, p_din, 4,
-               p_bclk, p_lrclk, bclk, mclk,
-               SAMPLE_FREQUENCY, MASTER_CLOCK_FREQUENCY);
+               p_bclk, p_lrclk, bclk, mclk);
     i2c_master(i_i2c, 1, p_sda, p_scl, 100000);
     output_gpio(i_gpio, 2, p_gpio, gpio_pin_map);
 
