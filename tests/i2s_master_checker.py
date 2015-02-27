@@ -1,147 +1,204 @@
 import xmostest
 
-class I2SMasterChecker(xmostest.SimThread):
-    """"
-    This simulator thread will act as I2S slave and check any transactions
-    caused by the master.
-    """
 
-    def __init__(self, 
-                 din_port_1, din_port_2, din_port_3, din_port_4, 
-                 num_in_ports,
-                 dout_port_1, dout_port_2, dout_port_3, dout_port_4,
-                 num_out_ports,
-                 bclk_port, lrclk_port, mode, tx_data = [],
-                 trigger_port = None, test_ctrl = None):
-        self._din_port_1 = din_port_1
-        self._din_port_2 = din_port_2
-        self._din_port_3 = din_port_3
-        self._din_port_4 = din_port_4
-        self._num_in_ports = num_in_ports
-        self._dout_port_1 = dout_port_1
-        self._dout_port_2 = dout_port_2
-        self._dout_port_3 = dout_port_3
-        self._dout_port_4 = dout_port_4
-        self._num_out_ports = num_out_ports
-        self._bclk_port = bclk_port
-        self._lrclk_port = lrclk_port
-        self._tx_data = tx_data
-        self._trigger_port = trigger_port
-        self._test_ctrl = test_ctrl
-        self._mode = mode
-        print "Checking I2S: BLCK=%s, LRCLK=%s" % (self._bclk_port, 
-         self._lrclk_port)
-        if self._trigger_port != None:
-            print("Using port %s as trigger" % (self._trigger_port))
+class Clock(xmostest.SimThread):
 
-    def get_port_val(self, xsi, port):
-        "Sample port, modelling the pull up"
-        is_driving = xsi.is_port_driving(port)
-        if not is_driving:
-            return 1
-        else:
-            return xsi.sample_port_pins(port);
+    def set_rate(self, rate):
+        self._half_period = float(500000000) / rate
+        return
 
-    #read I2S test data from xCORE
-    def read_data(self, xsi):
-        p_l_values = []
-        p_r_values = []
-        lrclk_val = -1
-        bit_num = 0
-        self.wait_for_port_pins_change([self._lrclk_port])
-        lrclk_val = self.get_port_val(xsi, self._lrclk_port)
-        # if LR clock is 'low', read it as Left channel audio sample
-        # if LR clock is 'hi', read it as Right channel audio sample
-        while True:
-            for client in range(0, self._num_in_ports):
-                p_l_values.append(0)
-                p_r_values.append(0)
-            self.wait_for_port_pins_change([self._bclk_port])
-            # Read bits when bit clock changes to high
-            if self.get_port_val(xsi, self._bclk_port) == 1:
-                for client in range(0, self._num_in_ports):
-                  if client == 0: 
-                    p_data = self.get_port_val(xsi, self._din_port_1)
-                  if client == 1: 
-                    p_data = self.get_port_val(xsi, self._din_port_2)
-                  if client == 2: 
-                    p_data = self.get_port_val(xsi, self._din_port_3)
-                  if client == 3: 
-                    p_data = self.get_port_val(xsi, self._din_port_4)
-                  #p_data = ((port_data >> client) & 1)
-                  if lrclk_val == 0:
-                    p_l_values[client] = p_l_values[client] | \
-                      (p_data << (31 - bit_num))
-                  else:
-                    p_r_values[client] = p_r_values[client] | \
-                      (p_data << (31 - bit_num))
-                #Report the received word
-                if bit_num == 31:
-                  bit_num = 0
-                  for client in range(0, self._num_in_ports):            
-                    if  lrclk_val == 0: 
-                      print("Left Sample received: client:%d, data:%x" %
-                       (client, p_l_values[client]))
-                    else: 
-                      print("Right Sample received: client:%d, data:%x" %
-                       (client, p_r_values[client]))
-                else:
-                  bit_num += 1
-            lrclk_val = self.get_port_val(xsi, self._lrclk_port)
-            trig_data = xsi.sample_port_pins(self._trigger_port)
-            if trig_data == 1: break
 
-    def get_next_data_item(self):
-        if self._tx_data_index >= len(self._tx_data):
-            return 0xab
-        else:
-            data = self._tx_data[self._tx_data_index]
-            self._tx_data_index += 1
-            return data
- 
-    #send I2S test data to xCORE
-    def write_data(self, xsi):
-        p_l_values = []
-        p_r_values = []
-        lrclk_val = -1
-        bit_val = 0x0
-        while True:
-            trigger_port_data = xsi.sample_port_pins(self._trigger_port)
-            if (trigger_port_data == 0) : break
-
-        while True:
-            self.wait_for_port_pins_change([self._lrclk_port])
-            lrclk_val = self.get_port_val(xsi, self._lrclk_port)
-            if lrclk_val == 1: break
-            
-        while True:
-            self.wait_for_port_pins_change([self._bclk_port])
-            if self.get_port_val(xsi, self._bclk_port) == 1:
-                if self._num_out_ports > 0:
-                  xsi.drive_port_pins(self._dout_port_1, bit_val)
-                if self._num_out_ports > 1:
-                  xsi.drive_port_pins(self._dout_port_2, bit_val)
-                if self._num_out_ports > 2:
-                  xsi.drive_port_pins(self._dout_port_3, bit_val)
-                if self._num_out_ports > 3:
-                  xsi.drive_port_pins(self._dout_port_4, bit_val)
-                 
-                if lrclk_val == 0:
-                  #left channel data
-                  bit_val = 1-bit_val
-                else:
-                  bit_val = 1 #-bit_val
-            lrclk_val = self.get_port_val(xsi, self._lrclk_port)
-            #Check if xCORE testing is complete
-            trig_data = xsi.sample_port_pins(self._trigger_port)
-            if trig_data == 1: break
+    def __init__(self, port):
+        rate = 1000000
+        self._half_period = float(500000000) / rate
+        self._val = 0
+        self._port = port
 
     def run(self):
-        xsi = self.xsi
-        self._tx_data_index = 0
-        if self._mode == 0:
-            print("I2S Master simulation - read")
-            self.read_data(xsi)            
-        else:
-            print("I2S Master simulation - write")
-            self.write_data(xsi)
+        t = self.xsi.get_time()
+        t += self._half_period
+        while True:
+            self.wait_until(t)
+            self._val = 1 - self._val
+            self.xsi.drive_port_pins(self._port, self._val)
+            t += self._half_period
+
+    def is_high(self):
+        return (self._val == 1)
+
+    def is_low(self):
+        return (self._val == 0)
+
+    def get_val(self):
+        return (self._val)
+
+    def get_rate(self):
+        return self._clk
+
+    def get_name(self):
+        return self._name
+ 
+class I2SMasterChecker(xmostest.SimThread):
+    """"
+    This simulator thread will act as I2S master and check any transactions
+    caused by the Slave.
+    """
+
+    def get_setup_data(self, xsi, setup_strobe_port, setup_data_port):
+        self.wait_for_port_pins_change([setup_strobe_port])
+        self.wait_for_port_pins_change([setup_strobe_port])
+        return xsi.sample_port_pins(setup_data_port)
+
+    def __init__(self,  bclk, lrclk, din, dout, setup_strobe_port, setup_data_port, setup_resp_port, c):
+        self._din = din
+        self._dout = dout
+        self._bclk = bclk
+        self._lrclk = lrclk
+        self._setup_strobe_port = setup_strobe_port
+        self._setup_data_port = setup_data_port
+        self._setup_resp_port = setup_resp_port
+        self._clk = c
+
+    def run(self):
+      xsi = self.xsi
+      print "I2S Master Checker Started"
+
+      while True: 
+        xsi.drive_port_pins(self._setup_resp_port, 0)
+        strobe_val = xsi.sample_port_pins(self._setup_strobe_port)
+	if strobe_val == 1:
+           self.wait_for_port_pins_change([self._setup_strobe_port])
+        mclk_frequency_u      = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
+        mclk_frequency_l      = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
+        mclk_bclk_ratio       = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
+        num_outs              = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
+        num_ins               = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
+        is_i2s_justified      = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
+        mclk_frequency = (mclk_frequency_u<<16) + mclk_frequency_l
+        
+        #print "c:mclk_freq: %d mclk_bclk_ratio: %d num_in:%d num_out:%d"%( mclk_frequency, mclk_bclk_ratio, num_ins, num_outs)
+
+        bclk_frequency = mclk_frequency / mclk_bclk_ratio
+
+        time = xsi.get_time()
+        error = False
+        word_count = 0
+        bit_count = 0
+
+        rx_word=[0, 0, 0, 0]
+        tx_word=[0, 0, 0, 0]
+        tx_data=[[1, 2, 3, 4, 5, 6, 7, 8],
+                 [1, 2, 3, 4, 5, 6, 7, 8],
+                 [1, 2, 3, 4, 5, 6, 7, 8],
+                 [1, 2, 3, 4, 5, 6, 7, 8]]
+        rx_data=[[1, 2, 3, 4, 5, 6, 7, 8],
+                 [1, 2, 3, 4, 5, 6, 7, 8],
+                 [1, 2, 3, 4, 5, 6, 7, 8],
+                 [1, 2, 3, 4, 5, 6, 7, 8]]
+
+        #start the master clock running
+	self._clk.set_rate(mclk_frequency)
+
+        #for verifing the clock stability
+        half_period = float(500000000) / bclk_frequency
+
+        for i in range(0, 4):
+          rx_word[i] = 0
+          tx_word[i] = tx_data[i][word_count]
+        lr_count = 0
+
+        left = xsi.sample_port_pins(self._lrclk)
+
+        #if i2s mode ignore the first bit
+        if is_i2s_justified == True:
+          self.wait_for_port_pins_change([self._bclk])
+          self.wait_for_port_pins_change([self._bclk])
+          lr_count = 1
+
+        while word_count < 8:
+          self.wait_for_port_pins_change([self._bclk])
+          fall_time = xsi.get_time()
+          
+          if word_count > 0:
+            t = fall_time - rise_time
+            if abs(t - half_period) > 2.0:
+              if not error:
+                print "Timing Error(falling edge) %d %d MCLK:%d ratio:%d"%(t, half_period, mclk_frequency, mclk_bclk_ratio)
+              error = True;
+
+          #drive 
+          for i in range(0, num_outs):
+             xsi.drive_port_pins(self._dout[i], tx_word[i]>>31)
+             tx_word[i] = tx_word[i]<<1
+
+          self.wait_for_port_pins_change([self._bclk])
+          #print "bit: %d time: %d" % (bit_count, xsi.get_time())
+          rise_time = xsi.get_time()
+          t = rise_time - fall_time
+          if abs(t - half_period) > 2.0:
+            if not error:
+              print "Timing Error(rising edge) %d %d MCLK:%d ratio:%d"%(t, half_period, mclk_frequency, mclk_bclk_ratio)
+            error = True
+
+          #read
+          for i in range(0, num_ins):
+            val = xsi.sample_port_pins(self._din[i])
+            rx_word[i] = (rx_word[i]<<1) + val
+          
+          #check the lr clock
+          if xsi.sample_port_pins(self._lrclk) == left:
+            lr_count += 1;
+          else:
+            lr_count = 1;
+          left = xsi.sample_port_pins(self._lrclk)
+
+          bit_count += 1
+          if bit_count == 32:
+            bit_count = 0
+
+            if is_i2s_justified:
+              if lr_count != 1 :
+                print "bad i2s lr"
+            else:
+              if lr_count != 32:
+                if not error:
+                  print "LR count error"
+                error = True
+            #check the rx'd word
+            for i in range(0, num_ins):
+              if rx_data[i][word_count] != rx_word[i]:
+               if not error:
+                 print "rx error: %08x %08x" %(rx_data[i][word_count], rx_word[i])
+               #error = True
+              rx_word[i] = 0
+            word_count+=1
+            if word_count < 8:
+              for i in range(0, num_outs):
+                tx_word[i] = tx_data[i][word_count]
+
+        if word_count != 8:
+          print "Error: word lost MCLK:%d ratio:%d"%(mclk_frequency, mclk_bclk_ratio)
+
+        xsi.drive_port_pins(self._setup_resp_port, 1)
+        not_done = True
+        while not_done:
+          bclk_val              =  xsi.sample_port_pins(self._bclk)
+          setup_strobe_port_val =  xsi.sample_port_pins(self._setup_strobe_port)
+
+          #send the response
+          self.wait_for_port_pins_change([self._setup_strobe_port, self._bclk])
+          
+          bclk_val_n              =  xsi.sample_port_pins(self._bclk)
+          setup_strobe_port_val_n =  xsi.sample_port_pins(self._setup_strobe_port)
+          
+          if bclk_val_n != bclk_val:
+            if not error:
+              print "Unexpected bclk edge MCLK:%d ratio:%d"%(mclk_frequency, mclk_bclk_ratio)
+            error = True
+          if setup_strobe_port_val_n != setup_strobe_port_val:
+            xsi.drive_port_pins(self._setup_resp_port, error)
+            self.wait_for_port_pins_change([self._setup_strobe_port]) 
+            not_done = False
+          
+        
+   
