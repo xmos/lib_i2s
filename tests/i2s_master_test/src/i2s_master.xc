@@ -109,9 +109,8 @@ void app(server interface i2s_callback_if i2s_i){
             break;
         }
         case i2s_i.init(unsigned & mclk_bclk_ratio, i2s_mode & mode):{
-            if(!first_time){
+            if(!first_time)
                  error |= request_response(setup_strobe_port, setup_resp_port);
-            }
             if(error)
                 printf("Error\n");
             mclk_bclk_ratio = (1<<ratio);
@@ -152,6 +151,7 @@ int main(){
     interface i2s_callback_if i2s_i;
 
     stop_clock(mclk);
+    //configure_clock_ref(mclk, 8);
     configure_clock_src(mclk, p_mclk);
     start_clock(mclk);
 

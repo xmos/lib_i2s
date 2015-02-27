@@ -3,11 +3,11 @@
 #include "i2s.h"
 
 static const unsigned clk_mask_lookup[5] = {
-        0xaaaaaaaa, //div 1
-        0xcccccccc, //div 2
-        0xf0f0f0f0, //div 3
-        0xff00ff00, //div 4
-        0xffff0000, //div 5
+        0xaaaaaaaa, //div 2
+        0xcccccccc, //div 4
+        0xf0f0f0f0, //div 8
+        0xff00ff00, //div 16
+        0xffff0000, //div 32
 };
 
 static void init_ports(
@@ -19,7 +19,7 @@ static void init_ports(
         out buffered port:32 p_lrclk,
         clock bclk,
         const clock mclk){
-    stop_clock(bclk);
+    set_clock_on(bclk);
     configure_clock_src(bclk, p_bclk);
     configure_out_port(p_bclk, mclk, 1);
     configure_out_port(p_lrclk, bclk, 1);
@@ -38,8 +38,7 @@ static void ratio_2(client i2s_callback_if i2s_i,
         static const size_t num_in,
         out buffered port:32 p_bclk,
         out buffered port:32 p_lrclk,
-        i2s_mode mode, unsigned &bclk_time
-        ){
+        i2s_mode mode){
     const unsigned clk_mask = clk_mask_lookup[0];
     unsigned lr_mask = 0;
     unsigned restart = 0;
@@ -56,13 +55,12 @@ static void ratio_2(client i2s_callback_if i2s_i,
 
     if(mode == I2S_MODE_I2S){
         for(size_t i=0;i<num_out;i++)
-            p_dout[i] @ bclk_time+2 <: bitrev(i2s_i.send(i));
+            p_dout[i] @ 2 <: bitrev(i2s_i.send(i));
         partout(p_lrclk, 1, 0);
         for(size_t i=0;i<num_in;i++)
-            asm("setpt res[%0], %1"::"r"(p_din[i]), "r"(bclk_time+32+1));
+            asm("setpt res[%0], %1"::"r"(p_din[i]), "r"(32+1));
         lr_mask = 0x80000000;
         partout(p_bclk, 2, 0x2);
-        bclk_time+=1;
      } else {
        for(size_t i=0;i<num_out;i++)
            p_dout[i] <: bitrev(i2s_i.send(i));
@@ -80,7 +78,6 @@ static void ratio_2(client i2s_callback_if i2s_i,
     p_bclk <: clk_mask;
 
     while(!(restart && (lr_mask&0xf))){
-        bclk_time+=32;
         t:> time;
         if(! (lr_mask&0xf))
            i2s_i.frame_start(time, restart);
@@ -104,7 +101,6 @@ static void ratio_2(client i2s_callback_if i2s_i,
         p_din[i] :> data;
         i2s_i.receive(i, bitrev(data));
     }
-    bclk_time+=64;
 }
 
 #pragma unsafe arrays
@@ -116,7 +112,7 @@ static void ratio_n(client i2s_callback_if i2s_i,
         out buffered port:32 p_bclk,
         out buffered port:32 p_lrclk,
         unsigned ratio,
-        i2s_mode mode, unsigned &bclk_time){
+        i2s_mode mode){
     unsigned clk_mask = clk_mask_lookup[ratio-1];
     unsigned lr_mask = 0;
     unsigned restart = 0;
@@ -136,13 +132,12 @@ static void ratio_n(client i2s_callback_if i2s_i,
 
     if(mode == I2S_MODE_I2S){
         for(size_t i=0;i<num_out;i++)
-            p_dout[i] @ bclk_time+2 <: bitrev(i2s_i.send(i));
+            p_dout[i] @ 2 <: bitrev(i2s_i.send(i));
         partout(p_lrclk, 1, 0);
         for(size_t i=0;i<num_in;i++)
-            asm("setpt res[%0], %1"::"r"(p_din[i]), "r"(bclk_time + 32+1));
+            asm("setpt res[%0], %1"::"r"(p_din[i]), "r"(32+1));
         lr_mask = 0x80000000;
         partout(p_bclk, 1<<ratio, clk_mask);
-        bclk_time+=1;
      } else {
        for(size_t i=0;i<num_out;i++)
            p_dout[i] <: bitrev(i2s_i.send(i));
@@ -169,7 +164,6 @@ static void ratio_n(client i2s_callback_if i2s_i,
     }
 
     while(!(restart && (lr_mask&0xf))){
-        bclk_time+=32;
         t:> time;
         if(!(lr_mask&0xf))
            i2s_i.frame_start(time, restart);
@@ -213,12 +207,8 @@ static void ratio_n(client i2s_callback_if i2s_i,
             i2s_i.receive(i, bitrev(data));
         }
     }
-
-
-    bclk_time+=32;
-    bclk_time+=32;
-
 }
+
 unsigned log2(unsigned x){
     switch(x){
     case 1: return 0;
@@ -226,6 +216,7 @@ unsigned log2(unsigned x){
     case 4: return 2;
     case 8: return 3;
     case 16: return 4;
+    case 32: return 5;
     }
     __builtin_unreachable();
     return 0;
@@ -241,11 +232,12 @@ void i2s_master(client i2s_callback_if i2s_i,
                 clock bclk,
                 const clock mclk){
 
-
-    init_ports(p_dout, num_out, p_din, num_in,
-            p_bclk, p_lrclk, bclk, mclk);
-    unsigned bclk_time = 0;
     while(1){
+
+        //This ensures that the port time on all the ports is at 0
+        init_ports(p_dout, num_out, p_din, num_in,
+           p_bclk, p_lrclk, bclk, mclk);
+
         unsigned mclk_bclk_ratio, mclk_bclk_ratio_log2;
         i2s_mode mode;
         i2s_i.init(mclk_bclk_ratio, mode);
@@ -254,10 +246,10 @@ void i2s_master(client i2s_callback_if i2s_i,
 
         if(mclk_bclk_ratio_log2 == 1){
             ratio_2(i2s_i, p_dout, num_out, p_din,
-                num_in, p_bclk, p_lrclk, mode, bclk_time);
+                num_in, p_bclk, p_lrclk, mode);
         } else {
             ratio_n(i2s_i, p_dout, num_out, p_din,
-                num_in, p_bclk, p_lrclk, mclk_bclk_ratio_log2, mode, bclk_time);
+                num_in, p_bclk, p_lrclk, mclk_bclk_ratio_log2, mode);
         }
     }
 }
