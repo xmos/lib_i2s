@@ -32,15 +32,13 @@ def do_master_test(num_in, num_out):
 
     xmostest.run_on_simulator(resources['xsim'], binary,
                               simthreads = [clk, checker],
-                              #simargs=['--weak-external-drive'],
                               #simargs=['--vcd-tracing', '-o ./i2s_master_test/trace.vcd -tile tile[0] -pads -functions -clock-blocks -ports-detailed -instructions'],
-                              simargs=['--vcd-tracing', '-o ./i2s_master_test/trace.vcd -tile tile[0] -ports '],
+                              simargs=[],
                               suppress_multidrive_messages = True,
                               tester = tester)
 
 def runtest():
    do_master_test(4, 4)
-
 #    for num_in in [0, 1, 2, 3, 4]:  
 #      for num_out in [0, 1, 2, 3, 4]:
 #        if num_in + num_out == 0:

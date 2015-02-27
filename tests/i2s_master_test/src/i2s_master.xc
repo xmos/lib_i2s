@@ -151,7 +151,6 @@ int main(){
     interface i2s_callback_if i2s_i;
 
     stop_clock(mclk);
-    //configure_clock_ref(mclk, 8);
     configure_clock_src(mclk, p_mclk);
     start_clock(mclk);
 
