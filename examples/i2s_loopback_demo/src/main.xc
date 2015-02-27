@@ -112,7 +112,7 @@ void cs4270_reset(client i2c_master_if i2c, uint8_t device_addr,
 
 
 [[distributable]]
-static void i2s_loopback(server i2s_callback_if i2s,
+void i2s_loopback(server i2s_callback_if i2s,
                          client i2c_master_if i2c,
                          client output_gpio_if codec_reset,
                          client output_gpio_if clock_select)
@@ -178,7 +178,7 @@ int main() {
     output_gpio(i_gpio, 2, p_gpio, gpio_pin_map);
 
     /* The application - loopback the I2S samples */
-    i2s_loopback(i_i2s, i_i2c[0], i_gpio[0], i_gpio[1]);
+    [[distribute]]i2s_loopback(i_i2s, i_i2c[0], i_gpio[0], i_gpio[1]);
   }
   return 0;
 }
