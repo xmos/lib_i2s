@@ -1,2 +1,0 @@
-Product,Test Group,Test,Config,Environment,Result
-lib_i2s,i2s_master_sim_tests,basic_test_in4_out4,num_out=4;num_in=4,,PASS
