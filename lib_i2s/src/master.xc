@@ -210,16 +210,7 @@ static void ratio_n(client i2s_callback_if i2s_i,
 }
 
 unsigned log2(unsigned x){
-    switch(x){
-    case 1: return 0;
-    case 2: return 1;
-    case 4: return 2;
-    case 8: return 3;
-    case 16: return 4;
-    case 32: return 5;
-    }
-    __builtin_unreachable();
-    return 0;
+  return clz(bitrev(x));
 }
 
 void i2s_master(client i2s_callback_if i2s_i,
