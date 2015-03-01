@@ -127,7 +127,7 @@ void i2s_loopback(server i2s_callback_if i2s,
       mode = I2S_MODE_I2S;
 
       /* Set master clock select appropriately */
-      mclk_bclk_ratio = (MASTER_CLOCK_FREQUENCY/SAMPLE_FREQUENCY)/32;
+      mclk_bclk_ratio = (MASTER_CLOCK_FREQUENCY/SAMPLE_FREQUENCY)/64;
 
       if ((SAMPLE_FREQUENCY % 22050) == 0) {
         clock_select.output(0);
