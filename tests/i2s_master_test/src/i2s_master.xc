@@ -114,7 +114,7 @@ void app(server interface i2s_callback_if i2s_i){
         }
         case i2s_i.frame_start(unsigned timestamp, unsigned &restart):{
             frames_recieved++;
-            if (frames_recieved == 4)
+            if (frames_recieved == 3)
               restart = 1;
             break;
         }

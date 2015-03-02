@@ -82,7 +82,7 @@ class I2SMasterChecker(xmostest.SimThread):
 
         time = xsi.get_time()
         error = False
-        word_count = 0
+        frame_count = 0
         bit_count = 0
 
         rx_word=[0, 0, 0, 0]
@@ -112,7 +112,7 @@ class I2SMasterChecker(xmostest.SimThread):
 
         for i in range(0, 4):
           rx_word[i] = 0
-          tx_word[i] = tx_data[i*2][word_count]
+          tx_word[i] = tx_data[i*2][frame_count]
         lr_count = 0
 
         left = xsi.sample_port_pins(self._lrclk)
@@ -123,11 +123,11 @@ class I2SMasterChecker(xmostest.SimThread):
           self.wait_for_port_pins_change([self._bclk])
           lr_count = 1
 
-        while word_count < 8:
+        while frame_count < 4:
           self.wait_for_port_pins_change([self._bclk])
           fall_time = xsi.get_time()
           
-          if word_count > 0:
+          if frame_count > 0:
             t = fall_time - rise_time
             if abs(t - half_period) > 2.0:
               if not error:
@@ -173,31 +173,31 @@ class I2SMasterChecker(xmostest.SimThread):
                   print "LR count error"
                 error = True
             #check the rx'd word
-            #print "rx %d, %d" % (word_count, left)
+            #print "rx %d, %d" % (frame_count, left)
 
             for i in range(0, num_ins):
               if is_i2s_justified:
                   chan = i * 2 + (1 - left)
               else:
                   chan = i * 2 + left
-              if rx_data[chan][word_count] != rx_word[i]:
+              if rx_data[chan][frame_count] != rx_word[i]:
                if not error:
-                 print "rx error: expected:%08x actual:%08x" %(rx_data[chan][word_count], rx_word[i])
+                 print "rx error: expected:%08x actual:%08x" %(rx_data[chan][frame_count], rx_word[i])
                #error = True
               rx_word[i] = 0
             if left==0 and is_i2s_justified:
-                word_count+=1
+                frame_count+=1
             if left==1 and not is_i2s_justified:
-                word_count+=1
-            if word_count < 8:
+                frame_count+=1
+            if frame_count < 8:
               for i in range(0, num_outs):
                 if is_i2s_justified:
                     chan = i * 2 + left
                 else:
                     chan = i * 2 + (1 - left)
-                tx_word[i] = tx_data[chan][word_count]
+                tx_word[i] = tx_data[chan][frame_count]
                 #print tx_word[i]
-        if word_count != 8:
+        if frame_count != 4:
           print "Error: word lost MCLK:%d ratio:%d"%(mclk_frequency, mclk_bclk_ratio)
 
         xsi.drive_port_pins(self._setup_resp_port, 1)

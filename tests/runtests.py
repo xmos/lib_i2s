@@ -22,6 +22,6 @@ varying number of input and output channels. The tests are
 run at different sampling rates of 44.1 KHz and 48 KHz.
 """)
 
-    # xmostest.runtests()
+    xmostest.runtests()
 
     xmostest.finish()
