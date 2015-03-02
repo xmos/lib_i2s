@@ -33,7 +33,7 @@ static const unsigned mclock_freq[MAX_NUM_MCLK_RATIOS] = {
 };
 
 int32_t tx_data[MAX_CHANNELS][8] = {
-        {1, 2, 3, 4, 5, 6, 7, 8},
+        {  1,   2,   3,   4,   5,   6,   7,   8},
         {101, 102, 103, 104, 105, 106, 107, 108},
         {201, 202, 203, 204, 205, 206, 207, 208},
         {301, 302, 303, 304, 305, 306, 307, 308},
@@ -43,7 +43,7 @@ int32_t tx_data[MAX_CHANNELS][8] = {
         {701, 702, 703, 704, 705, 706, 707, 708}};
 
 int32_t rx_data[MAX_CHANNELS][8] = {
-        {1, 2, 3, 4, 5, 6, 7, 8},
+        {  1,   2,   3,   4,   5,   6,   7,   8},
         {101, 102, 103, 104, 105, 106, 107, 108},
         {201, 202, 203, 204, 205, 206, 207, 208},
         {301, 302, 303, 304, 305, 306, 307, 308},
@@ -114,7 +114,7 @@ void app(server interface i2s_callback_if i2s_i){
         }
         case i2s_i.frame_start(unsigned timestamp, unsigned &restart):{
             frames_recieved++;
-            if (frames_recieved == 7)
+            if (frames_recieved == 4)
               restart = 1;
             break;
         }
