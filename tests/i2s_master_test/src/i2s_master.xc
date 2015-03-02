@@ -19,7 +19,7 @@ in port  setup_resp_port = XS1_PORT_1M;
 
 #define MAX_RATIO 3
 
-#define MAX_CHANNELS 4
+#define MAX_CHANNELS 8
 #define NUM_MCLKS 4
 #define MAX_NUM_MCLK_RATIOS 6
 
@@ -34,15 +34,24 @@ static const unsigned mclock_freq[MAX_NUM_MCLK_RATIOS] = {
 
 int32_t tx_data[MAX_CHANNELS][8] = {
         {1, 2, 3, 4, 5, 6, 7, 8},
-        {1, 2, 3, 4, 5, 6, 7, 8},
-        {1, 2, 3, 4, 5, 6, 7, 8},
-        {1, 2, 3, 4, 5, 6, 7, 8}};
+        {101, 102, 103, 104, 105, 106, 107, 108},
+        {201, 202, 203, 204, 205, 206, 207, 208},
+        {301, 302, 303, 304, 305, 306, 307, 308},
+        {401, 402, 403, 404, 405, 406, 407, 408},
+        {501, 502, 503, 504, 505, 506, 507, 508},
+        {601, 602, 603, 604, 605, 606, 607, 608},
+        {701, 702, 703, 704, 705, 706, 707, 708}};
 
 int32_t rx_data[MAX_CHANNELS][8] = {
         {1, 2, 3, 4, 5, 6, 7, 8},
-        {1, 2, 3, 4, 5, 6, 7, 8},
-        {1, 2, 3, 4, 5, 6, 7, 8},
-        {1, 2, 3, 4, 5, 6, 7, 8}};
+        {101, 102, 103, 104, 105, 106, 107, 108},
+        {201, 202, 203, 204, 205, 206, 207, 208},
+        {301, 302, 303, 304, 305, 306, 307, 308},
+        {401, 402, 403, 404, 405, 406, 407, 408},
+        {501, 502, 503, 504, 505, 506, 507, 508},
+        {601, 602, 603, 604, 605, 606, 607, 608},
+        {701, 702, 703, 704, 705, 706, 707, 708}};
+
 
 static void send_data_to_tester(
         out port setup_strobe_port,
@@ -105,7 +114,8 @@ void app(server interface i2s_callback_if i2s_i){
         }
         case i2s_i.frame_start(unsigned timestamp, unsigned &restart):{
             frames_recieved++;
-            restart = (frames_recieved>>2);
+            if (frames_recieved == 7)
+              restart = 1;
             break;
         }
         case i2s_i.init(unsigned & mclk_bclk_ratio, i2s_mode & mode):{

@@ -76,7 +76,7 @@ class I2SMasterChecker(xmostest.SimThread):
         is_i2s_justified      = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
         mclk_frequency = (mclk_frequency_u<<16) + mclk_frequency_l
         
-        #print "c:mclk_freq: %d mclk_bclk_ratio: %d num_in:%d num_out:%d"%( mclk_frequency, mclk_bclk_ratio, num_ins, num_outs)
+        #print "c:mclk_freq: %d mclk_bclk_ratio: %d num_in:%d num_out:%d,i2s_justified:%s"%( mclk_frequency, mclk_bclk_ratio, num_ins, num_outs, str(is_i2s_justified))
 
         bclk_frequency = mclk_frequency / mclk_bclk_ratio
 
@@ -88,13 +88,21 @@ class I2SMasterChecker(xmostest.SimThread):
         rx_word=[0, 0, 0, 0]
         tx_word=[0, 0, 0, 0]
         tx_data=[[1, 2, 3, 4, 5, 6, 7, 8],
-                 [1, 2, 3, 4, 5, 6, 7, 8],
-                 [1, 2, 3, 4, 5, 6, 7, 8],
-                 [1, 2, 3, 4, 5, 6, 7, 8]]
+                 [101, 102, 103, 104, 105, 106, 107, 108],
+                 [201, 202, 203, 204, 205, 206, 207, 208],
+                 [301, 302, 303, 304, 305, 306, 307, 308],
+                 [401, 402, 403, 404, 405, 406, 407, 408],
+                 [501, 502, 503, 504, 505, 506, 507, 508],
+                 [601, 602, 603, 604, 605, 606, 607, 608],
+                 [701, 702, 703, 704, 705, 706, 707, 708]]
         rx_data=[[1, 2, 3, 4, 5, 6, 7, 8],
-                 [1, 2, 3, 4, 5, 6, 7, 8],
-                 [1, 2, 3, 4, 5, 6, 7, 8],
-                 [1, 2, 3, 4, 5, 6, 7, 8]]
+                 [101, 102, 103, 104, 105, 106, 107, 108],
+                 [201, 202, 203, 204, 205, 206, 207, 208],
+                 [301, 302, 303, 304, 305, 306, 307, 308],
+                 [401, 402, 403, 404, 405, 406, 407, 408],
+                 [501, 502, 503, 504, 505, 506, 507, 508],
+                 [601, 602, 603, 604, 605, 606, 607, 608],
+                 [701, 702, 703, 704, 705, 706, 707, 708]]
 
         #start the master clock running
 	self._clk.set_rate(mclk_frequency)
@@ -104,7 +112,7 @@ class I2SMasterChecker(xmostest.SimThread):
 
         for i in range(0, 4):
           rx_word[i] = 0
-          tx_word[i] = tx_data[i][word_count]
+          tx_word[i] = tx_data[i*2][word_count]
         lr_count = 0
 
         left = xsi.sample_port_pins(self._lrclk)
@@ -123,7 +131,7 @@ class I2SMasterChecker(xmostest.SimThread):
             t = fall_time - rise_time
             if abs(t - half_period) > 2.0:
               if not error:
-                print "Timing Error(falling edge) %d %d MCLK:%d ratio:%d"%(t, half_period, mclk_frequency, mclk_bclk_ratio)
+                print "Timing Error(falling edge) actual_half_period:%d expected_half_period:%d MCLK:%d ratio:%d"%(t, half_period, mclk_frequency, mclk_bclk_ratio)
               error = True;
 
           #drive 
@@ -165,17 +173,30 @@ class I2SMasterChecker(xmostest.SimThread):
                   print "LR count error"
                 error = True
             #check the rx'd word
+            #print "rx %d, %d" % (word_count, left)
+
             for i in range(0, num_ins):
-              if rx_data[i][word_count] != rx_word[i]:
+              if is_i2s_justified:
+                  chan = i * 2 + (1 - left)
+              else:
+                  chan = i * 2 + left
+              if rx_data[chan][word_count] != rx_word[i]:
                if not error:
-                 print "rx error: %08x %08x" %(rx_data[i][word_count], rx_word[i])
+                 print "rx error: expected:%08x actual:%08x" %(rx_data[chan][word_count], rx_word[i])
                #error = True
               rx_word[i] = 0
-            word_count+=1
+            if left==0 and is_i2s_justified:
+                word_count+=1
+            if left==1 and not is_i2s_justified:
+                word_count+=1
             if word_count < 8:
               for i in range(0, num_outs):
-                tx_word[i] = tx_data[i][word_count]
-
+                if is_i2s_justified:
+                    chan = i * 2 + left
+                else:
+                    chan = i * 2 + (1 - left)
+                tx_word[i] = tx_data[chan][word_count]
+                #print tx_word[i]
         if word_count != 8:
           print "Error: word lost MCLK:%d ratio:%d"%(mclk_frequency, mclk_bclk_ratio)
 

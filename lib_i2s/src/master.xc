@@ -55,51 +55,59 @@ static void ratio_2(client i2s_callback_if i2s_i,
 
     if(mode == I2S_MODE_I2S){
         for(size_t i=0;i<num_out;i++)
-            p_dout[i] @ 2 <: bitrev(i2s_i.send(i));
+            p_dout[i] @ 2 <: bitrev(i2s_i.send(i*2));
         partout(p_lrclk, 1, 0);
         for(size_t i=0;i<num_in;i++)
-            asm("setpt res[%0], %1"::"r"(p_din[i]), "r"(32+1));
+          asm volatile("setpt res[%0], %1"::"r"(p_din[i]), "r"(32+1):"memory");
         lr_mask = 0x80000000;
         partout(p_bclk, 2, 0x2);
      } else {
        for(size_t i=0;i<num_out;i++)
-           p_dout[i] <: bitrev(i2s_i.send(i));
+           p_dout[i] <: bitrev(i2s_i.send(i*2));
      }
     p_lrclk <: lr_mask;
     p_bclk <: clk_mask;
     p_bclk <: clk_mask;
     t:> time;
-    i2s_i.frame_start(time, restart);
     lr_mask = ~lr_mask;
     p_lrclk <: lr_mask;
     for(size_t i=0;i<num_out;i++)
-        p_dout[i] <: bitrev(i2s_i.send(i));
+        p_dout[i] <: bitrev(i2s_i.send(i*2+1));
     p_bclk <: clk_mask;
     p_bclk <: clk_mask;
 
-    while(!(restart && (lr_mask&0xf))){
+    while (!restart) {
         t:> time;
-        if(! (lr_mask&0xf))
-           i2s_i.frame_start(time, restart);
+        i2s_i.frame_start(time, restart);
         lr_mask = ~lr_mask;
         p_lrclk <: lr_mask;
-
-        for(size_t i=0;i<num_out;i++)
-            p_dout[i] <: bitrev(i2s_i.send(i));
         for(size_t i=0;i<num_in;i++){
-            p_din[i] :> data;
-            i2s_i.receive(i, bitrev(data));
+            asm volatile("in %0, res[%1]":"=r"(data):"r"(p_din[i]):"memory");
+            i2s_i.receive(i*2, bitrev(data));
         }
+        for(size_t i=0;i<num_out;i++)
+            p_dout[i] <: bitrev(i2s_i.send(i*2));
+        p_bclk <: clk_mask;
+        p_bclk <: clk_mask;
+        t:> time;
+        lr_mask = ~lr_mask;
+        p_lrclk <: lr_mask;
+        for(size_t i=0;i<num_in;i++){
+            asm volatile("in %0, res[%1]":"=r"(data):"r"(p_din[i]):"memory");
+            i2s_i.receive(i*2+1, bitrev(data));
+        }
+        for(size_t i=0;i<num_out;i++)
+            p_dout[i] <: bitrev(i2s_i.send(i*2+1));
         p_bclk <: clk_mask;
         p_bclk <: clk_mask;
     }
     for(size_t i=0;i<num_in;i++){
         p_din[i] :> data;
-        i2s_i.receive(i, bitrev(data));
+        i2s_i.receive(i*2, bitrev(data));
     }
     for(size_t i=0;i<num_in;i++){
         p_din[i] :> data;
-        i2s_i.receive(i, bitrev(data));
+        i2s_i.receive(i*2+1, bitrev(data));
     }
 }
 
@@ -132,7 +140,7 @@ static void ratio_n(client i2s_callback_if i2s_i,
 
     if(mode == I2S_MODE_I2S){
         for(size_t i=0;i<num_out;i++)
-            p_dout[i] @ 2 <: bitrev(i2s_i.send(i));
+            p_dout[i] @ 2 <: bitrev(i2s_i.send(i*2));
         partout(p_lrclk, 1, 0);
         for(size_t i=0;i<num_in;i++)
             asm("setpt res[%0], %1"::"r"(p_din[i]), "r"(32+1));
@@ -140,14 +148,13 @@ static void ratio_n(client i2s_callback_if i2s_i,
         partout(p_bclk, 1<<ratio, clk_mask);
      } else {
        for(size_t i=0;i<num_out;i++)
-           p_dout[i] <: bitrev(i2s_i.send(i));
+           p_dout[i] <: bitrev(i2s_i.send(i*2));
      }
 
     p_lrclk <: lr_mask;
     p_bclk <: clk_mask;
     p_bclk <: clk_mask;
     t:> time;
-    i2s_i.frame_start(time, restart);
     lr_mask = ~lr_mask;
     {
         p_lrclk <: lr_mask;
@@ -155,7 +162,7 @@ static void ratio_n(client i2s_callback_if i2s_i,
         for(unsigned clk_pair=0; clk_pair < total_clk_pairs;clk_pair++){
             for(unsigned i=0;i<calls_per_pair;i++){
                 if(if_call_num < num_out)
-                    p_dout[if_call_num] <: bitrev(i2s_i.send(if_call_num));
+                    p_dout[if_call_num] <: bitrev(i2s_i.send(if_call_num*2+1));
                 if_call_num++;
             }
             p_bclk <: clk_mask;
@@ -165,7 +172,8 @@ static void ratio_n(client i2s_callback_if i2s_i,
 
     while(!(restart && (lr_mask&0xf))){
         t:> time;
-        if(!(lr_mask&0xf))
+        int lr = (lr_mask&0xf) ? 0 : 1;
+        if(!lr)
            i2s_i.frame_start(time, restart);
         lr_mask = ~lr_mask;
         p_lrclk <: lr_mask;
@@ -174,10 +182,10 @@ static void ratio_n(client i2s_callback_if i2s_i,
             for(unsigned i=0;i<calls_per_pair;i++){
                 if(if_call_num < num_in){
                     p_din[if_call_num] :> data;
-                    i2s_i.receive(if_call_num, bitrev(data));
+                    i2s_i.receive(if_call_num*2+lr, bitrev(data));
                 } else if(if_call_num < num_in + num_out){
                     unsigned index = if_call_num - num_in;
-                    p_dout[index] <: bitrev(i2s_i.send(index));
+                    p_dout[index] <: bitrev(i2s_i.send(index*2+lr));
                 }
                 if_call_num++;
             }
@@ -193,7 +201,7 @@ static void ratio_n(client i2s_callback_if i2s_i,
             for(unsigned i=0;i<calls_per_pair;i++){
                 if(if_call_num < num_in){
                     p_din[if_call_num] :> data;
-                    i2s_i.receive(if_call_num, bitrev(data));
+                    i2s_i.receive(if_call_num*2, bitrev(data));
                 }
                 if_call_num++;
             }
@@ -204,7 +212,7 @@ static void ratio_n(client i2s_callback_if i2s_i,
         }
         for(size_t i=0;i<num_in;i++){
             p_din[i] :> data;
-            i2s_i.receive(i, bitrev(data));
+            i2s_i.receive(i*2+1, bitrev(data));
         }
     }
 }
