@@ -19,12 +19,12 @@ typedef interface i2s_callback_if {
    *   The I2S component will call this
    *   when it first initializes on first run of after a restart.
    *
-   *   \param mclk_bclk_ratio_log2     This should be set to the desired master
+   *   \param mclk_bclk_ratio          This should be set to the desired master
    *                                   clock to bit clock ratio(must be a power
-   *                                   of two thats greater then or equal to two
-   *                                   and less than or euqal to 32.
-   *   \param mode                     The transfer mode(i2s, left justified,
-   *                                   right justified)
+   *                                   of two thats greater than or equal to two
+   *                                   and less than or equal to 32.
+   *   \param mode                     The transfer mode (I2S_MODE_I2S,
+   *                                   I2S_MODE_LEFT_JUSTIFIED)
    */
   void init(unsigned &mclk_bclk_ratio, i2s_mode &mode);
 
@@ -91,11 +91,11 @@ typedef interface i2s_callback_if {
  *                        Usually this should be configured to be driven by
  *                        an incoming master system clock.
  */
-void i2s_master(client i2s_callback_if i,
+void i2s_master(client i2s_callback_if i2s_i,
                 out buffered port:32 p_dout[num_out],
-                size_t num_out,
+                static const size_t num_out,
                 in buffered port:32 p_din[num_in],
-                size_t num_in,
+                static const size_t num_in,
                 out buffered port:32 p_bclk,
                 out buffered port:32 p_lrclk,
                 clock bclk,
@@ -110,12 +110,12 @@ typedef interface i2s_slave_callback_if {
    *   The I2S component will call this
    *   when it first initializes on first run of after a restart.
    *
-   *   \param mclk_bclk_ratio_log2     This should be set to the desired master
+   *   \param mclk_bclk_ratio          This should be set to the desired master
    *                                   clock to bit clock ratio(must be a power
-   *                                   of two thats greater then or equal to two
-   *                                   and less than or euqal to 32.
-   *   \param mode                     The transfer mode(i2s, left justified,
-   *                                   right justified)
+   *                                   of two thats greater than or equal to two
+   *                                   and less than or equal to 32.
+   *   \param mode                     The transfer mode (I2S_MODE_I2S,
+   *                                   I2S_MODE_LEFT_JUSTIFIED)
    */
   void init(i2s_mode &mode);
 
