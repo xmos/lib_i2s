@@ -187,4 +187,40 @@ void i2s_slave(client i2s_slave_callback_if i,
         in port p_lrclk,
         clock bclk);
 
+
+typedef interface tdm_if {
+  void configure(const clock clk);
+  void start(void);
+  int32_t transfer(size_t stream_index, int32_t val);
+} tdm_if;
+
+
+enum tdm_format_flags {
+  TDM_SYNC_LENGTH_BIT = 0,
+  TDM_SYNC_LENGTH_WORD = 1,
+  TDM_SYNC_DELAY_ZERO = 0,
+  TDM_SYNC_DELAY_ONE = 1 << 1
+};
+
+[[distributable]]
+void tdm_master(server interface tdm_if i_tdm,
+                out buffered port:32 p_fsync,
+                out buffered port:32 (&?p_out)[num_out],
+                size_t num_out,
+                in buffered port:32 (&?p_in)[num_in],
+                size_t num_in,
+                size_t samples_per_frame,
+                unsigned format_flags);
+
+void tdm_master_cb(server interface i2s_callback_if i,
+                   out buffered port:32 p_fsync,
+                   out buffered port:32 (&?p_out)[num_out],
+                   size_t num_out,
+                   in buffered port:32 (&?p_in)[num_in],
+                   clock clk,
+                   size_t num_in,
+                   size_t samples_per_frame,
+                   unsigned format_flags);
+
+
 #endif // _i2s_h_

@@ -22,6 +22,15 @@ varying number of input and output channels. The tests are
 run at different sampling rates of 44.1 KHz and 48 KHz.
 """)
 
+    xmostest.register_group("lib_i2s",
+                            "tdm_master_sim_tests",
+                            "TDM master simulator tests",
+    """
+Tests are performed by running the I2S library connected to a
+simulator model (written as a python plugin to xsim). The simulator
+model checks that the signals are producing a TDM signal
+""")
+
     xmostest.runtests()
 
     xmostest.finish()
