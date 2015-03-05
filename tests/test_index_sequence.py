@@ -8,8 +8,6 @@ def do_test(ratio):
 
     resources = xmostest.request_resource("xsim")
 
-    xmostest.build('index_sequence_check', build_config="{r}".format(r=ratio))
-
     binary = 'index_sequence_check/bin/{r}/index_sequence_check_{r}.xe'.format(r=ratio)
 
     tester = xmostest.ComparisonTester(open('sequence_check.expect'),

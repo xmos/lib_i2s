@@ -8,8 +8,6 @@ def do_slave_test(num_in, num_out):
 
     resources = xmostest.request_resource("xsim")
 
-    xmostest.build('i2s_slave_test', build_config="{i}{o}".format(i=num_in, o=num_out))
-
     binary = 'i2s_slave_test/bin/{i}{o}/i2s_slave_test_{i}{o}.xe'.format(i=num_in, o=num_out)
 
     clk = Clock("tile[0]:XS1_PORT_1A")
