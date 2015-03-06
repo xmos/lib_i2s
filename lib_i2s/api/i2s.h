@@ -125,7 +125,7 @@ typedef interface i2s_slave_callback_if {
    *   are input/output.
    *
    *   \param timestamp                The time (relative to the XS1 reference
-   *                                   frequency) of the start of the frame
+   *                                   frequency) of the start of the frame. Note, there may be an offset...
    *   \param restart                  Setting this reference parameter to
    *                                   non-zero will cause the I2S component
    *                                   to restart.
@@ -178,13 +178,13 @@ typedef interface i2s_slave_callback_if {
  *  \param bclk           A clock that will get configured for use with
  *                        the bit clock
  */
-void i2s_slave(client i2s_slave_callback_if i,
+void i2s_slave(client i2s_slave_callback_if i2s_i,
         out buffered port:32 p_dout[num_out],
-        size_t num_out,
+        static const size_t num_out,
         in buffered port:32 p_din[num_in],
-        size_t num_in,
+        static const size_t num_in,
         in port p_bclk,
-        in port p_lrclk,
+        in buffered port:32 p_lrclk,
         clock bclk);
 
 #endif // _i2s_h_

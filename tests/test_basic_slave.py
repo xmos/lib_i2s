@@ -26,21 +26,19 @@ def do_slave_test(num_in, num_out):
 
     tester = xmostest.ComparisonTester(open('slave_test.expect'),
                                      'lib_i2s', 'i2s_slave_sim_tests',
-                                     'basic_test_in{i}_out{o}'.format(i=num_in, o=num_out), 
+                                     'basic_test', 
                                      {'num_in':num_in, 'num_out':num_out},
                                      regexp=True)
 
     xmostest.run_on_simulator(resources['xsim'], binary,
                               simthreads = [clk, checker],
-                              #simargs=['--vcd-tracing', '-o ./i2s_slave_test/trace.vcd -tile tile[0] -pads -functions -clock-blocks -ports-detailed -instructions'],
-                              simargs=['--vcd-tracing', '-o ./i2s_slave_test/trace.vcd -tile tile[0] -ports'],
-                              #simargs=[],
+                              #simargs=['--vcd-tracing', '-o ./i2s_slave_test/trace.vcd -tile tile[0] -ports-detailed'],
+                              simargs=[],
                               suppress_multidrive_messages = True,
                               tester = tester)
 
 def runtest():
-#   do_slave_test(4, 4)
-    return
+    do_slave_test(4, 4)
 #    for num_in in [0, 1, 2, 3, 4]:  
 #      for num_out in [0, 1, 2, 3, 4]:
 #        if num_in + num_out == 0:

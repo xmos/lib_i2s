@@ -116,6 +116,8 @@ void app(server interface i2s_callback_if i2s_i){
             frames_recieved++;
             if (frames_recieved == 3)
               restart = 1;
+            else
+              restart = 0;
             break;
         }
         case i2s_i.init(unsigned & mclk_bclk_ratio, i2s_mode & mode):{

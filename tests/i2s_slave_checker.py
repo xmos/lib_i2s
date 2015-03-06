@@ -3,13 +3,13 @@ import xmostest
 class Clock(xmostest.SimThread):
 
     def set_rate(self, rate):
-        self._half_period = float(500000000) / rate
+        self._half_period = float(500000000) / float(rate)
         return
 
 
     def __init__(self, port):
         rate = 1000000
-        self._half_period = float(500000000) / rate
+        self._half_period = float(500000000) / float(rate)
         self._val = 0
         self._port = port
 
@@ -60,28 +60,34 @@ class I2SSlaveChecker(xmostest.SimThread):
 
     def run(self):
         
-        xsi = self.xsi
-        print "I2S Slave Checker Started"
+      xsi = self.xsi
 
+
+      bits_per_word = 32
+      num_frames = 4
+
+      xsi.drive_port_pins(self._bclk, 1)
+      print "I2S Slave Checker Started"
+      while True:
         xsi.drive_port_pins(self._setup_resp_port, 0)
         strobe_val = xsi.sample_port_pins(self._setup_strobe_port)
 	if strobe_val == 1:
            self.wait_for_port_pins_change([self._setup_strobe_port])
 
-        xsi.drive_port_pins(self._bclk, 1)
-        xsi.drive_port_pins(self._lrclk, 1)
-
+        bclk_clocking         = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
         bclk_frequency_u      = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
         bclk_frequency_l      = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
         num_ins               = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
         num_outs              = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
         is_i2s_justified      = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
 
-        bclk_frequency = (bclk_frequency_u<<16) + bclk_frequency_l
-        clock_half_period = 1000000000/(2*bclk_frequency)
-        self.wait_until(xsi.get_time() + 10000)
-        #the test will begin now
+        xsi.drive_port_pins(self._bclk, 1)
+        xsi.drive_port_pins(self._lrclk, 1)
 
+        bclk_frequency = (bclk_frequency_u<<16) + bclk_frequency_l
+        #print "bclk:%d in:%d out:%d i2s_justified:%d"%(bclk_frequency, num_ins, num_outs, is_i2s_justified)
+        clock_half_period = float(1000000000)/float(2*bclk_frequency)
+        
         rx_word=[0, 0, 0, 0]
         tx_word=[0, 0, 0, 0]
         tx_data=[[  1,   2,   3,   4,   5,   6,   7,   8],
@@ -101,19 +107,52 @@ class I2SSlaveChecker(xmostest.SimThread):
                  [601, 602, 603, 604, 605, 606, 607, 608],
                  [701, 702, 703, 704, 705, 706, 707, 708]]
 
-        bits_per_word = 32
-        time = xsi.get_time()
+        #there is one frame lead in for the slave to sync to
+        time =float(xsi.get_time())
+
+	lr_counter = 32+16+(is_i2s_justified)
+        for i in range(0, 16):
+          xsi.drive_port_pins(self._lrclk, lr_counter>=32)
+          lr_counter = (lr_counter + 1)&0x3f
+          xsi.drive_port_pins(self._bclk, 0)
+          time = time + clock_half_period
+          self.wait_until(time)
+          xsi.drive_port_pins(self._bclk, 1)
+          time = time + clock_half_period
+          self.wait_until(time)
+            
+        for i in range(0, 32):
+          xsi.drive_port_pins(self._lrclk, lr_counter>=32)
+          lr_counter = (lr_counter + 1)&0x3f
+          xsi.drive_port_pins(self._bclk, 0)
+          time = time + clock_half_period
+          self.wait_until(time)
+          xsi.drive_port_pins(self._bclk, 1)
+          time = time + clock_half_period
+          self.wait_until(time)
+
+        for i in range(0, 32):
+          xsi.drive_port_pins(self._lrclk, lr_counter>=32)
+          lr_counter = (lr_counter + 1)&0x3f
+          xsi.drive_port_pins(self._bclk, 0)
+          time = time + clock_half_period
+          self.wait_until(time)
+          xsi.drive_port_pins(self._bclk, 1)
+          time = time + clock_half_period
+          self.wait_until(time)
+
         error = False
         bit_count = 0
 
-        for frame_count in range(0, 4):
+        xsi.drive_port_pins(self._setup_resp_port, 0)
+        for frame_count in range(0, num_frames):
           for i in range(0, 4):
             rx_word[i] = 0
             tx_word[i] = tx_data[i*2][frame_count]
 
-          xsi.drive_port_pins(self._lrclk, 0)
           for i in range(0, bits_per_word):
-
+             xsi.drive_port_pins(self._lrclk, lr_counter>=32)
+             lr_counter = (lr_counter + 1)&0x3f
              xsi.drive_port_pins(self._bclk, 0)
 
              for p in range(0, num_outs):
@@ -133,14 +172,14 @@ class I2SSlaveChecker(xmostest.SimThread):
           for p in range(0, num_outs):
              if rx_data[p*2][frame_count] != rx_word[p]:
                 error = True
-          
-          xsi.drive_port_pins(self._lrclk, 1)
 
           for i in range(0, 4):
             rx_word[i] = 0
             tx_word[i] = tx_data[i*2+1][frame_count]
 
           for i in range(0, bits_per_word):
+             xsi.drive_port_pins(self._lrclk, lr_counter>=32)
+             lr_counter = (lr_counter + 1)&0x3f
 
              xsi.drive_port_pins(self._bclk, 0)
 
@@ -163,24 +202,11 @@ class I2SSlaveChecker(xmostest.SimThread):
                 error = True
 
         xsi.drive_port_pins(self._setup_resp_port, 1)
-        not_done = True
-        while not_done:
-          bclk_val              =  xsi.sample_port_pins(self._bclk)
-          setup_strobe_port_val =  xsi.sample_port_pins(self._setup_strobe_port)
+        #send the response
+        self.wait_for_port_pins_change([self._setup_strobe_port])        
+        xsi.drive_port_pins(self._setup_resp_port, error)
+        #print error
+        self.wait_for_port_pins_change([self._setup_strobe_port]) 
 
-          #send the response
-          self.wait_for_port_pins_change([self._setup_strobe_port, self._bclk])
-          
-          bclk_val_n              =  xsi.sample_port_pins(self._bclk)
-          setup_strobe_port_val_n =  xsi.sample_port_pins(self._setup_strobe_port)
-          
-          if bclk_val_n != bclk_val:
-            if not error:
-              print "Unexpected bclk edge"
-            error = True
-          if setup_strobe_port_val_n != setup_strobe_port_val:
-            xsi.drive_port_pins(self._setup_resp_port, error)
-            self.wait_for_port_pins_change([self._setup_strobe_port]) 
-            not_done = False
 
        

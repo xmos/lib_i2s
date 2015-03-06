@@ -4,24 +4,32 @@ import xmostest
 class Clock(xmostest.SimThread):
 
     def set_rate(self, rate):
-        self._half_period = float(500000000) / rate
+        if rate == 0:
+          self._driving = False
+        else:
+          self._driving = True
+          self._half_period = float(500000000) / rate
         return
 
 
     def __init__(self, port):
         rate = 1000000
+        self._driving = True
         self._half_period = float(500000000) / rate
-        self._val = 0
         self._port = port
 
     def run(self):
         t = self.xsi.get_time()
         t += self._half_period
         while True:
-            self.wait_until(t)
-            self._val = 1 - self._val
-            self.xsi.drive_port_pins(self._port, self._val)
+          if self._driving:
+            self.xsi.drive_port_pins(self._port, 0)
             t += self._half_period
+            self.wait_until(t)
+            self.xsi.drive_port_pins(self._port, 1)
+            t += self._half_period
+            self.wait_until(t)
+
 
     def is_high(self):
         return (self._val == 1)
