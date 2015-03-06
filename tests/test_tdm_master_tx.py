@@ -15,8 +15,6 @@ expected_output = "\n".join(["Received frame %d" % x for x in range(31)])
 def runtest():
     resources = xmostest.request_resource("xsim")
 
-    xmostest.build('tdm_master_tx_test')
-
     binary = 'tdm_master_tx_test/bin/tdm_master_tx_test.xe'
 
     tester = xmostest.ComparisonTester(expected_output,

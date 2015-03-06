@@ -15,8 +15,6 @@ expected_output = "\n".join(["Sent frame %d" % x for x in range(11)])
 def do_test(config):
     resources = xmostest.request_resource("xsim")
 
-    xmostest.build('tdm_master_rx_test')
-
     binary = 'tdm_master_rx_test/bin/tdm_master_rx_test.xe'
 
     tester = xmostest.ComparisonTester(expected_output,
