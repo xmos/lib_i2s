@@ -12,3 +12,5 @@
 **/pdf/*
 **/html/*
 **/.settings/*
+*.pyc
+*.log
