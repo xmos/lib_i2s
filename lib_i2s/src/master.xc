@@ -2,6 +2,10 @@
 #include <xclib.h>
 #include "i2s.h"
 
+#ifndef I2S_PRIORITIZE_FRAME_START_CALLBACK
+#define I2S_PRIORITIZE_FRAME_START_CALLBACK (0)
+#endif
+
 static const unsigned clk_mask_lookup[5] = {
         0xaaaaaaaa, //div 2
         0xcccccccc, //div 4
@@ -138,6 +142,15 @@ static void ratio_n(client i2s_callback_if i2s_i,
     unsigned total_clk_pairs = (1<<(ratio-1));
     unsigned calls_per_pair = ((num_in + num_out) + (1<<(ratio-1))-1)>>(ratio-1);
 
+    // If the frame start callback is prioritized then the in first clk_pair
+    // the number of calls is halved and the other callbacks are squashed into
+    // into (total_clock_pairs - 1) slots.
+    unsigned calls_per_first_pair = calls_per_pair / 2;
+    unsigned remaining_calls = num_in + num_out - calls_per_first_pair;
+    unsigned total_clk_pairs_m1 = total_clk_pairs - 1;
+    unsigned calls_per_pair_squashed =  
+      (remaining_calls + (total_clk_pairs_m1 - 1)) / total_clk_pairs_m1;
+
     if(mode == I2S_MODE_I2S){
         for(size_t i=0;i<num_out;i++)
             p_dout[i] @ 2 <: bitrev(i2s_i.send(i*2));
@@ -170,22 +183,55 @@ static void ratio_n(client i2s_callback_if i2s_i,
         }
     }
 
-    while(!(restart && (lr_mask&0xf))){
+    while (!restart) {
         t:> time;
-        int lr = (lr_mask&0xf) ? 0 : 1;
-        if(!lr)
-           i2s_i.frame_start(time, restart);
+        i2s_i.frame_start(time, restart);
         lr_mask = ~lr_mask;
         p_lrclk <: lr_mask;
+        unsigned total_clk_pairs_now = total_clk_pairs;
+        unsigned calls_per_pair_now = calls_per_pair;
         unsigned if_call_num = 0;
+        if (I2S_PRIORITIZE_FRAME_START_CALLBACK){
+            for(unsigned i=0;i<calls_per_first_pair;i++){
+                if(if_call_num < num_in){
+                    p_din[if_call_num] :> data;
+                    i2s_i.receive(if_call_num*2, bitrev(data));
+                } else if(if_call_num < num_in + num_out){
+                    unsigned index = if_call_num - num_in;
+                    p_dout[index] <: bitrev(i2s_i.send(index*2));
+                }
+                if_call_num++;
+            }
+            total_clk_pairs_now = total_clk_pairs_m1;
+            calls_per_pair_now = calls_per_pair_squashed;
+            p_bclk <: clk_mask;
+            p_bclk <: clk_mask;
+        }
+        for(unsigned clk_pair=0; clk_pair < total_clk_pairs_now;clk_pair++){
+            for(unsigned i=0;i<calls_per_pair_now;i++){
+                if(if_call_num < num_in){
+                    p_din[if_call_num] :> data;
+                    i2s_i.receive(if_call_num*2, bitrev(data));
+                } else if(if_call_num < num_in + num_out){
+                    unsigned index = if_call_num - num_in;
+                    p_dout[index] <: bitrev(i2s_i.send(index*2));
+                }
+                if_call_num++;
+            }
+            p_bclk <: clk_mask;
+            p_bclk <: clk_mask;
+        }
+        lr_mask = ~lr_mask;
+        p_lrclk <: lr_mask;
+        if_call_num = 0;
         for(unsigned clk_pair=0; clk_pair < total_clk_pairs;clk_pair++){
             for(unsigned i=0;i<calls_per_pair;i++){
                 if(if_call_num < num_in){
                     p_din[if_call_num] :> data;
-                    i2s_i.receive(if_call_num*2+lr, bitrev(data));
+                    i2s_i.receive(if_call_num*2+1, bitrev(data));
                 } else if(if_call_num < num_in + num_out){
                     unsigned index = if_call_num - num_in;
-                    p_dout[index] <: bitrev(i2s_i.send(index*2+lr));
+                    p_dout[index] <: bitrev(i2s_i.send(index*2+1));
                 }
                 if_call_num++;
             }
