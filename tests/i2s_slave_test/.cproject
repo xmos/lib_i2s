@@ -195,6 +195,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/xc"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.239543847" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -517,6 +520,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.2127531326" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -845,6 +850,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/c++/v1"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.1714567888" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -1051,6 +1059,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/xc"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.1176190888" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -1373,6 +1384,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.737694285" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -1701,6 +1714,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/c++/v1"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.155575676" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -1907,6 +1923,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/xc"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.1183178190" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -2229,6 +2248,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.203101592" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -2557,6 +2578,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/c++/v1"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.2120192472" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -2763,6 +2787,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/xc"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.1604518832" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -3085,6 +3112,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.2016404146" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -3413,6 +3442,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/c++/v1"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.261403944" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -3619,6 +3651,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/xc"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.741784391" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -3941,6 +3976,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.2056387069" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -4269,6 +4306,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/c++/v1"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.124076828" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -4475,6 +4515,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/xc"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.775494655" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -4797,6 +4840,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.1641750022" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -5125,6 +5170,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/c++/v1"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.387021820" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -5331,6 +5379,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/xc"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.2102106352" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -5653,6 +5704,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.1515023113" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -5981,6 +6034,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/c++/v1"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.46923944" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -6187,6 +6243,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/xc"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.102467434" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -6509,6 +6568,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.1814437131" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -6837,6 +6898,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/c++/v1"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.1393357570" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -7043,6 +7107,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/xc"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.247398745" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -7365,6 +7432,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.1927349613" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -7693,6 +7762,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/c++/v1"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.1132437853" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -7899,6 +7971,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/xc"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.1851660839" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -8221,6 +8296,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.1387690188" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -8549,6 +8626,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/c++/v1"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.879923687" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -8755,6 +8835,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/xc"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.1569438753" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -9077,6 +9160,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.1844428396" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -9405,6 +9490,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/c++/v1"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.1624036377" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -9611,6 +9699,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/xc"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.58901228" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -9933,6 +10024,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.1348911531" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -10261,6 +10354,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/c++/v1"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.1978284588" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -10467,6 +10563,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/xc"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.1621305799" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -10789,6 +10888,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.1914267310" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -11117,6 +11218,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/c++/v1"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.440974225" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -11323,6 +11427,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/xc"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.817899075" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -11645,6 +11752,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.1622570355" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -11973,6 +12082,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/c++/v1"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.1917556831" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -12179,6 +12291,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/xc"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.88582894" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -12501,6 +12616,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.1503914438" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -12829,6 +12946,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/c++/v1"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.241426150" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -13035,6 +13155,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/xc"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.667855349" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -13357,6 +13480,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.1901480504" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -13685,6 +13810,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/c++/v1"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.725293630" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -13891,6 +14019,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/xc"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.1355680537" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -14213,6 +14344,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.49242132" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -14541,6 +14674,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/c++/v1"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.1635742899" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -14747,6 +14883,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/xc"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.971988263" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -15069,6 +15208,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.738253497" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -15397,6 +15538,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/c++/v1"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.23199665" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -15603,6 +15747,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/xc"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.1401494200" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -15925,6 +16072,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.2024196211" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -16253,6 +16402,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/c++/v1"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.293300328" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -16459,6 +16611,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/xc"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.1627836368" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -16781,6 +16936,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.332795474" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -17109,6 +17266,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/c++/v1"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.1944931039" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -17315,6 +17475,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/xc"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.1028363824" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -17637,6 +17800,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.91821308" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -17965,6 +18130,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/c++/v1"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.997816815" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -18171,6 +18339,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/xc"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.1837449680" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -18493,6 +18664,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.2013472397" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -18821,6 +18994,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/c++/v1"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.1886738534" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -19027,6 +19203,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/xc"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.1996887302" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -19349,6 +19528,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.2039171179" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -19677,6 +19858,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/c++/v1"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.869149943" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -19883,6 +20067,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/xc"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.819530536" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -20205,6 +20392,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.1627118026" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -20533,6 +20722,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/rst}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_logging/doc/pdf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_xassert}&quot;"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/clang"/>
+									<listOptionValue builtIn="false" value="/builds/sandboxes/swapps/Installs/Linux/target/include/c++/v1"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.1181754107" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>

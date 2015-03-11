@@ -12,7 +12,7 @@ out buffered port:32  p_dout[4] = {XS1_PORT_1H, XS1_PORT_1I, XS1_PORT_1J, XS1_PO
 clock bclk = XS1_CLKBLK_1;
 
 out port setup_strobe_port = XS1_PORT_1L;
-out port setup_data_port = XS1_PORT_16B;
+out port setup_data_port = XS1_PORT_16A;
 in port  setup_resp_port = XS1_PORT_1M;
 
 #define MAX_CHANNELS 8
@@ -56,11 +56,10 @@ static void send_data_to_tester(
     sync(setup_strobe_port);
 }
 
-static void broadcast(int bclk_clocking, unsigned bclk_freq,
+static void broadcast(unsigned bclk_freq,
         unsigned num_in, unsigned num_out, int is_i2s_justified){
     setup_strobe_port <: 0;
 
-    send_data_to_tester(setup_strobe_port, setup_data_port, bclk_clocking);
     send_data_to_tester(setup_strobe_port, setup_data_port, bclk_freq>>16);
     send_data_to_tester(setup_strobe_port, setup_data_port, bclk_freq);
     send_data_to_tester(setup_strobe_port, setup_data_port, num_in);
@@ -156,12 +155,13 @@ void app(server interface i2s_slave_callback_if i2s_i){
             first_time = 0;
 
             mode = current_mode;
+
             for(unsigned i=0;i<MAX_CHANNELS;i++){
                 tx_data_counter[i] = 0;
                 rx_data_counter[i] = 0;
             }
 
-            broadcast(1, bclk_freq_lut[bclk_freq_index],
+            broadcast(bclk_freq_lut[bclk_freq_index],
                     NUM_IN, NUM_OUT, mode == I2S_MODE_I2S);
 
             break;

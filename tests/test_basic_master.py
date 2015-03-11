@@ -18,7 +18,7 @@ def do_master_test(num_in, num_out, priority_frame_start, testlevel):
         ["tile[0]:XS1_PORT_1H","tile[0]:XS1_PORT_1I","tile[0]:XS1_PORT_1J", "tile[0]:XS1_PORT_1K"],
         ["tile[0]:XS1_PORT_1D","tile[0]:XS1_PORT_1E","tile[0]:XS1_PORT_1F", "tile[0]:XS1_PORT_1G"],
         "tile[0]:XS1_PORT_1L", 
-        "tile[0]:XS1_PORT_16B", 
+        "tile[0]:XS1_PORT_16A", 
         "tile[0]:XS1_PORT_1M",
          clk)
 
@@ -33,8 +33,8 @@ def do_master_test(num_in, num_out, priority_frame_start, testlevel):
 
     xmostest.run_on_simulator(resources['xsim'], binary,
                               simthreads = [clk, checker],
-                              #simargs=['--vcd-tracing', '-o ./i2s_master_test/trace.vcd -tile tile[0] -pads -functions -clock-blocks -ports-detailed -instructions'],
-                              simargs=[],
+                              simargs=['--trace-to', 'trace.txt', '--vcd-tracing', '-o ./i2s_master_test/trace.vcd -tile tile[0] -pads -functions -clock-blocks -ports-detailed -instructions'],
+                              #simargs=[],
                               suppress_multidrive_messages = True,
                               tester = tester)
 

@@ -74,7 +74,6 @@ class I2SSlaveChecker(xmostest.SimThread):
 	if strobe_val == 1:
            self.wait_for_port_pins_change([self._setup_strobe_port])
 
-        bclk_clocking         = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
         bclk_frequency_u      = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
         bclk_frequency_l      = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
         num_ins               = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)

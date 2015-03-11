@@ -14,10 +14,10 @@ clock mclk = XS1_CLKBLK_1;
 clock bclk = XS1_CLKBLK_2;
 
 out port setup_strobe_port = XS1_PORT_1L;
-out port setup_data_port = XS1_PORT_16B;
+out port setup_data_port = XS1_PORT_16A;
 in port  setup_resp_port = XS1_PORT_1M;
 
-#define MAX_RATIO 3
+#define MAX_RATIO 4
 
 #define MAX_CHANNELS 8
 #define NUM_MCLKS 4
@@ -86,20 +86,20 @@ static int request_response(
     setup_resp_port :> r;
     return r;
 }
-
 [[distributable]]
 #pragma unsafe arrays
 void app(server interface i2s_callback_if i2s_i){
     unsigned mclock_freq_index=0;
-    unsigned frames_recieved = 0;
+    unsigned frames_sent = 0;
     unsigned rx_data_counter[MAX_CHANNELS] = {0};
     unsigned tx_data_counter[MAX_CHANNELS] = {0};
-    unsigned ratio = 1;
+    unsigned ratio_log2 = 2;
     int error=0;
 
     int first_time = 1;
 
     i2s_mode current_mode = I2S_MODE_I2S;
+    unsigned frame_times[4];
     while(1){
         select {
         case i2s_i.receive(size_t index, int32_t sample):{
@@ -113,46 +113,55 @@ void app(server interface i2s_callback_if i2s_i){
             break;
         }
         case i2s_i.frame_start(unsigned timestamp, unsigned &restart):{
-            frames_recieved++;
-            if (frames_recieved == 3)
-              restart = 1;
-            else
-              restart = 0;
+            frame_times[frames_sent]=timestamp;
+            frames_sent++;
+            restart = (frames_sent == 4);
             break;
         }
         case i2s_i.init(unsigned & mclk_bclk_ratio, i2s_mode & mode):{
-            if(!first_time)
-                 error |= request_response(setup_strobe_port, setup_resp_port);
-            if(error)
-                printf("Error\n");
-            mclk_bclk_ratio = (1<<ratio);
-            frames_recieved = 0;
+            if(!first_time){
+                 unsigned x=request_response(setup_strobe_port, setup_resp_port);
+                 error |= x;
+                 if(error)
+                   printf("Error: test fail\n");
+
+                 int s = 0;
+                 while(!s){
+                     if (ratio_log2 == MAX_RATIO){
+                         ratio_log2 = 1;
+                        if(mclock_freq_index == NUM_MCLKS-1){
+                            mclock_freq_index = 0;
+                            if (mode == I2S_MODE_I2S) {
+                                current_mode = I2S_MODE_LEFT_JUSTIFIED;
+                            } else {
+                                _Exit(1);
+                            }
+                        } else {
+                            mclock_freq_index++;
+                        }
+                    } else {
+                        ratio_log2++;
+                    }
+                    if(mclock_freq[mclock_freq_index] / ((1<<ratio_log2)*64) <=48000)
+                        s=1;
+                }
+            }
+
+            mclk_bclk_ratio = (1<<ratio_log2);
+
+            frames_sent = 0;
+            error = 0;
+            first_time = 0;
+
             mode = current_mode;
-            broadcast(mclock_freq[mclock_freq_index],
-                    mclk_bclk_ratio, NUM_IN, NUM_OUT, mode == I2S_MODE_I2S);
 
             for(unsigned i=0;i<MAX_CHANNELS;i++){
                 tx_data_counter[i] = 0;
                 rx_data_counter[i] = 0;
             }
+            broadcast(mclock_freq[mclock_freq_index],
+                    mclk_bclk_ratio, NUM_IN, NUM_OUT, mode == I2S_MODE_I2S);
 
-            if (ratio == MAX_RATIO){
-                ratio = 1;
-                if(mclock_freq_index == NUM_MCLKS-1){
-                    if (mode == I2S_MODE_I2S) {
-                        current_mode = I2S_MODE_LEFT_JUSTIFIED;
-                        mclock_freq_index = 0;
-                    } else {
-                        _Exit(1);
-                    }
-                } else {
-                    mclock_freq_index++;
-                }
-            } else {
-                ratio++;
-            }
-            error = 0;
-            first_time = 0;
             break;
         }
         }

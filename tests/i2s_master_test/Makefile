@@ -17,7 +17,7 @@ USED_MODULES = lib_i2s
 # If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
 # xcc for the final link (mapping) stage.
 
-COMMON_FLAGS = -O2 -g
+COMMON_FLAGS = -O2 -g -save-temps
 
 $(foreach out,0 1 2 3 4,\
  $(foreach in,0 1 2 3 4,\
