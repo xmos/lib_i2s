@@ -1,201 +1,146 @@
 import xmostest
 
-def convert_from_bits(bits):
-    data = 0
-    for bit in reversed(bits):
-        data = (data << 1) + bit
-    return data
+class TDMMasterChecker(xmostest.SimThread):
 
-def convert_to_bits(data):
-    bits = []
-    for i in range(32):
-        bit = data & 1
-        data = data >> 1
-        bits.append(bit)
-    return [b for b in reversed(bits)]
+    def print_setup(self, sr_frequency, sclk_frequency, num_outs, num_ins, is_i2s_justified, sclk_edge_count, channels_per_data_line):
+        print "sample rate: %d\tSCLK: %d\tnum ins %d,\tnum outs:%d, is i2s justified: %d\tsclk_edge_count %d\tchannels_per_data_line: %d"%(sr_frequency, sclk_frequency, num_outs, num_ins, is_i2s_justified, sclk_edge_count, channels_per_data_line)
+        return
 
-class Clock(xmostest.SimThread):
-    def __init__(self, port, rate):
-        self._half_period = float(500000000) / rate
-        self._val = 0
-        self._port = port
-        print("Driving %d master clk to xCORE" % rate)
+    def get_setup_data(self, xsi, setup_strobe_port, setup_data_port):
+        self.wait_for_port_pins_change([setup_strobe_port])
+        self.wait_for_port_pins_change([setup_strobe_port])
+        return xsi.sample_port_pins(setup_data_port)
 
-    def run(self):
-        t = self.xsi.get_time()
-        t += self._half_period
-        while True:
-            self.wait_until(t)
-            self._val = 1 - self._val
-            self.xsi.drive_port_pins(self._port, self._val)
-            t += self._half_period
-
-    def is_high(self):
-        return (self._val == 1)
-
-    def is_low(self):
-        return (self._val == 0)
-
-    def get_val(self):
-        return (self._val)
-
-    def get_rate(self):
-        return self._clk
-
-    def get_name(self):
-        return self._name
-
-
-class TDMMasterTxChecker(xmostest.SimThread):
-
-    def __init__(self, fsync, data, bclk, expected,
-                 samples_per_frame=8, fsync_length=1, sample_rate=48000):
-        super(TDMMasterTxChecker, self).__init__()
+    def __init__(self, sclk, fsync, din, dout, setup_strobe_port, setup_data_port, setup_resp_port):
+        self._din = din
+        self._dout = dout
+        self._sclk = sclk
         self._fsync = fsync
-        self._data = data
-        self._bclk = bclk
-        self._samples_per_frame = samples_per_frame
-        self._expected = expected
-        self._fsync_length = fsync_length
-        self._sample_rate = sample_rate
-        self._bit_rate = sample_rate * samples_per_frame * 32
-        self._bit_time = float(1000000000) / float(self._bit_rate)
+        self._setup_strobe_port = setup_strobe_port
+        self._setup_data_port = setup_data_port
+        self._setup_resp_port = setup_resp_port
 
     def run(self):
-        # First wait for fsync to go low
-        if self.xsi.sample_port_pins(self._fsync) != 0:
-            self.wait_for_port_pins_change([self._fsync])
+      xsi = self.xsi
+      print "TDM Master Checker Started"
 
-        prev_fsync_val = 0
-        prev_bclk_val = 0
-        ticks = 0
-        fsync_rise_ticks = None
-        bitnum = 0
-        bits = None
+      while True: 
+        xsi.drive_port_pins(self._setup_resp_port, 0)
+        strobe_val = xsi.sample_port_pins(self._setup_strobe_port)
+	if strobe_val == 1:
+           self.wait_for_port_pins_change([self._setup_strobe_port])
+
+        sr_frequency_u      = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
+        sr_frequency_l      = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
+
+        num_outs              = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
+        num_ins               = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
+        is_i2s_justified      = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
+        sclk_edge_count       = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
+        channels_per_data_line= self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
+
+        sr_frequency = (sr_frequency_u<<16) + sr_frequency_l
+        sclk_frequency = sr_frequency * 32 * channels_per_data_line
+        #self.print_setup(sr_frequency, sclk_frequency, num_outs, num_ins, is_i2s_justified, sclk_edge_count, channels_per_data_line)
+
+        time = xsi.get_time()
+        max_num_in_or_outs = 4
+        num_test_frames = 4
+        error = False 
         frame_count = 0
-        prev_bclk_high_time = None
+        bit_count = 0
+        word_count = 0
+        bits_per_word = 32
 
-        while True:
-            self.wait(lambda x:
-                       self.xsi.sample_port_pins(self._fsync) != prev_fsync_val
-                      or
-                       self._bclk.get_val() != prev_bclk_val)
-            fsync_val = self.xsi.sample_port_pins(self._fsync)
-            bclk_val  = self._bclk.get_val()
+        rx_word=[0, 0, 0, 0]
+        tx_word=[0, 0, 0, 0]
 
-            if fsync_val != prev_fsync_val and fsync_val == 1:
-                print "Received frame %d" % frame_count
-                frame_count += 1
-                if fsync_rise_ticks != None:
-                    frame_len = (ticks - fsync_rise_ticks)
-                    if frame_len != self._samples_per_frame * 32:
-                        print "Unexpected frame length: %d" % frame_len
-                fsync_rise_ticks = ticks
-                bitnum = 0
-                bits = []
+        #for verifing the clock stability
+        clock_half_period = float(500000000) / sclk_frequency
+        fsync_count = 0
 
-            if fsync_val != prev_fsync_val and fsync_val == 0:
-                if fsync_rise_ticks != None:
-                    fsync_len = ticks - fsync_rise_ticks
-                    if fsync_len != self._fsync_length:
-                        print "ERROR: Unexpected fsync length: %d" % fsync_len
+        #there is one frame lead in for the slave to sync to
+        time =float(xsi.get_time())
 
-            if bclk_val != prev_bclk_val and bclk_val == 1:
-                ticks += 1
-                if bits != None:
-                    bit = self.xsi.sample_port_pins(self._data)
-                    bits.append(bit)
-                    bitnum += 1
-                if bitnum == 32:
-                    data = convert_from_bits(bits)
-                    expected = self._expected.next()
-                    if data != expected:
-                        print "ERROR: data not as expected (%d instead of %d)" % (data, expected)
-                    bits = []
-                    bitnum = 0
-                if prev_bclk_high_time != None:
-                    bit_time = self.xsi.get_time() - prev_bclk_high_time
-                    pass
-                prev_bclk_high_time = self.xsi.get_time()
+	fsync_counter = 32+16+(is_i2s_justified)
 
-            prev_fsync_val = fsync_val
-            prev_bclk_val = bclk_val
+        tx_counter=0
+        rx_counter=0
+        waiting_for_sync_pulse = True
 
-class TDMMasterRxChecker(xmostest.SimThread):
+        error = False
 
-    def __init__(self, fsync, data, bclk, vals,
-                 samples_per_frame=8, fsync_length=1, sample_rate=48000):
-        super(TDMMasterRxChecker, self).__init__()
-        self._fsync = fsync
-        self._data = data
-        self._bclk = bclk
-        self._samples_per_frame = samples_per_frame
-        self._vals = vals
-        self._fsync_length = fsync_length
-        self._sample_rate = sample_rate
-        self._bit_rate = sample_rate * samples_per_frame * 32
-        self._bit_time = float(1000000000) / float(self._bit_rate)
+        for p in range(0, num_ins):
+          rx_word[p] = 0
 
-    def run(self):
-        # First wait for fsync to go low
-        if self.xsi.sample_port_pins(self._fsync) != 0:
-            self.wait_for_port_pins_change([self._fsync])
-            self.wait_for_port_pins_change([self._fsync])
-            self.wait_for_port_pins_change([self._fsync])
+        for p in range(0, num_outs):
+          tx_word[p] = tx_counter
 
-        prev_fsync_val = 0
-        prev_bclk_val = 0
-        ticks = 0
-        fsync_rise_ticks = None
-        frame_count = 0
-        prev_bclk_high_time = None
-        bitnum = 0
-        bits = None
+        if is_i2s_justified:
+          bit_count = 0
+          for p in range(0, num_outs):
+            tx_word[p] = tx_counter
+            xsi.drive_port_pins(self._dout[p], tx_counter>>31)
+            tx_counter += 1
+        else:
+          bit_count = 1
+          for p in range(0, num_outs):
+            tx_word[p] = tx_counter<<1
+            xsi.drive_port_pins(self._dout[p], tx_counter>>31)
+            tx_counter += 1
 
-        while True:
-            self.wait(lambda x:
-                       self.xsi.sample_port_pins(self._fsync) != prev_fsync_val
-                      or
-                       self._bclk.get_val() != prev_bclk_val)
-            fsync_val = self.xsi.sample_port_pins(self._fsync)
-            bclk_val  = self._bclk.get_val()
+        while waiting_for_sync_pulse:
+          xsi.drive_port_pins(self._sclk, 0)
+          time = time + clock_half_period
+          self.wait_until(time)
+          xsi.drive_port_pins(self._sclk, 1)
+          if xsi.sample_port_pins(self._fsync) != 0:
+            waiting_for_sync_pulse = False
+          time = time + clock_half_period
+          self.wait_until(time)
+       
+        ##TODO add fsync checking
+        xsi.drive_port_pins(self._setup_resp_port, 0)
+        while frame_count < num_test_frames:
+         for c in range(0, channels_per_data_line):
+          for i in range(bit_count, bits_per_word):
+            xsi.drive_port_pins(self._sclk, 0)
 
-            if fsync_val != prev_fsync_val and fsync_val == 1:
-                print "Sent frame %d" % frame_count
-                frame_count += 1
-                if fsync_rise_ticks != None:
-                    frame_len = (ticks - fsync_rise_ticks)
-                    if frame_len != self._samples_per_frame * 32:
-                        print "Unexpected frame length: %d" % frame_len
-                fsync_rise_ticks = ticks
-                if not bits:
-                    bitnum = 0
-                    data = self._vals.next()
-                    bits = convert_to_bits(data)
+            for p in range(0, num_outs):
+                xsi.drive_port_pins(self._dout[p], tx_word[p]>>31)
+                tx_word[p] = tx_word[p]<<1
 
-            if fsync_val != prev_fsync_val and fsync_val == 0:
-                if fsync_rise_ticks != None:
-                    fsync_len = ticks - fsync_rise_ticks
-                    if fsync_len != self._fsync_length:
-                        print "ERROR: Unexpected fsync length: %d" % fsync_len
+            self.wait_until(time)
+            time = time + clock_half_period
+            xsi.drive_port_pins(self._sclk, 1)
 
-            if bclk_val != prev_bclk_val and bclk_val == 0:
-                if bits:
-                    bit = bits[0]
-                    bits = bits[1:]
-                    self.xsi.drive_port_pins(self._data, bit)
-                    bitnum += 1
-                    if bitnum == 32:
-                        bitnum = 0
-                        data = self._vals.next()
-                        bits = convert_to_bits(data)
+            for p in range(0, num_ins):
+                val = xsi.sample_port_pins(self._din[p])
+                rx_word[p] = (rx_word[p]<<1) + val
+            self.wait_until(time)
+            time = time + clock_half_period
 
-            if bclk_val != prev_bclk_val and bclk_val == 1:
-                ticks += 1
-                if prev_bclk_high_time != None:
-                    bit_time = self.xsi.get_time() - prev_bclk_high_time
-                    pass
-                prev_bclk_high_time = self.xsi.get_time()
+          
+          for p in range(0, num_outs):
+             if num_ins > 0:
+               if rx_counter != rx_word[p]:
+                  print "rx error %08x %08x"%(rx_counter, rx_word[p])
+                  error = True
+             rx_counter+=1
+        
+          bit_count = 0
+          for p in range(0, num_outs):
+            tx_word[p] = tx_counter
+            tx_counter += 1
+          for p in range(0, num_ins):
+            rx_word[p] = 0
+         frame_count += 1
+        xsi.drive_port_pins(self._setup_resp_port, 1)
+        #send the response
+        self.wait_for_port_pins_change([self._setup_strobe_port])        
+        xsi.drive_port_pins(self._setup_resp_port, error)
+        #print error
+        self.wait_for_port_pins_change([self._setup_strobe_port]) 
 
-            prev_fsync_val = fsync_val
-            prev_bclk_val = bclk_val
+
+       

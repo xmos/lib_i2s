@@ -40,6 +40,7 @@ static void inline output_clock_pair(out buffered port:32 p_bclk,unsigned clk_ma
     p_bclk <: clk_mask;
     p_bclk <: clk_mask;
 }
+
 #pragma unsafe arrays
 static void inline output_word(
         out buffered port:32 p_lrclk,

@@ -24,17 +24,13 @@ def do_master_test(num_in, num_out, priority_frame_start, testlevel):
 
     tester = xmostest.ComparisonTester(open('master_test.expect'),
                                      'lib_i2s', 'i2s_master_sim_tests',
-                                     'basic_test_in{i}_out{o}'.format(i=num_in, o=num_out), 
-                                       {'num_in':num_in, 'num_out':num_out,
-                                        'priority_frame_start':priority_frame_start},
-                                     regexp=True)
+                                     'basic_test', {'num_in':num_in, 'num_out':num_out,'priority_frame_start':priority_frame_start},regexp=True)
 
     tester.set_min_testlevel(testlevel)
 
     xmostest.run_on_simulator(resources['xsim'], binary,
                               simthreads = [clk, checker],
-                              simargs=['--trace-to', 'trace.txt', '--vcd-tracing', '-o ./i2s_master_test/trace.vcd -tile tile[0] -pads -functions -clock-blocks -ports-detailed -instructions'],
-                              #simargs=[],
+                              simargs=[],
                               suppress_multidrive_messages = True,
                               tester = tester)
 
@@ -45,10 +41,9 @@ def runtest():
    do_master_test(0, 4, 0, "nightly")
    do_master_test(4, 0, 1, "nightly")
    do_master_test(0, 4, 1, "nightly")
-   return
-#    for num_in in [0, 1, 2, 3, 4]:  
-#      for num_out in [0, 1, 2, 3, 4]:
-#        if num_in + num_out == 0:
-#          continue
-#        do_master_test(num_in, num_out)
+   for num_in in [0, 1, 2, 3, 4]:  
+      for num_out in [0, 1, 2, 3, 4]:
+       if num_in + num_out == 0:
+          continue
+       do_master_test(num_in, num_out, 0, "nightly")
 

@@ -1,0 +1,58 @@
+# The TARGET variable determines what target system the application is
+# compiled for. It either refers to an XN file in the source directories
+# or a valid argument for the --target option when compiling
+TARGET = SLICEKIT-L16
+
+# The APP_NAME variable determines the name of the final .xe file. It should
+# not include the .xe postfix. If left blank the name will default to
+# the project name
+APP_NAME = tdm_master_cb_test
+
+# The USED_MODULES variable lists other module used by the application.
+USED_MODULES = lib_i2s
+
+# The flags passed to xcc when building the application
+# You can also set the following to override flags for a particular language:
+# XCC_XC_FLAGS, XCC_C_FLAGS, XCC_ASM_FLAGS, XCC_CPP_FLAGS
+# If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
+# xcc for the final link (mapping) stage.
+COMMON_FLAGS = -O2 -g
+
+XCC_FLAGS_10 = $(COMMON_FLAGS) -DNUM_OUT=1 -DNUM_IN=0
+XCC_FLAGS_20 = $(COMMON_FLAGS) -DNUM_OUT=2 -DNUM_IN=0
+XCC_FLAGS_30 = $(COMMON_FLAGS) -DNUM_OUT=3 -DNUM_IN=0
+XCC_FLAGS_40 = $(COMMON_FLAGS) -DNUM_OUT=4 -DNUM_IN=0
+
+XCC_FLAGS_01 = $(COMMON_FLAGS) -DNUM_OUT=0 -DNUM_IN=1
+XCC_FLAGS_11 = $(COMMON_FLAGS) -DNUM_OUT=1 -DNUM_IN=1
+XCC_FLAGS_21 = $(COMMON_FLAGS) -DNUM_OUT=2 -DNUM_IN=1
+XCC_FLAGS_31 = $(COMMON_FLAGS) -DNUM_OUT=3 -DNUM_IN=1
+XCC_FLAGS_41 = $(COMMON_FLAGS) -DNUM_OUT=4 -DNUM_IN=1
+
+XCC_FLAGS_02 = $(COMMON_FLAGS) -DNUM_OUT=0 -DNUM_IN=2
+XCC_FLAGS_12 = $(COMMON_FLAGS) -DNUM_OUT=1 -DNUM_IN=2
+XCC_FLAGS_22 = $(COMMON_FLAGS) -DNUM_OUT=2 -DNUM_IN=2
+XCC_FLAGS_32 = $(COMMON_FLAGS) -DNUM_OUT=3 -DNUM_IN=2
+XCC_FLAGS_42 = $(COMMON_FLAGS) -DNUM_OUT=4 -DNUM_IN=2
+
+XCC_FLAGS_03 = $(COMMON_FLAGS) -DNUM_OUT=0 -DNUM_IN=3
+XCC_FLAGS_13 = $(COMMON_FLAGS) -DNUM_OUT=1 -DNUM_IN=3
+XCC_FLAGS_23 = $(COMMON_FLAGS) -DNUM_OUT=2 -DNUM_IN=3
+XCC_FLAGS_33 = $(COMMON_FLAGS) -DNUM_OUT=3 -DNUM_IN=3
+XCC_FLAGS_43 = $(COMMON_FLAGS) -DNUM_OUT=4 -DNUM_IN=3
+
+XCC_FLAGS_04 = $(COMMON_FLAGS) -DNUM_OUT=0 -DNUM_IN=4
+XCC_FLAGS_14 = $(COMMON_FLAGS) -DNUM_OUT=1 -DNUM_IN=4
+XCC_FLAGS_24 = $(COMMON_FLAGS) -DNUM_OUT=2 -DNUM_IN=4
+XCC_FLAGS_34 = $(COMMON_FLAGS) -DNUM_OUT=3 -DNUM_IN=4
+XCC_FLAGS_44 = $(COMMON_FLAGS) -DNUM_OUT=4 -DNUM_IN=4
+
+# The XCORE_ARM_PROJECT variable, if set to 1, configures this
+# project to create both xCORE and ARM binaries.
+XCORE_ARM_PROJECT = 0
+
+# The VERBOSE variable, if set to 1, enables verbose output from the make system.
+VERBOSE = 0
+
+XMOS_MAKE_PATH ?= ../..
+-include $(XMOS_MAKE_PATH)/xcommon/module_xcommon/build/Makefile.common

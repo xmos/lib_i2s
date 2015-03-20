@@ -89,27 +89,29 @@ static int request_response(
 [[distributable]]
 #pragma unsafe arrays
 void app(server interface i2s_callback_if i2s_i){
-    unsigned mclock_freq_index=0;
+
+    int error=0;
     unsigned frames_sent = 0;
+    unsigned frame_times[4];
     unsigned rx_data_counter[MAX_CHANNELS] = {0};
     unsigned tx_data_counter[MAX_CHANNELS] = {0};
-    unsigned ratio_log2 = 2;
-    int error=0;
 
     int first_time = 1;
-
+    unsigned mclock_freq_index=0;
+    unsigned ratio_log2 = 2;
     i2s_mode current_mode = I2S_MODE_I2S;
-    unsigned frame_times[4];
+
     while(1){
         select {
-        case i2s_i.receive(size_t index, int32_t sample):{
-            error |= (sample != rx_data[index][rx_data_counter[index]]);
-            rx_data_counter[index]++;
-            break;
-        }
         case i2s_i.send(size_t index) -> int32_t r:{
             r = tx_data[index][tx_data_counter[index]];
             tx_data_counter[index]++;
+            break;
+        }
+        case i2s_i.receive(size_t index, int32_t sample):{
+            unsigned i = rx_data_counter[index];
+            error |= (sample != rx_data[index][i]);
+            rx_data_counter[index]=i+1;
             break;
         }
         case i2s_i.frame_start(unsigned timestamp, unsigned &restart):{

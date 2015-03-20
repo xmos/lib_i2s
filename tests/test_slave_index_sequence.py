@@ -20,7 +20,7 @@ def do_slave_test(num_in, num_out):
         ["tile[0]:XS1_PORT_1H","tile[0]:XS1_PORT_1I","tile[0]:XS1_PORT_1J", "tile[0]:XS1_PORT_1K"],
         ["tile[0]:XS1_PORT_1D","tile[0]:XS1_PORT_1E","tile[0]:XS1_PORT_1F", "tile[0]:XS1_PORT_1G"],
         "tile[0]:XS1_PORT_1L", 
-        "tile[0]:XS1_PORT_16B", 
+        "tile[0]:XS1_PORT_16A", 
         "tile[0]:XS1_PORT_1M",
          clk)
     tester = xmostest.ComparisonTester(open('slave_sequence_check_{i}{o}.expect'.format(i=num_in, o=num_out)),
