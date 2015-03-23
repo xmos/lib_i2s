@@ -120,7 +120,7 @@ void app(server interface i2s_slave_callback_if i2s_i){
             if(!first_time){
 
                 int max_delta_squared = 0;
-                for(unsigned i=1;i<4;i++){
+                for(unsigned i=2;i<4;i++){
                     unsigned elapsed = frame_times[i] - frame_times[i-1];
 
                     float exact_f = 32*2*(float)XS1_TIMER_HZ/(float)bclk_freq_lut[bclk_freq_index];
@@ -130,8 +130,8 @@ void app(server interface i2s_slave_callback_if i2s_i){
                         max_delta_squared = delta_squared;
                 }
 
-                //if(max_delta_squared > 10 * 10)
-                    //error |= 1;
+                if(max_delta_squared > 10 * 10)
+                    error |= 1;
 
                 error |= request_response(setup_strobe_port, setup_resp_port);
 

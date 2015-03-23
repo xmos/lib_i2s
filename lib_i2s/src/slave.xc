@@ -10,7 +10,6 @@ static void init_ports(
         in port p_bclk,
         in buffered port:32 p_lrclk,
         clock bclk){
-
     set_clock_on(bclk);
     configure_clock_src(bclk, p_bclk);
     configure_out_port(p_lrclk, bclk, 1);
@@ -47,9 +46,8 @@ void i2s_slave(client i2s_slave_callback_if i2s_i,
         in buffered port:32 p_lrclk,
         clock bclk){
 
-    unsigned time;
+    unsigned time, port_time;
     timer t;
-    unsigned port_time;
     init_ports(p_dout, num_out, p_din, num_in, p_bclk, p_lrclk, bclk);
 
     while(1){
@@ -74,8 +72,6 @@ void i2s_slave(client i2s_slave_callback_if i2s_i,
         for(size_t i=0;i<num_in;i++)
             asm volatile("setpt res[%0], %1"::"r"(p_din[i]), "r"(port_time + 64+32-1):"memory");
 
-
-
         while(restart == 0){
             recieve(i2s_i, p_din, num_in, 0);
 
@@ -86,14 +82,11 @@ void i2s_slave(client i2s_slave_callback_if i2s_i,
 
             recieve(i2s_i, p_din, num_in, 1);
 
-
             send(i2s_i, p_dout, num_out, 1);
-
 
         }
 
         recieve(i2s_i, p_din, num_in, 0);
         recieve(i2s_i, p_din, num_in, 1);
-
     }
 }
