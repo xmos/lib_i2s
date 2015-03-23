@@ -5,8 +5,8 @@
 #include <stddef.h>
 
 typedef enum {
-    I2S_MODE_I2S,
-    I2S_MODE_LEFT_JUSTIFIED,
+    I2S_MODE_I2S,            //Use this for when the LR clock is ahead of the data by one bit clock.
+    I2S_MODE_LEFT_JUSTIFIED, //Use this for when the data and LR clock are phase aligned.
 } i2s_mode;
 
 /** Interface representing callback events that can occur during the

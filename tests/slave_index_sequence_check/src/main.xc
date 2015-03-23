@@ -57,13 +57,15 @@ void app(server interface i2s_slave_callback_if i2s){
       printintln(index);
       break;
     case i2s.frame_start(unsigned timestamp, unsigned &restart):
-      restart = 0;
-      printstrln("F");
+      printstr("F");
+      printintln(fcount);
       fcount++;
-      if (fcount == 4)
-        exit(0);
+      restart = fcount == 4; 
       break;
     case i2s.init(i2s_mode &mode):
+
+      if (fcount >0 )
+        exit(0);
       mode = I2S_MODE_I2S;
       break;
     }
