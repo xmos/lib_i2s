@@ -1,22 +1,22 @@
 I2S Slave Checker Started
 S0
-S1
-R0
 F0
-S0
-R1
 S1
 R0
+S0
 F1
-S0
 R1
 S1
 R0
+S0
 F2
-S0
 R1
 S1
 R0
+S0
 F3
+R1
+S1
+R0
 R1
 

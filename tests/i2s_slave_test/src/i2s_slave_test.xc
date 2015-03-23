@@ -130,8 +130,8 @@ void app(server interface i2s_slave_callback_if i2s_i){
                         max_delta_squared = delta_squared;
                 }
 
-                if(max_delta_squared > 10 * 10)
-                    error |= 1;
+                //if(max_delta_squared > 10 * 10)
+                    //error |= 1;
 
                 error |= request_response(setup_strobe_port, setup_resp_port);
 
