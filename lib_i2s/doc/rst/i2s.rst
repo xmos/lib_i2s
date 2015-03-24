@@ -74,6 +74,25 @@ The following application notes use this library:
 Hardware characteristics
 ------------------------
 
+Connecting to the xCORE I2S master and slave
+............................................
+
+The i2s wires need to be connected to the xCORE device as shown in
+:ref:`i2s_xcore_connect`. The signals can be connected to any
+one bit ports on the device provide they do not overlap any other used
+ports and are all on the same tile.
+
+.. _i2s_xcore_connect:
+
+.. figure:: images/i2s_connect.*
+   :width: 40%
+
+   I2S connection to the xCORE device
+
+If only one data direction is required then the *DOUT* or *DIN* lines
+need not be connected.
+
+
 I2S master
 ==========
 
@@ -106,6 +125,7 @@ Mode: I2S justified
 ~~~~~~~~~~~~~~~~~~~
  
 .. wavedrom:: Left Justified Mode
+
   {signal: [
   {name: 'BCLK',  wave: '10101|010101|01..'},
   {name: 'LRCLK', wave: '10...|..1...|....'},
@@ -117,6 +137,7 @@ Mode: Left justified
 ~~~~~~~~~~~~~~~~~~~~
 
 .. wavedrom:: I2S Mode
+
   {signal: [
   {name: 'BCLK',  wave: '1010101|010101|01..'},
   {name: 'LRCLK', wave: '10.....|1.....|0..'},
@@ -170,6 +191,9 @@ You will also have to add ``lib_i2s`` to the
 |i2s| components are instantiated as parallel tasks that run in a
 ``par`` statement. The application can connect via an interface
 connection.
+.. figure:: images/i2s_master_task_diag.*
+
+   SPI master task diagram
 
 For example, the following code instantiates an |i2s| master component
 and connects to it::
@@ -238,6 +262,9 @@ You will also have to add ``lib_i2s`` to the
 |i2s| components are instantiated as parallel tasks that run in a
 ``par`` statement. The application can connect via an interface
 connection.
+.. figure:: images/i2s_slave_task_diag.*
+
+   SPI master task diagram
 
 For example, the following code instantiates an |i2s| slave component
 and connects to it::
@@ -299,14 +326,6 @@ In order to use the interfaces efficiently the user is expected to
 handle the callbacks with minimum delay. Both the i2s master and slave will 
 call their methods in a predefined order.
 
-digraph g {
-  init -> frame_start;
-  frame_start -> send_head;
-  send_head -> send -> recieve -> send;
-  send -> recieve_tail;
-  recieve_tail -> init;
-}
-
 As the i2s library uses it ports in 32 bit buffered mode they are always sending 
 data out one word ahead and recieving data in one word behind. For this 
 reason after the user has responded to the ``init`` callback the i2s 
@@ -327,7 +346,9 @@ out buffered port:32 p_dout[4] = {XS1_PORT_1A, XS1_PORT_1B, XS1_PORT_1C, XS1_POR
 
 Then the samples wille be number as indicated below::
 
+
 .. wavedrom:: i2s channel numbering
+
   {signal: [
   {name: 'LRCLK', wave: '1.0.1.0.1..'},
   {name: 'DOUT[0]',  wave: 'xx2.2.2.2.x.', data: ['0','1', '0','1']},
@@ -382,6 +403,14 @@ recieve - the right channel data for port 1A. It will have index 1.
 recieve - the right channel data for port 1B. It will have index 3.
 recieve - the right channel data for port 1C. It will have index 5.
 recieve - the right channel data for port 1D. It will have index 7.
+
+Equally:
+
+.. figure:: images/i2s_state_machine.*
+   :width: 40%
+
+   I2S state machine
+
 
 The ``frame_start`` callback returns a timestamp. This timestamp should 
 be used to compare the time of one frame to another to detemine the speed 

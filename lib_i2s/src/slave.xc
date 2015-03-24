@@ -60,29 +60,34 @@ void i2s_slave(client i2s_slave_callback_if i2s_i,
         p_lrclk when pinseq(0x80000000) :> int @ port_time;
         port_time += (m == I2S_MODE_I2S);
 
+  
         for(size_t i=0;i<num_out;i++)
             p_dout[i] @ port_time + 32+32  <: bitrev(i2s_i.send(i*2));
 
 
-        t:> time;
-        i2s_i.frame_start(time, restart);
 
         send(i2s_i, p_dout, num_out, 1);
 
         for(size_t i=0;i<num_in;i++)
             asm volatile("setpt res[%0], %1"::"r"(p_din[i]), "r"(port_time + 64+32-1):"memory");
+      t:> time;
+        i2s_i.frame_start(time, restart);
+
 
         while(restart == 0){
+
+  
             recieve(i2s_i, p_din, num_in, 0);
 
             send(i2s_i, p_dout, num_out, 0);
 
-            t:> time;
-            i2s_i.frame_start(time, restart);
 
             recieve(i2s_i, p_din, num_in, 1);
 
             send(i2s_i, p_dout, num_out, 1);
+          t:> time;
+            i2s_i.frame_start(time, restart);
+
 
         }
 

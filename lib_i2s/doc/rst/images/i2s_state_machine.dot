@@ -1,0 +1,21 @@
+digraph g {
+
+  head0 [label="init()", shape=box];
+  head1 [label="send() - left samples", shape=box];
+  head2 [label="frame_start()", shape=box];
+  head3 [label="send() - right samples", shape=box];
+
+  body0 [label="recieve() - left samples", shape=box];
+  body1 [label="send() - left samples", shape=box];
+  body2 [label="frame_start()", shape=box];
+  body3 [label="recieve() - right samples", shape=box];
+  body4 [label="send() - right samples", shape=box];
+
+  tail0 [label="recieve() - left samples", shape=box];
+  tail1 [label="recieve() - right samples", shape=box];
+
+  head0 -> head1 -> head2 -> head3 -> body0 -> body1 -> body2 -> body3 -> body4;
+  tail0 -> tail1 -> head0;
+  body4 -> body0 [label="restart == 0"];
+  body4 -> tail0 [label="restart != 0"];
+}
