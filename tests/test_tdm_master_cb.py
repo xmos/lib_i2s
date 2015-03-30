@@ -6,7 +6,7 @@ from tdm_checker import TDMMasterChecker
 def do_test(num_in, num_out, testlevel):
     resources = xmostest.request_resource("xsim")
 
-    binary = 'tdm_master_cb_test/bin/{i}{o}/tdm_master_cb_test_{i}{o}.xe'.format(i=num_in, o=num_out)
+    binary = 'tdm_master_cb_test/bin/{t}_{i}{o}/tdm_master_cb_test_{t}_{i}{o}.xe'.format(i=num_in, o=num_out, t = testlevel)
 
    
     checker = TDMMasterChecker(
@@ -20,7 +20,10 @@ def do_test(num_in, num_out, testlevel):
 
     tester = xmostest.ComparisonTester(open('tdm_cb_test.expect'),
                                      'lib_i2s', 'tdm_master_sim_tests',
-                                     'basic_test', {'num_in':num_in, 'num_out':num_out},regexp=True)
+                                     'basic_test_%s'%testlevel,
+                                     {'num_in':num_in, 'num_out':num_out},
+                                       regexp=True,
+                                       ignore=["CONFIG:"])
 
     tester.set_min_testlevel(testlevel)
 
@@ -33,9 +36,11 @@ def do_test(num_in, num_out, testlevel):
 
 
 def runtest():
+    do_test(2, 2, "smoke")
     do_test(4, 4, "smoke")
     do_test(0, 4, "smoke")
     do_test(4, 0, "smoke")
+    do_test(4, 4, "nightly")
     return
 
 

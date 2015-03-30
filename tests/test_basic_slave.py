@@ -4,11 +4,11 @@ from i2s_slave_checker import I2SSlaveChecker
 from i2s_slave_checker import Clock
 import os
 
-def do_slave_test(num_in, num_out):
+def do_slave_test(num_in, num_out, testlevel):
 
     resources = xmostest.request_resource("xsim")
 
-    binary = 'i2s_slave_test/bin/{i}{o}/i2s_slave_test_{i}{o}.xe'.format(i=num_in, o=num_out)
+    binary = 'i2s_slave_test/bin/{tl}_{i}{o}/i2s_slave_test_{tl}_{i}{o}.xe'.format(i=num_in, o=num_out, tl=testlevel)
 
     clk = Clock("tile[0]:XS1_PORT_1A")
     
@@ -24,9 +24,12 @@ def do_slave_test(num_in, num_out):
 
     tester = xmostest.ComparisonTester(open('slave_test.expect'),
                                      'lib_i2s', 'i2s_slave_sim_tests',
-                                     'basic_test', 
+                                     'basic_test_%s'%testlevel,
                                      {'num_in':num_in, 'num_out':num_out},
-                                     regexp=True)
+                                       regexp=True,
+                                       ignore=["CONFIG:.*"])
+
+    tester.set_min_testlevel(testlevel)
 
     xmostest.run_on_simulator(resources['xsim'], binary,
                               simthreads = [clk, checker],
@@ -36,10 +39,8 @@ def do_slave_test(num_in, num_out):
                               tester = tester)
 
 def runtest():
-    do_slave_test(4, 4)
-#    for num_in in [0, 1, 2, 3, 4]:  
-#      for num_out in [0, 1, 2, 3, 4]:
-#        if num_in + num_out == 0:
-#          continue
-#        do_slave_test(num_in, num_out)
+    do_slave_test(4, 4, "smoke")
+    do_slave_test(4, 0, "smoke")
+    do_slave_test(0, 4, "smoke")
+    do_slave_test(4, 4, "nightly")
 

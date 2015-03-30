@@ -1,81 +1,101 @@
-I2S Library
-===========
+.. include:: ../../../README.rst
 
-.. |i2s| replace:: I |-| :sup:`2` |-| S
+External signal description
+---------------------------
 
-.. rheader::
+I2S
+...
 
-   I2S |version|
+I2S is a protocol between two devices where one is the *master* and
+one is the *slave* . The protocol is made up of four signals shown
+in :ref:`i2s_wire_table`.
 
-I2S Libary
-----------
+.. _i2s_wire_table:
 
-A software defined, industry-standard, |i2s| library
-that allows you to control an |i2s| bus via xCORE ports.
-|i2s| is a digital data streaming interface. The components in the libary
-are controlled via C using the XMOS multicore extensions (xC) and
-can either act as |i2s| master or slave.
+.. list-table:: I2S data wires
+     :class: vertical-borders horizontal-borders
 
-Features
-........
+     * - *MCLK*
+       - Clock line, driven by external oscillator
+     * - *BCLK*
+       - Bit clock. This is a fixed divide of the *MCLK* and is driven
+         by the master.
+     * - *LRCLK* (or *WCLK*)
+       - Word clock (or word select). This is driven by the master.
+     * - *DATA*
+       - Data line, driven by one of the slave or master depending on
+         the data direction. There may be several data lines in
+         differing directions.
 
- * |i2s| master and |i2s| slave modes.
- * Handles up to ?? input and output channels
- * Support for standard |i2s|, left justified or right justified modes.
 
-Components
-...........
+The configuration of an |i2s| signal depends on the parameters shown
+in :ref:`i2s_signal_params`.
 
- * |i2s| master
- * |i2s| slave
+.. _i2s_signal_params:
 
-Resource Usage
-..............
+.. list-table:: I2S configuration parameters
+     :class: vertical-borders horizontal-borders
 
-.. list-table::
-   :header-rows: 1
-   :class: wide vertical-borders horizontal-borders
+     * - *MCLK_BCLK_RATIO*
+       - The fixed ratio between the master clock and the bit clock.
+     * - *MODE*
+       - The mode - either |i2s| or left justified.
 
-   * - Component
-     - Pins
-     - Ports
-     - Clock Blocks
-     - Ram
-     - Logical cores
-   * - Master
-     - 3 + data lines
-     - 3 x (1-bit) + data lines
-     - 0
-     - ~0.7K
-     - 1
-   * - Slave
-     - 3 + data lines
-     - 3 x (1-bit) + data lines
-     - 0
-     - ~0.7K
-     - 1
+The *MCLK_BCLK_RATIO* should be such that 64 bits can be output by the
+bit clock at the data rate of the |i2s| signal. For example, a
+24.576Mhz master clock with a ratio of 8 gives a bit clock at
+3.072Mhz. This bit clock can output 64 bits at a frequency of 48Khz -
+which is the underlying rate of the data.
 
-Software version and dependencies
-.................................
+The master signals data transfer should occur by a transition on the
+*LRCLK* wire. There are two supported modes for |i2s|. In *I2S mode*
+(shown in :ref:`i2s_i2s_mode_signal`) data is transferred on the
+second falling edge after the *LRCLK* transitions.
 
-This document pertains to version |version| of the |i2s| library. It is
-intended to be used with version 13.x of the xTIMEcomposer studio tools.
+.. _i2s_i2s_mode_signal:
 
-The library does not have any dependencies (i.e. it does not rely on any
-other libraries).
+.. wavedrom:: I2S Mode
 
-Related application notes
-.........................
+  {signal: [
+  {name: 'BCLK',  wave: '1010101|010101|01..'},
+  {name: 'LRCLK', wave: '10.....|1.....|0..'},
+  {name: 'DOUT',  wave: 'xxx2.2.|2.2.2.|2.x.', data: ['MSB(l)',,'LSB(l)', 'MSB(r)',,'LSB(r)']},
+  {name: 'DIN',   wave: 'xxx2.2.|2.2.2.|2.x.', data: ['MSB(l)',,'LSB(l)', 'MSB(r)',,'LSB(r)']},]
+  }
 
-The following application notes use this library:
 
-  * AN00052 - How to use the I2S component
+In *Left Justified Mode* (shown in :ref:`i2s_left_justified_mode_signal`) the
+data is transferred on the next falling edge after the *LRCLK*
+transition.
 
-Hardware characteristics
-------------------------
+.. _i2s_left_justified_mode_signal:
 
-Connecting to the xCORE I2S master and slave
-............................................
+.. wavedrom:: Left Justified Mode
+
+  {signal: [
+  {name: 'BCLK',  wave: '10101|010101|01..'},
+  {name: 'LRCLK', wave: '10...|..1...|....'},
+  {name: 'DOUT',  wave: 'x2.2.|2.2.2.|2.x.', data: ['MSB(l)',,'LSB(l)', 'MSB(r)',,'LSB(r)']},
+  {name: 'DIN',   wave: 'x2.2.|2.2.2.|2.x.', data: ['MSB(l)',,'LSB(l)', 'MSB(r)',,'LSB(r)']},]
+  }
+
+In either case the signal multiplexes two channels of data onto one
+data line. When the *LRCLK* is low, the *left* channel is
+transmitted. When the *LRCLK* is high, the *right* channel is
+transmitted.
+
+All data is transmitted most significant bit first. The xCORE |i2s|
+library assumes 32 bits of data between *LRCLK* transitions. How the
+data is aligned is expeced to be done in software by the
+application.
+
+I2S speeds and performance
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Connecting I2S signals to the xCORE device
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 The i2s wires need to be connected to the xCORE device as shown in
 :ref:`i2s_xcore_connect`. The signals can be connected to any
@@ -92,90 +112,90 @@ ports and are all on the same tile.
 If only one data direction is required then the *DOUT* or *DIN* lines
 need not be connected.
 
+|newpage|
 
-I2S master
-==========
+TDM
+...
 
-The signals from the xCore required to drive an I2S Master are:
+TDM is a protocol that multiplexes several signals onto one wire.
+It is a protocol between two devices where one is the *master* and
+one is the *slave* . The protocol is made up of three signals shown
+in :ref:`tdm_wire_table`.
 
-.. _i2s_master_wire_table:
+.. _tdm_wire_table:
 
-.. list-table:: I2S data and signal wires
+.. list-table:: TDM data wires
      :class: vertical-borders horizontal-borders
 
      * - *BCLK*
-       - Bit clock line
-     * - *LR_CLK*
-       - Left/right clock
-     * - *DOUT*
-       - Data out. 
-     * - *DIN*
-       - Data in.
+       - Bit clock line, driven by external oscillator.
+     * - *FSYNC*
+       - The frame sync line. This is driven by the master.
+     * - *DATA*
+       - Data line, driven by one of the slave or master depending on
+         the data direction. There may be several data lines in
+         differing directions.
 
-Additionally, there is an expected MCLK(master clock). This clock, typically 
-divided down to form the bit clock, is used to distribute a system wide clock
-to all devices wishing to synchronise to the I2S bus.
+Unlike |i2s|, the bit clock is not a divide of an underlying master
+clock.
 
+The configuration of a TDM signal depends on the parameters shown
+in :ref:`tdm_signal_params`.
 
-I2S has two alignment modes: data aligned to the LR clock and the data behind 
-the LR clock by a single bit clock. These are refered to as I2S aligned(``I2S_MODE_I2S``) 
-and left justified1(``I2S_MODE_LEFT_JUSTIFIED``).
+.. _tdm_signal_params:
 
-Mode: I2S justified
-~~~~~~~~~~~~~~~~~~~
- 
-.. wavedrom:: Left Justified Mode
-
-  {signal: [
-  {name: 'BCLK',  wave: '10101|010101|01..'},
-  {name: 'LRCLK', wave: '10...|..1...|....'},
-  {name: 'DOUT',  wave: 'x2.2.|2.2.2.|2.x.', data: ['MSB(l)',,'LSB(l)', 'MSB(r)',,'LSB(r)']},
-  {name: 'DIN',   wave: 'x2.2.|2.2.2.|2.x.', data: ['MSB(l)',,'LSB(l)', 'MSB(r)',,'LSB(r)']},]
-  }
-
-Mode: Left justified
-~~~~~~~~~~~~~~~~~~~~
-
-.. wavedrom:: I2S Mode
-
-  {signal: [
-  {name: 'BCLK',  wave: '1010101|010101|01..'},
-  {name: 'LRCLK', wave: '10.....|1.....|0..'},
-  {name: 'DOUT',  wave: 'xxx2.2.|2.2.2.|2.x.', data: ['MSB(l)',,'LSB(l)', 'MSB(r)',,'LSB(r)']},
-  {name: 'DIN',   wave: 'xxx2.2.|2.2.2.|2.x.', data: ['MSB(l)',,'LSB(l)', 'MSB(r)',,'LSB(r)']},]
-  }
-
-Note that left justified mode can be used for right justification also.
-In the case of right justification it is up to the user to bit reverse 
-the data before sending it and after recieveing it. 
-
-I2S slave
-=========
-
-The signals from the xCore required to drive an I2S Slave are:
-
-.. _i2s_master_wire_table:
-
-.. list-table:: I2S data and signal wires
+.. list-table:: TDM configuration parameters
      :class: vertical-borders horizontal-borders
 
-     * - *BCLK*
-       - Bit clock line
-     * - *LR_CLK*
-       - Left/right clock
-     * - *DOUT*
-       - Data out. 
-     * - *DIN*
-       - Data in.
+     * - *CHANNELS_PER_FRAME*
+       - The number of channels multiplexed into a frame on the data line.
+     * - *FSYNC_OFFSET*
+       - The number of bits between the frame sync signal transitioning an
+         data being drive on the data line.
+     * - *FSYNC_LENGTH*
+       - The number of bits that the frame sync signal stays high for
+         when signalling frame start.
 
-The i2s slave operates in much the same way as the master except it 
-is no longer responsible for driving the bit clock and the LR clock. 
-Instead the slave triggers off the first falling edge of the LR clock 
-then clocks data in and out one frame later. It assumes 32 bit data and
-the alignment with the LR clock is given by the same mode as with the 
-master implementation.
+:ref:`tdm_sig_1` and :ref:`tdm_sig_2` show example waveforms for TDM
+with different offset and sync length values.
 
-The timing for the I2S slave is the same as the I2S master, see above.
+.. _tdm_sig_1:
+
+.. wavedrom:: TDM signal (sync offset 0, sync length 1)
+
+ { signal: [
+ { name: 'FSYNC', wave: '0..10...|......|......|...10..' },
+   {name: 'BCLK',  wave: '01010101|010101|010101|0101010', node: '...B'},
+  { name: 'DATA', wave: 'x..2.2.2|.2.2.2|.2.2.2|.2.2.2.', data: ['MSB(c0)',,,'LSB(c0)','MSB(c1)',,'LSB(c1)','MSB(c2)',,'LSB(cN)','MSB(c0)'], node: '...................'}],
+ }
+
+.. _tdm_sig_2:
+
+.. wavedrom:: TDM signal (sync offset 1, sync length 32)
+
+  { signal: [
+  { name: 'FSYNC', wave: '01......|.0....|......|.1.....' },
+    {name: 'BCLK',  wave: '01010101|010101|010101|0101010', node: '...B'},
+   { name: 'DATA', wave: 'x..2.2.2|.2.2.2|.2.2.2|.2.2.2.', data: ['MSB(c0)',,,'LSB(c0)','MSB(c1)',,'LSB(c1)','MSB(c2)',,'LSB(cN)','MSB(c0)'], node: '...................'}],
+  }
+
+The master signals a frame by driving the *FSYNC* signal high. After a
+delay of *FSYNC_OFFSET* bits, data is driven. Data is driven most
+significant bit first. First, 32 bits of data from Channel 0 is
+driven, then 32 bits from channel 1 up to channel N (when N is the
+number of channels per frame). The next frame is then signalled (there
+is no padding between frames).
+
+TDM speeds and performance
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Connecting TDM signals to the xCORE device
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Usage
+-----
 
 
 Master API
@@ -344,8 +364,7 @@ For example: in a system with 4 data out ports declared as::
 
 out buffered port:32 p_dout[4] = {XS1_PORT_1A, XS1_PORT_1B, XS1_PORT_1C, XS1_PORT_1D};
 
-Then the samples wille be number as indicated below::
-
+Then the samples wille be number as indicated below:
 
 .. wavedrom:: i2s channel numbering
 

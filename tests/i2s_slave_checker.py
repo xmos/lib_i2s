@@ -48,7 +48,7 @@ class I2SSlaveChecker(xmostest.SimThread):
         self.wait_for_port_pins_change([setup_strobe_port])
         return xsi.sample_port_pins(setup_data_port)
 
-    def __init__(self, bclk, lrclk, din, dout, setup_strobe_port, setup_data_port, setup_resp_port, c):
+    def __init__(self, bclk, lrclk, din, dout, setup_strobe_port, setup_data_port, setup_resp_port, c, no_start_msg = False):
         self._din = din
         self._dout = dout
         self._bclk = bclk
@@ -57,6 +57,7 @@ class I2SSlaveChecker(xmostest.SimThread):
         self._setup_data_port = setup_data_port
         self._setup_resp_port = setup_resp_port
         self._clk = c
+        self._no_start_msg = no_start_msg
 
     def run(self):
         
@@ -67,7 +68,8 @@ class I2SSlaveChecker(xmostest.SimThread):
       num_frames = 4
 
       xsi.drive_port_pins(self._bclk, 1)
-      print "I2S Slave Checker Started"
+      if not self._no_start_msg:
+          print "I2S Slave Checker Started"
       while True:
         xsi.drive_port_pins(self._setup_resp_port, 0)
         strobe_val = xsi.sample_port_pins(self._setup_strobe_port)
@@ -79,14 +81,13 @@ class I2SSlaveChecker(xmostest.SimThread):
         num_ins               = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
         num_outs              = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
         is_i2s_justified      = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
-
         xsi.drive_port_pins(self._bclk, 1)
         xsi.drive_port_pins(self._lrclk, 1)
 
         bclk_frequency = (bclk_frequency_u<<16) + bclk_frequency_l
-        #print "bclk:%d in:%d out:%d i2s_justified:%d"%(bclk_frequency, num_ins, num_outs, is_i2s_justified)
+        print "CONFIG:bclk:%d in:%d out:%d i2s_justified:%d"%(bclk_frequency, num_ins, num_outs, is_i2s_justified)
         clock_half_period = float(1000000000)/float(2*bclk_frequency)
-        
+
         rx_word=[0, 0, 0, 0]
         tx_word=[0, 0, 0, 0]
         tx_data=[[  1,   2,   3,   4,   5,   6,   7,   8],
@@ -154,14 +155,14 @@ class I2SSlaveChecker(xmostest.SimThread):
              lr_counter = (lr_counter + 1)&0x3f
              xsi.drive_port_pins(self._bclk, 0)
 
-             for p in range(0, num_outs):
+             for p in range(0, num_ins):
                 xsi.drive_port_pins(self._dout[p], tx_word[p]>>31)
                 tx_word[p] = tx_word[p]<<1
              time = time + clock_half_period
              self.wait_until(time)
              xsi.drive_port_pins(self._bclk, 1)
 
-             for p in range(0, num_ins):
+             for p in range(0, num_outs):
                 val = xsi.sample_port_pins(self._din[p])
                 rx_word[p] = (rx_word[p]<<1) + val
 
@@ -170,6 +171,7 @@ class I2SSlaveChecker(xmostest.SimThread):
 
           for p in range(0, num_outs):
              if rx_data[p*2][frame_count] != rx_word[p]:
+                print "ERROR: actual (%d) expected (%d)" % (rx_word[p],rx_data[p*2][frame_count])
                 error = True
 
           for i in range(0, 4):
@@ -182,14 +184,14 @@ class I2SSlaveChecker(xmostest.SimThread):
 
              xsi.drive_port_pins(self._bclk, 0)
 
-             for p in range(0, num_outs):
+             for p in range(0, num_ins):
                 xsi.drive_port_pins(self._dout[p], tx_word[p]>>31)
                 tx_word[p] = tx_word[p]<<1  
              time = time + clock_half_period
              self.wait_until(time)
              xsi.drive_port_pins(self._bclk, 1)
 
-             for p in range(0, num_ins):
+             for p in range(0, num_outs):
                 val = xsi.sample_port_pins(self._din[p])
                 rx_word[p] = (rx_word[p]<<1) + val
 
@@ -199,6 +201,9 @@ class I2SSlaveChecker(xmostest.SimThread):
           for p in range(0, num_outs):
              if rx_data[p*2 + 1][frame_count] != rx_word[p]:
                 error = True
+                print "ERROR: actual (%d) expected (%d)" % (rx_word[p],rx_data[p*2 + 1][frame_count])
+                error = True
+
 
         xsi.drive_port_pins(self._setup_resp_port, 1)
         #send the response

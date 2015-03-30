@@ -1,6 +1,6 @@
 #ifndef TDM_COMMON_H_
 #define TDM_COMMON_H_
-
+#include <xclib.h>
 #define TDM_MAX_CHANNELS_PER_DATA_LINE 16
 
 static void make_fsync_mask(

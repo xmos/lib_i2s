@@ -11,8 +11,21 @@ typedef struct {
     unsigned sample_rate;
 } test_setup;
 
+#if defined(SMOKE) 
+#define TEST_COUNT (2)
+#if NUM_OUT > 2 || NUM_IN > 2
+test_setup tests[TEST_COUNT] = {
+  {0 , 1,   4, 48000},
+  {-1, 1,   4, 48000},
+};
+#else
+test_setup tests[TEST_COUNT] = {
+  {0 , 1,   8, 48000},
+  {-1, 1,   8, 48000},
+};
+#endif
+#else
 #define TEST_COUNT (10)
-
 test_setup tests[TEST_COUNT] = {
     {0 , 1,   2, 48000},
     {-1, 1,   2, 48000},
@@ -32,9 +45,8 @@ test_setup tests[TEST_COUNT] = {
     {-1, 64,  4, 48000},
    // {0 , 128, 8, 48000},
    // {-1, 128, 8, 48000},
-
-
 };
+#endif
 in port p_sclk  = XS1_PORT_1A;
 out buffered port:32 p_fsync = XS1_PORT_1C;
 
@@ -92,7 +104,7 @@ static int request_response(
 
 [[distributable]]
 #pragma unsafe arrays
-void app(server interface tdm_callback_if tdm_i){
+void app(server interface i2s_callback_if tdm_i){
 
 
     int error=0;
@@ -105,7 +117,6 @@ void app(server interface tdm_callback_if tdm_i){
     int first_time = 1;
     unsigned test_index = 0;
 
-    unsigned frame_times[4];
     while(1){
         select {
         case tdm_i.receive(size_t index, int32_t sample):{
@@ -118,13 +129,16 @@ void app(server interface tdm_callback_if tdm_i){
             tx_data_counter[index]++;
             break;
         }
-        case tdm_i.frame_start(unsigned timestamp, unsigned &restart):{
-            frame_times[frames_sent]=timestamp;
+        case tdm_i.restart_check() -> i2s_restart_t restart:{
             frames_sent++;
-            restart = (frames_sent == 4);
+            if (frames_sent == 4)
+              restart = I2S_RESTART;
+            else
+              restart = I2S_NO_RESTART;
             break;
         }
-        case tdm_i.init(int &offset, unsigned &sclk_edge_count, unsigned &channels_per_data_line):{
+
+        case tdm_i.init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config):{
             if(!first_time){
 
                 unsigned x=request_response(setup_strobe_port, setup_resp_port);
@@ -135,12 +149,14 @@ void app(server interface tdm_callback_if tdm_i){
                 if(test_index == TEST_COUNT)
                     _Exit(1);
             }
-            offset = tests[test_index].offset;
-            sclk_edge_count = tests[test_index].sclk_edge_count;
-            channels_per_data_line = tests[test_index].channels_per_data_line;
+            tdm_config.offset = tests[test_index].offset;
+            tdm_config.sync_len = tests[test_index].sclk_edge_count;
+            tdm_config.channels_per_frame = tests[test_index].channels_per_data_line;
             frames_sent = 0;
-            broadcast(tests[test_index].sample_rate, NUM_IN, NUM_OUT, offset ==-1,
-                    sclk_edge_count, channels_per_data_line );
+            broadcast(tests[test_index].sample_rate, NUM_IN, NUM_OUT,
+                      tdm_config.offset ==-1,
+                      tdm_config.sync_len,
+                      tdm_config.channels_per_frame );
             first_time = 0;
             y=0;
             x=0;
@@ -151,7 +167,7 @@ void app(server interface tdm_callback_if tdm_i){
 }
 
 int main(){
-    interface tdm_callback_if tdm_i;
+    interface i2s_callback_if tdm_i;
 
     stop_clock(sclk);
     configure_clock_src(sclk, p_sclk);
@@ -159,7 +175,7 @@ int main(){
 
     par {
       [[distribute]] app(tdm_i);
-      tdm_master_cb(tdm_i, p_fsync, p_dout, NUM_OUT, p_din, NUM_IN, sclk);
+      tdm_master(tdm_i, p_fsync, p_dout, NUM_OUT, p_din, NUM_IN, sclk);
       par(int i=0;i<7;i++) while(1);
     }
     return 0;

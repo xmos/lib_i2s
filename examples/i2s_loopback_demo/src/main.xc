@@ -120,14 +120,14 @@ void i2s_loopback(server i2s_callback_if i2s,
   int32_t samples[8];
   while (1) {
     select {
-    case i2s.init(unsigned & mclk_bclk_ratio, i2s_mode & mode):
+    case i2s.init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config):
       /* Set CODEC in reset */
       codec_reset.output(0);
 
-      mode = I2S_MODE_I2S;
+      i2s_config.mode = I2S_MODE_I2S;
 
       /* Set master clock select appropriately */
-      mclk_bclk_ratio = (MASTER_CLOCK_FREQUENCY/SAMPLE_FREQUENCY)/64;
+      i2s_config.mclk_bclk_ratio = (MASTER_CLOCK_FREQUENCY/SAMPLE_FREQUENCY)/64;
 
       if ((SAMPLE_FREQUENCY % 22050) == 0) {
         clock_select.output(0);
@@ -146,8 +146,8 @@ void i2s_loopback(server i2s_callback_if i2s,
                    CODEC_IS_I2S_SLAVE);
       break;
 
-    case i2s.frame_start(unsigned timestamp, unsigned &restart):
-      // Nothing to do on frame start
+    case i2s.restart_check() -> i2s_restart_t restart:
+      restart = I2S_NO_RESTART;
       break;
 
     case i2s.receive(size_t index, int32_t sample):

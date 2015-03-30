@@ -6,7 +6,7 @@ TARGET = SLICEKIT-A16
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
 # the project name
-APP_NAME = i2s_slave_test
+APP_NAME =
 
 # The USED_MODULES variable lists other module used by the application.
 USED_MODULES = lib_i2s
@@ -17,18 +17,8 @@ USED_MODULES = lib_i2s
 # If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
 # xcc for the final link (mapping) stage.
 
-COMMON_FLAGS = -O2 -g -save-temps
-
-$(foreach out,0 1 2 3 4,\
- $(foreach in,0 1 2 3 4,\
-   $(eval \
-    XCC_FLAGS_smoke_$(out)$(in) = $(COMMON_FLAGS) -DNUM_OUT=$(out) -DNUM_IN=$(in) -DSMOKE\
-    ) \
-   $(eval \
-    XCC_FLAGS_nightly_$(out)$(in) = $(COMMON_FLAGS) -DNUM_OUT=$(out) -DNUM_IN=$(in)\
-    ) \
- ) \
-)
+XCC_FLAGS_i2s = -O3 -g -save-temps -DI2S
+XCC_FLAGS_tdm = -O3 -g -save-temps -DTDM
 
 # The XCORE_ARM_PROJECT variable, if set to 1, configures this
 # project to create both xCORE and ARM binaries.

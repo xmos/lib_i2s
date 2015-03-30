@@ -6,7 +6,7 @@ TARGET = SLICEKIT-A16
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
 # the project name
-APP_NAME = i2s_slave_test
+APP_NAME =
 
 # The USED_MODULES variable lists other module used by the application.
 USED_MODULES = lib_i2s
@@ -17,18 +17,26 @@ USED_MODULES = lib_i2s
 # If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
 # xcc for the final link (mapping) stage.
 
-COMMON_FLAGS = -O2 -g -save-temps
-
 $(foreach out,0 1 2 3 4,\
  $(foreach in,0 1 2 3 4,\
    $(eval \
-    XCC_FLAGS_smoke_$(out)$(in) = $(COMMON_FLAGS) -DNUM_OUT=$(out) -DNUM_IN=$(in) -DSMOKE\
-    ) \
+	XCC_FLAGS_master_$(out)$(in) = -O2 -g -DMASTER  -DNUM_OUT=$(out) -DNUM_IN=$(in)\
+    )\
    $(eval \
-    XCC_FLAGS_nightly_$(out)$(in) = $(COMMON_FLAGS) -DNUM_OUT=$(out) -DNUM_IN=$(in)\
+	XCC_FLAGS_slave_$(out)$(in) = -O2 -g -DSLAVE  -DNUM_OUT=$(out) -DNUM_IN=$(in)\
     ) \
  ) \
 )
+
+XCC_FLAGS_tdm_118 = -O2 -g -DTDM  -DTDM_CHANS_PER_FRAME=8 -DNUM_OUT=1 -DNUM_IN=1
+XCC_FLAGS_tdm_108 = -O2 -g -DTDM  -DTDM_CHANS_PER_FRAME=8 -DNUM_OUT=1 -DNUM_IN=0
+XCC_FLAGS_tdm_018 = -O2 -g -DTDM  -DTDM_CHANS_PER_FRAME=8 -DNUM_OUT=0 -DNUM_IN=1
+XCC_FLAGS_tdm_224 = -O2 -g -DTDM  -DTDM_CHANS_PER_FRAME=4 -DNUM_OUT=2 -DNUM_IN=2
+
+
+XCC_FLAGS_i2s_tdm_i2s = -O2 -g -DI2S_TDM_I2S -DI2S_TDM -DNUM_OUT=4 -DNUM_IN=4 -DTDM_CHANS_PER_FRAME=8
+
+XCC_FLAGS_i2s_tdm_tdm = -O2 -g -DI2S_TDM_TDM -DI2S_TDM -DNUM_OUT=4 -DNUM_IN=4 -DTDM_CHANS_PER_FRAME=8
 
 # The XCORE_ARM_PROJECT variable, if set to 1, configures this
 # project to create both xCORE and ARM binaries.

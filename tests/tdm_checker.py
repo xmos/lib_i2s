@@ -2,8 +2,8 @@ import xmostest
 
 class TDMMasterChecker(xmostest.SimThread):
 
-    def print_setup(self, sr_frequency, sclk_frequency, num_outs, num_ins, is_i2s_justified, sclk_edge_count, channels_per_data_line):
-        print "sample rate: %d\tSCLK: %d\tnum ins %d,\tnum outs:%d, is i2s justified: %d\tsclk_edge_count %d\tchannels_per_data_line: %d"%(sr_frequency, sclk_frequency, num_outs, num_ins, is_i2s_justified, sclk_edge_count, channels_per_data_line)
+    def print_setup(self, sr_frequency, sclk_frequency, num_outs, num_ins, is_i2s_justified, sclk_edge_count, channels_per_data_line, prefix=""):
+        print "%ssample rate: %d\tSCLK: %d\tnum ins %d,\tnum outs:%d, is i2s justified: %d\tsclk_edge_count %d\tchannels_per_data_line: %d"%(prefix,sr_frequency, sclk_frequency, num_outs, num_ins, is_i2s_justified, sclk_edge_count, channels_per_data_line)
         return
 
     def get_setup_data(self, xsi, setup_strobe_port, setup_data_port):
@@ -11,7 +11,7 @@ class TDMMasterChecker(xmostest.SimThread):
         self.wait_for_port_pins_change([setup_strobe_port])
         return xsi.sample_port_pins(setup_data_port)
 
-    def __init__(self, sclk, fsync, din, dout, setup_strobe_port, setup_data_port, setup_resp_port):
+    def __init__(self, sclk, fsync, din, dout, setup_strobe_port, setup_data_port, setup_resp_port, extra_clocks = 0):
         self._din = din
         self._dout = dout
         self._sclk = sclk
@@ -19,6 +19,7 @@ class TDMMasterChecker(xmostest.SimThread):
         self._setup_strobe_port = setup_strobe_port
         self._setup_data_port = setup_data_port
         self._setup_resp_port = setup_resp_port
+        self._extra_clocks = extra_clocks
 
     def run(self):
       xsi = self.xsi
@@ -41,7 +42,7 @@ class TDMMasterChecker(xmostest.SimThread):
 
         sr_frequency = (sr_frequency_u<<16) + sr_frequency_l
         sclk_frequency = sr_frequency * 32 * channels_per_data_line
-        #self.print_setup(sr_frequency, sclk_frequency, num_outs, num_ins, is_i2s_justified, sclk_edge_count, channels_per_data_line)
+        self.print_setup(sr_frequency, sclk_frequency, num_outs, num_ins, is_i2s_justified, sclk_edge_count, channels_per_data_line, prefix="CONFIG: ")
 
         time = xsi.get_time()
         max_num_in_or_outs = 4
@@ -135,6 +136,13 @@ class TDMMasterChecker(xmostest.SimThread):
           for p in range(0, num_ins):
             rx_word[p] = 0
          frame_count += 1
+        for x in range(0, self._extra_clocks):
+            self.wait_until(time)
+            time = time + clock_half_period
+            xsi.drive_port_pins(self._sclk, 1)
+            self.wait_until(time)
+            time = time + clock_half_period
+            xsi.drive_port_pins(self._sclk, 0)
         xsi.drive_port_pins(self._setup_resp_port, 1)
         #send the response
         self.wait_for_port_pins_change([self._setup_strobe_port])        
