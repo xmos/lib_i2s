@@ -1,4 +1,4 @@
-DEPENDENT_MODULES = lib_xassert lib_logging
+DEPENDENT_MODULES = lib_xassert(>=2.0.0) lib_logging(>=2.0.0)
 
 VERSION = 3.0.0
 
