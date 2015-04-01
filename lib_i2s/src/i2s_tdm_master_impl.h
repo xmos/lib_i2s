@@ -1,3 +1,4 @@
+// Copyright (c) 2015, XMOS Ltd, All rights reserved
 #include <i2s.h>
 #include "tdm_common.h"
 #include <xs1.h>

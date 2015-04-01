@@ -1,3 +1,4 @@
+// Copyright (c) 2015, XMOS Ltd, All rights reserved
 #include <i2s.h>
 
 #undef i2s_tdm_master

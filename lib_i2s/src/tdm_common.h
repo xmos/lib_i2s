@@ -1,3 +1,4 @@
+// Copyright (c) 2015, XMOS Ltd, All rights reserved
 #ifndef TDM_COMMON_H_
 #define TDM_COMMON_H_
 #include <xclib.h>
