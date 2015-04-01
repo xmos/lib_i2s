@@ -6,7 +6,7 @@ External signal description
 I2S
 ...
 
-I2S is a protocol between two devices where one is the *master* and
+|i2s| is a protocol between two devices where one is the *master* and
 one is the *slave* . The protocol is made up of four signals shown
 in :ref:`i2s_wire_table`.
 
@@ -43,8 +43,8 @@ in :ref:`i2s_signal_params`.
 
 The *MCLK_BCLK_RATIO* should be such that 64 bits can be output by the
 bit clock at the data rate of the |i2s| signal. For example, a
-24.576Mhz master clock with a ratio of 8 gives a bit clock at
-3.072Mhz. This bit clock can output 64 bits at a frequency of 48Khz -
+24.576MHz master clock with a ratio of 8 gives a bit clock at
+3.072MHz. This bit clock can output 64 bits at a frequency of 48Khz -
 which is the underlying rate of the data.
 
 The master signals data transfer should occur by a transition on the
@@ -63,6 +63,7 @@ second falling edge after the *LRCLK* transitions.
   {name: 'DIN',   wave: 'xxx2.2.|2.2.2.|2.x.', data: ['MSB(l)',,'LSB(l)', 'MSB(r)',,'LSB(r)']},]
   }
 
+|newpage|
 
 In *Left Justified Mode* (shown in :ref:`i2s_left_justified_mode_signal`) the
 data is transferred on the next falling edge after the *LRCLK*
@@ -87,30 +88,149 @@ transmitted.
 All data is transmitted most significant bit first. The xCORE |i2s|
 library assumes 32 bits of data between *LRCLK* transitions. How the
 data is aligned is expeced to be done in software by the
-application.
-
-I2S speeds and performance
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+application. For example, some audio codecs have a *Right Justified*
+mode; to attain this mode the library should be set to
+*Left Justified* mode to align the *LRCLK* signal and then the data
+should be right shifted by the application before being passed to the
+library.
 
 Connecting I2S signals to the xCORE device
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 The i2s wires need to be connected to the xCORE device as shown in
-:ref:`i2s_xcore_connect`. The signals can be connected to any
+:ref:`i2s_master_xcore_connect` and :ref:`i2s_slave_xcore_connect`. The signals can be connected to any
 one bit ports on the device provide they do not overlap any other used
 ports and are all on the same tile.
 
-.. _i2s_xcore_connect:
+.. _i2s_master_xcore_connect:
 
-.. figure:: images/i2s_connect.*
-   :width: 40%
+.. figure:: images/i2s_master_connect.*
+   :width: 30%
 
-   I2S connection to the xCORE device
+   I2S connection to the xCORE device (xCORE as I2S master)
+
+.. _i2s_slave_xcore_connect:
+
+.. figure:: images/i2s_slave_connect.*
+   :width: 30%
+
+   I2S connection to the xCORE device (xCORE as I2S slave)
 
 If only one data direction is required then the *DOUT* or *DIN* lines
 need not be connected.
+
+|newpage|
+
+I2S master speeds and performance
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The speed and number of data wires that can be driven by the |i2s|
+library running as |i2s| master
+depends on the speed of the logical core that runs the code
+and the amount of processing that occurs in the user callbacks for
+handling the data from the library. :ref:`i2s_master_62_5_speeds` and
+:ref:`i2s_master_83_3_speeds` show configurations that are known to
+work for small amounts of callback processing. Other speeds will be
+acheivable depending on the amount of processing in the application
+and the logical core speed.
+
+.. _i2s_master_62_5_speeds:
+
+.. list-table:: Known working I2S master configurations on a 62.5MHz core
+     :class: vertical-borders horizontal-borders
+     :header-rows: 1
+     :widths: 20 20 20 25 25
+
+     * - **MCLK FREQ**
+       - **MCLK/BCLK RATIO**
+       - **SAMPLE FREQ**
+       - **NUM IN (num channels)**
+       - **NUM OUT (num channels)**
+     * - 24.576MHz
+       - 2
+       - 192000
+       - 1 (2)
+       - 1 (2)
+     * - 24.576MHz
+       - 4
+       - 96000
+       - 2 (4)
+       - 2 (4)
+     * - 24.576MHz
+       - 8
+       - 48000
+       - 4 (8)
+       - 4 (8)
+     * - 12.288MHz
+       - 2
+       - 96000
+       - 2 (4)
+       - 2 (4)
+     * - 12.288MHz
+       - 4
+       - 48000
+       - 4 (8)
+       - 4 (8)
+
+.. _i2s_master_83_3_speeds:
+
+.. list-table:: Known working I2S master configurations on a 83.3MHz core
+     :class: vertical-borders horizontal-borders
+     :header-rows: 1
+     :widths: 20 20 20 25 25
+
+     * - **MCLK FREQ**
+       - **MCLK/BCLK RATIO**
+       - **SAMPLE FREQ**
+       - **NUM IN (num channels)**
+       - **NUM OUT (num channels)**
+     * - 24.576MHz
+       - 2
+       - 192000
+       - 2 (4)
+       - 2 (4)
+     * - 24.576MHz
+       - 4
+       - 96000
+       - 4 (8)
+       - 4 (8)
+     * - 12.288MHz
+       - 2
+       - 96000
+       - 4 (8)
+       - 4 (8)
+
+
+I2S slave speeds and performance
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The speed and number of data wires that can be driven by the |i2s|
+library running as slave depends on the speed of the logical core
+hat runs the code
+and the amount of processing that occurs in the user callbacks for
+handling the data from the library. :ref:`i2s_slave_62_5_speeds`
+shows configurations that are known to
+work for small amounts of callback processing. Other speeds will be
+acheivable depending on the amount of processing in the application
+and the logical core speed. Note that the when acting as slave the
+performance of the library only depends on the bit clock frequency,
+not the underlying master clock frequency.
+
+.. _i2s_slave_62_5_speeds:
+
+.. list-table:: Known working I2S slave configurations on a 62.5MHz core
+     :class: vertical-borders horizontal-borders
+     :header-rows: 1
+
+     * - **BCLK FREQU**
+       - **SAMPLE FREQ**
+       - **NUM IN (num channels)**
+       - **NUM OUT (num channels)**
+     * - 12.288MHz
+       - 192000
+       - 4 (8)
+       - 4 (8)
 
 |newpage|
 
@@ -164,9 +284,11 @@ with different offset and sync length values.
 .. wavedrom:: TDM signal (sync offset 0, sync length 1)
 
  { signal: [
- { name: 'FSYNC', wave: '0..10...|......|......|...10..' },
-   {name: 'BCLK',  wave: '01010101|010101|010101|0101010', node: '...B'},
-  { name: 'DATA', wave: 'x..2.2.2|.2.2.2|.2.2.2|.2.2.2.', data: ['MSB(c0)',,,'LSB(c0)','MSB(c1)',,'LSB(c1)','MSB(c2)',,'LSB(cN)','MSB(c0)'], node: '...................'}],
+  { name: 'FSYNC', wave: '0..1.0..|......|......|...10..', node: '...a.b' },
+   {name: 'BCLK',  wave: '01010101|010101|010101|0101010', node: '....'},
+  { name: 'DATA', wave: 'x..2.2.2|.2.2.2|.2.2.2|.2.2.2.', data: ['MSB(c0)',,,'LSB(c0)','MSB(c1)',,'LSB(c1)','MSB(c2)',,'LSB(cN)','MSB(c0)'], node: '...................'},
+ { node:'...A.B'}],
+ edge: ['a|A','A<->B fsync_len','b|B']
  }
 
 .. _tdm_sig_2:
@@ -174,9 +296,14 @@ with different offset and sync length values.
 .. wavedrom:: TDM signal (sync offset 1, sync length 32)
 
   { signal: [
-  { name: 'FSYNC', wave: '01......|.0....|......|.1.....' },
-    {name: 'BCLK',  wave: '01010101|010101|010101|0101010', node: '...B'},
-   { name: 'DATA', wave: 'x..2.2.2|.2.2.2|.2.2.2|.2.2.2.', data: ['MSB(c0)',,,'LSB(c0)','MSB(c1)',,'LSB(c1)','MSB(c2)',,'LSB(cN)','MSB(c0)'], node: '...................'}],
+    { name: 'FSYNC', wave: '01......|.0....|......|.1.....', node: '.a.b......c' },
+    {name: 'BCLK',  wave: '01010101|010101|010101|0101010'},
+   { name: 'DATA', wave: 'x..2.2.2|.2.2.2|.2.2.2|.2.2.2.', data: ['MSB(c0)',,,'LSB(c0)','MSB(c1)',,'LSB(c1)','MSB(c2)',,'LSB(cN)','MSB(c0)'], node: '...................'},
+    { node : '.A.B......'},
+    { node : '.D........C'}
+    ],
+   edge: ['a|A','A<->B offset','b|B','a|D','D<->C fsync_len','c|C'],
+ 
   }
 
 The master signals a frame by driving the *FSYNC* signal high. After a
@@ -186,20 +313,125 @@ driven, then 32 bits from channel 1 up to channel N (when N is the
 number of channels per frame). The next frame is then signalled (there
 is no padding between frames).
 
-TDM speeds and performance
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+|newpage|
 
 Connecting TDM signals to the xCORE device
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The TDM wires need to be connected to the xCORE device as shown in
+:ref:`tdm_xcore_connect`. The signals can be connected to any
+one bit ports on the device provide they do not overlap any other used
+ports and are all on the same tile.
+
+.. _tdm_xcore_connect:
+
+.. figure:: images/tdm_connect.*
+   :width: 30%
+
+   TDM connection to the xCORE device
+
+If only one data direction is required then the *DOUT* or *DIN* lines
+need not be connected.
+
+TDM speeds and performance
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The speed and number of data wires that can be driven by the |i2s|
+library running as TDM master
+depends on the speed of the logical core that runs the code
+and the amount of processing that occurs in the user callbacks for
+handling the data from the library. :ref:`tdm_master_62_5_speeds`
+show configurations that are known to
+work for small amounts of callback processing. Other speeds will be
+acheivable depending on the amount of processing in the application
+and the logical core speed.
+
+.. _tdm_master_62_5_speeds:
+
+.. list-table:: Known working TDM configurations on a 62.5MHz core
+     :class: vertical-borders horizontal-borders
+     :header-rows: 1
+
+     * - **BCLK FREQ**
+       - **CHANNELS PER FRAME**
+       - **SAMPLE FREQ**
+       - **NUM IN (num channels)**
+       - **NUM OUT (num channels)**
+
+     * - 12.288MHz
+       - 8
+       - 48000
+       - 2 (16)
+       - 2 (16)
+     * - 6.144MHz
+       - 4
+       - 48000
+       - 4 (16)
+       - 4 (16)
+
+|newpage|
+
+Combined I2S and TDM
+....................
+
+The library can drive synchronized |i2s| master and TDM signals from a single
+logical core. In this case, the *MCLK* of the |i2s| interface is the
+same as the *BCLK* of the TDM master. The sample rate must be the
+same. This implies that the TDM channels per frame must be equal
+to the twice the *MCLK*/*BCLK* ratio.
+
+Connecting synchronized I2S and TDM signals to the xCORE device
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The I2S_TDM wires need to be connected to the xCORE device as shown in
+:ref:`i2s_tdm_xcore_connect`. The signals can be connected to any
+one bit ports on the device provide they do not overlap any other used
+ports and are all on the same tile.
+
+.. _i2s_tdm_xcore_connect:
+
+.. figure:: images/i2s_tdm_connect.*
+   :width: 60%
+
+   I2S + TDM connection to the xCORE device
+
+If only one data direction is required then the *DOUT* or *DIN* lines
+need not be connected.
+
+Combined I2S and TDM speeds and performance
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The speed and number of data wires that can be driven by the
+library running combined |i2s| master and TDM
+depends on the speed of the logical core that runs the code
+and the amount of processing that occurs in the user callbacks for
+handling the data from the library. :ref:`i2s_tdm_master_62_5_speeds`
+show configurations that are known to
+work for small amounts of callback processing. Other speeds will be
+acheivable depending on the amount of processing in the application
+and the logical core speed.
+
+.. _i2s_tdm_master_62_5_speeds:
+
+.. list-table:: Known working I2S + TDM configurations on a 62.5MHz core
+     :class: vertical-borders horizontal-borders
+     :header-rows: 1
+
+     * - **MCLK FREQ**
+       - **MCLK/BCLK RATIO**
+       - **SAMPLE FREQ**
+       - **CHANNELS PER TDM FRAME**
+       - **I2S IN/OUT (channels in/out)**
+       - **TDM IN/OUT (channels in/out)**
+     * - 12.288MHz
+       - 4
+       - 48000
+       - 8
+       - 4/4 (8/8)
+       - 1/1 (8/8)
 
 
 Usage
 -----
-
-
-Master API
-----------
 
 All |i2s| functions can be accessed via the ``i2s.h`` header::
 
@@ -208,15 +440,68 @@ All |i2s| functions can be accessed via the ``i2s.h`` header::
 You will also have to add ``lib_i2s`` to the
 ``USED_MODULES`` field of your application Makefile.
 
-|i2s| components are instantiated as parallel tasks that run in a
-``par`` statement. The application can connect via an interface
-connection.
-.. figure:: images/i2s_master_task_diag.*
+The I2S callback interface
+..........................
 
-   SPI master task diagram
+All major functions in the |i2s| library work by controlling the |i2s|
+or TDM bus on its own logical core on an xCORE device. The library
+will then make callbacks to the application when it receives a sample
+or needs to send a sample.
 
-For example, the following code instantiates an |i2s| master component
-and connects to it::
+.. figure:: images/i2s_generic_task_diag.*
+
+   I2S callback usage
+
+The callbacks are implemented by the application providing a task
+which receives requests on the ``i2s_callback_if`` xC interface. The
+application tasks can run the callbacks on the same logical core by
+implementing a *distributable* task. More information on interfaces
+and tasks can be be found
+in the  :ref:`XMOS Programming Guide<programming_guide>`.
+
+A template application task is shown below. The specific contents of
+each callback will depend on the application.::
+
+  [[distributable]]
+  void my_application(server i2s_callback_if i2s) {
+  while (1) {
+    select {
+    case i2s.init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config):
+      i2s_config.mclk_to_bclk_ratio = 2;
+      i2c_config.mode = I2S_MODE_LEFT_JUSTIFIED;
+      ...
+      break;
+
+    case i2s.restart_check() -> i2s_restart_t restart:
+      ...
+      break;
+
+    case i2s.receive(size_t index, int32_t sample):
+      ...
+      break;
+
+    case i2s.send(size_t index) -> int32_t sample:
+      ...
+      break;
+    }
+  }
+
+The send/receive callbacks pass a channel index parameter to the
+application. This channel maps to the data signals as shown in
+:ref:`i2s_channel_map`.
+
+The initialization callback will provide configuration structures
+relevant to the communication bus being used.
+The application can set the parameters
+of the bus (*MCLK/BCLK* ratio, *LRCLK* alignment etc.) at this point.
+
+I2S master usage
+................
+
+The |i2s| master task is instantiated as a parallel task that run in a
+``par`` statement. The application can connect via the
+``i2s_callback_if``  interface connection. For example,
+the following code instantiates an |i2s| master component and connects to it::
      
   out buffered port:32 p_dout[2] = {XS1_PORT_1D, XS1_PORT_1E};
   in buffered port:32 p_din[2]  = {XS1_PORT_1I, XS1_PORT_1K};
@@ -239,56 +524,14 @@ and connects to it::
     return 0;
   }
 
-The application provieds the *server* of the interface
-connection. This means it must provide implementations of the
-callbacks the |i2s| component make e.g.::
+I2S slave usage
+................
 
-  void my_application(server i2s_callback_if i2s) {
-  while (1) {
-    select {
-    case i2s.init(unsigned &mclk_bclk_ratio, i2s_mode &mode):
-      ...
-      break;
+The |i2s| slave task is instantiated as a parallel task that run in a
+``par`` statement. The application can connect via the
+``i2s_callback_if``  interface connection. For example,
+the following code instantiates an |i2s| slave component and connects to it::
 
-    case i2s.frame_start(unsigned timestamp, unsigned &restart):
-      ...
-      break;
-
-    case i2s.receive(size_t index, int32_t sample):
-      ...
-      break;
-
-    case i2s.send(size_t index) -> int32_t sample:
-      ...
-      break;
-    }
-  }
-
-
-
-|newpage|
-
-
-Slave API
-----------
-
-All |i2s| functions can be accessed via the ``i2s.h`` header::
-
-  #include <i2s.h>
-
-You will also have to add ``lib_i2s`` to the
-``USED_MODULES`` field of your application Makefile.
-
-|i2s| components are instantiated as parallel tasks that run in a
-``par`` statement. The application can connect via an interface
-connection.
-.. figure:: images/i2s_slave_task_diag.*
-
-   SPI master task diagram
-
-For example, the following code instantiates an |i2s| slave component
-and connects to it::
-     
   out buffered port:32 p_dout[2] = {XS1_PORT_1D, XS1_PORT_1E};
   in buffered port:32 p_din[2]  = {XS1_PORT_1I, XS1_PORT_1K};
   in port p_bclk  = XS1_PORT_1A;
@@ -297,76 +540,107 @@ and connects to it::
   clock bclk = XS1_CLKBLK_1;
 
   int main(void) {
-    i2s_slave_callback_if i_i2s;
-    configure_clock_src(mclk, p_mclk);
-    start_clock(mclk);
     par {
-      i2s_master(i2s_i, p_dout, 2, p_din, 2,
-                 p_bclk, p_lrclk, bclk);
+      i2s_slave(i2s_i, p_dout, 2, p_din, 2,
+                p_bclk, p_lrclk, bclk);
       my_application(i_i2s);
     }
     return 0;
   }
 
-The application provieds the *server* of the interface
-connection. This means it must provide implementations of the
-callbacks the |i2s| component make e.g.::
+TDM usage
+.........
 
-  void my_application(server i2s_slave_callback_if i2s) {
-  while (1) {
-    select {
-    case i2s.init(i2s_mode &mode):
-      ...
-      break;
+The TDM master task is instantiated as a parallel task that run in a
+``par`` statement. The application can connect via the
+``i2s_callback_if``  interface connection. For example,
+the following code instantiates an TDM master component and connects to it::
 
-    case i2s.frame_start(unsigned timestamp, unsigned &restart):
-      ...
-      break;
 
-    case i2s.receive(size_t index, int32_t sample):
-      ...
-      break;
+  out buffered port:32 p_dout[2] = {XS1_PORT_1D, XS1_PORT_1E};
+  in buffered port:32 p_din[2]  = {XS1_PORT_1I, XS1_PORT_1K};
+  in port p_bclk  = XS1_PORT_1A;
+  out buffered port:32 p_fsync = XS1_PORT_1C;
 
-    case i2s.send(size_t index) -> int32_t sample:
-      ...
-      break;
+  clock bclk = XS1_CLKBLK_1;
+
+  int main(void) {
+    i2s_callback_if i_i2s;
+    configure_clock_src(bclk, p_bclk);
+    par {
+      tdm_master(i2s_i, p_fsync, p_dout, 2, p_din, 2, bclk);
+      my_application(i_i2s);
     }
+    return 0;
   }
 
-The difference between the i2s master and slave is that the 
-slave does not require a ``mclk_bclk_ratio`` to be set in 
-the ``init`` method of the interface.
 
-i2s calling protocol
-~~~~~~~~~~~~~~~~~~~~
+I2S + TDM usage
+...............
 
-This applies to both master and slave.
+You can run TDM and I2S master on one core via a task that is instantiated in a
+``par`` statement. The application can connect via the
+``i2s_callback_if``  interface connection. For example,
+the following code instantiates an I2S + TDM master
+component and connects to it::
 
-In order to use the interfaces efficiently the user is expected to 
-handle the callbacks with minimum delay. Both the i2s master and slave will 
-call their methods in a predefined order.
+  out buffered port:32 p_i2s_dout[2] = {XS1_PORT_1B, XS1_PORT_1F};
+  in buffered port:32 p_i2s_din[2]  = {XS1_PORT_1G, XS1_PORT_1H};
+  out buffered port:32 p_tdm_dout[1] = {XS1_PORT_1D};
+  in buffered port:32 p_tdm_din[1]  = {XS1_PORT_1I};
+  in port p_mclk  = XS1_PORT_1A;
+  out buffered port:32 p_fsync = XS1_PORT_1C;
+  out buffered port:32 p_bclk = XS1_PORT_1E;
+  out buffered port:32 p_lrclk = XS1_PORT_1K;
+  clock bclk = XS1_CLKBLK_1;
+  clock mclk = XS1_CLKBLK_2;
 
-As the i2s library uses it ports in 32 bit buffered mode they are always sending 
-data out one word ahead and recieving data in one word behind. For this 
-reason after the user has responded to the ``init`` callback the i2s 
-master will request data to send out twice before reporting that it has 
-recieved any. Equally, after the user signals that the current frame 
-should be the last(through ``frame_start``) then the i2s master will 
-continue to recieve until the din buffer has been cleared. This allows 
-the whole frame to be recieved by the client application.
+  int main(void) {
+    i2s_callback_if i_i2s;
+    configure_clock_src(mclk, p_mclk);
+    start_clock(mclk);
+    par {
+      i2s_tdm_master(i2s_i, p_i2s_dout, 2, p_i2s_din, 2,
+                     p_bclk, p_lrclk, p_fsync,
+                     tdm_dout, 1, tdm_din, 1,
+                     bclk, mclk);
+      my_application(i_i2s);
+    }
+    return 0;
+  }
 
-Additionally, it is useful to know the order of the recieved and sent words 
-when writing application code. The data words within frames will ordered by:
-even numbers assigned to the left samples(first) and the odd numbers assigned 
-to the right(second) samples. The actual sample number will be given with 
-respect to the order that the ports are in the data in and data out arrays. 
-For example: in a system with 4 data out ports declared as::
 
-out buffered port:32 p_dout[4] = {XS1_PORT_1A, XS1_PORT_1B, XS1_PORT_1C, XS1_PORT_1D};
+.. _i2s_channel_map:
 
-Then the samples wille be number as indicated below:
+Channel numbering
+.................
 
-.. wavedrom:: i2s channel numbering
+The callback interface numbers the channels being sent/received for
+the send and receive callbacks. There is a fixed mapping from these
+channel indices to the physical interface begin used.
+
+I2S channel numbering
+~~~~~~~~~~~~~~~~~~~~~
+
+The data words within |i2s| frames have even channel numbers
+assigned to the left samples (first within the frame)
+and odd numbers assigned to the right (second within the frame)
+samples. 
+
+The actual sample number will be given with respect to the order that
+the ports are provided in the data in and data out array
+arguments to the component.
+
+For example, in a system with 4 data out ports and 4 data in ports declared as::
+
+  out buffered port:32 p_dout[4] = {XS1_PORT_1A, XS1_PORT_1B, XS1_PORT_1C, XS1_PORT_1D};
+  in buffered port:32 p_din[4] = {XS1_PORT_1E, XS1_PORT_1F, XS1_PORT_1G, XS1_PORT_1H};
+
+The channels wil be numbered as indicated in :ref:`i2s_chan_diag`:
+
+.. _i2s_chan_diag:
+
+.. wavedrom:: I2S channel numbering
 
   {signal: [
   {name: 'LRCLK', wave: '1.0.1.0.1..'},
@@ -380,73 +654,133 @@ Then the samples wille be number as indicated below:
   {name: 'DIN[3]',  wave: 'xx2.2.2.2.x.', data: ['6','7', '6','7']}]
   }
 
-The user should expect to get call backs in the order of:
+|newpage|
 
-A lead in of:
-init
-send - the left channel data for port 1A. It will have index 0.
-send - the left channel data for port 1B. It will have index 2.
-send - the left channel data for port 1C. It will have index 4.
-send - the left channel data for port 1D. It will have index 6.
-frame_start
-send - the right channel data for port 1A. It will have index 1.
-send - the right channel data for port 1B. It will have index 3.
-send - the right channel data for port 1C. It will have index 5.
-send - the right channel data for port 1D. It will have index 7.
+TDM channel numbering
+~~~~~~~~~~~~~~~~~~~~~
 
-Then a body consisting of many of:(until restart is set to non-zero)
-recieve - the left channel data for port 1A. It will have index 0.
-recieve - the left channel data for port 1B. It will have index 2.
-recieve - the left channel data for port 1C. It will have index 4.
-recieve - the left channel data for port 1D. It will have index 6.
-send    - the left channel data for port 1A. It will have index 0.
-send    - the left channel data for port 1B. It will have index 2.
-send    - the left channel data for port 1C. It will have index 4.
-send    - the left channel data for port 1D. It will have index 6.
-frame_start
-recieve - the right channel data for port 1A. It will have index 1.
-recieve - the right channel data for port 1B. It will have index 3.
-recieve - the right channel data for port 1C. It will have index 5.
-recieve - the right channel data for port 1D. It will have index 7.
-send    - the right channel data for port 1A. It will have index 1.
-send    - the right channel data for port 1B. It will have index 3.
-send    - the right channel data for port 1C. It will have index 5.
-send    - the right channel data for port 1D. It will have index 7.
+The data words within TDM frames are assigned sequentially from the
+start of the frame. Each data line will have its channel numbers
+assigned in the order that the ports are provided in the
+data in and data out array arguments to the component.
 
-Then a tail of:
-recieve - the left channel data for port 1A. It will have index 0.
-recieve - the left channel data for port 1B. It will have index 2.
-recieve - the left channel data for port 1C. It will have index 4.
-recieve - the left channel data for port 1D. It will have index 6.
-recieve - the right channel data for port 1A. It will have index 1.
-recieve - the right channel data for port 1B. It will have index 3.
-recieve - the right channel data for port 1C. It will have index 5.
-recieve - the right channel data for port 1D. It will have index 7.
+For example, in a system with 2 data out ports and 2 data in ports declared as::
 
-Equally:
+  out buffered port:32 p_dout[2] = {XS1_PORT_1A, XS1_PORT_1B};
+  in buffered port:32 p_din[2] = {XS1_PORT_1E, XS1_PORT_1F};
 
-.. figure:: images/i2s_state_machine.*
-   :width: 40%
+With the number of channels per frame as 4, the samples will be
+numbered as indicated in :ref:`tdm_chan_diag`:
 
-   I2S state machine
+.. _tdm_chan_diag:
+
+.. wavedrom:: TDM channel numbering
+
+   {signal: [
+   {name: 'FSYNC', wave: '0.10......10'},
+   {name: 'DOUT[0]',  wave: 'xx2.2.2.2.x.', data: ['0','1', '2','3']},
+   {name: 'DOUT[1]',  wave: 'xx2.2.2.2.x.', data: ['4','5', '6','7']},
+   {name: 'DIN[0]',  wave: 'xx2.2.2.2.x.', data: ['0','1', '2','3']},
+   {name: 'DIN[1]',  wave: 'xx2.2.2.2.x.', data: ['4','5', '6','7']},
+   ]
+   }
+
+I2S and TDM combined numbering
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When using the |i2s|/TDM combined task the TDM channels are numbered
+after the I2S channels using the numbering system described in the
+previous two sections.
+
+Callback sequences
+..................
+
+The send/receive callbacks of |i2s| callbacks occur in a
+pre-determined order. The seqeunce consists of receipt of all even
+channel, sending of all even channels, receipt of all odd channels
+and then sending of all odd channels.
+
+Since the hardware port buffers within the xCORE device there is an
+initial sequences of sends after initialization. Similarly there is a
+final sequences of receives after a restart/shutdown request.
+:ref:`i2s_callback_seq` shows an example sequence of callbacks for two
+output lines and two input lines (four channels in and four channels out).
+
+.. _i2s_callback_seq:
+
+.. list-table:: Sample I2S callback sequence
+
+ * - Initial send:
+   - S0 S2 S1 S3
+ * - Frame:
+   - R0 R2 S0 S2 R1 R3 S1 S3
+ * - Frame:
+   - R0 R2 S0 S2 R1 R3 S1 S3
+ * - ...
+   - ...
+ * - Frame:
+   - R0 R2 S0 S2 R1 R3 S1 S3
+ * - Final receive:
+   - R0 R2 R1 R3
+
+When using TDM, the receive callbacks for a channel occur after the
+send callbacks. The receive callback for the last channel of the frame
+will occur after the send callback for the next frame. After a restart
+request a tail of receive callbacks for the last channel of the final
+frame will occur. :ref:`tdm_callback_seq` shows an example TDM
+callback sequence for two data lines in and out with four channels per
+frame.
+
+.. _tdm_callback_seq:
+
+.. list-table:: Sample TDM callback sequence
+
+  * - S0 S4 S1 S5 R0 R4 S2 S6 R1 R5 S3 S7 R2 R6
+  * - S0 S4 R3 R7 S1 S5 R0 R4 S2 S6 R1 R5 S3 S7 R2 R6
+  * - ...
+  * - S0 S4 R3 R7 S1 S5 R0 R4 S2 S6 R1 R5 S3 S7 R2 R6
+  * - S0 S4 R3 R7 S1 S5 R0 R4 S2 S6 R1 R5 S3 S7 R2 R6
+  * - R3 R7
+
+In both cases the components attempt to distribute the calling of the callbacks
+evenly within the frame to allow processing to occur throughout the
+frame evenly.
+
+The ``restart_check`` callback is called once per frame to allow the
+application to request a restart/shutdown of the data bus.
 
 
-The ``frame_start`` callback returns a timestamp. This timestamp should 
-be used to compare the time of one frame to another to detemine the speed 
-and jitter of the i2s data. The user should ignore the first timestamp as 
-its position in the frame can be non-deterministic, however, from then on 
-all timstamps are taken at exactly the same point in a frame and should be 
-considered stable. ``frame_start`` is also used for ending the i2s 
-transaction. When restart is set to non-zero then the current frame will 
-be the last. 
+Clock configuration
+...................
 
+For the |i2s| master and TDM components is it the application's
+responsibility to set up and start the internal clock used for the master clock
+before calling the component.
 
-More information on interfaces and tasks can be be found in
-the :ref:`XMOS Programming Guide<programming_guide>`. Often it makes
-sense to make the application task connected to the |i2s| component to
-be a ``[[distributed]]`` function. This means that the application
-callbacks will not run on a core of their own by on the same logical
-core that the |i2s| component is using.
+For example, the following code configures a clock to be based
+of an incoming data wire and starts the clock::
+
+    configure_clock_src(mclk, p_mclk);
+    start_clock(mclk);
+
+For more information on configuring clocks see the XMOS tools
+user guide.
+
+API
+---
+
+Supporting types
+................
+
+.. doxygenenum:: i2s_mode_t
+
+.. doxygenstruct:: i2s_config_t
+
+.. doxygenstruct:: tdm_config_t
+
+.. doxygenenum:: i2s_restart_t
+
+|newpage|
 
 Creating an I2S instance
 ........................
@@ -459,12 +793,18 @@ Creating an I2S instance
 
 |newpage|
 
-The I2S master callback interface
-.................................
+Creating an TDM instance
+........................
+
+.. doxygenfunction:: tdm_master
+
+|newpage|
+
+.. doxygenfunction:: i2s_tdm_master
+
+|newpage|
+
+The I2S callback interface
+..........................
 
 .. doxygeninterface:: i2s_callback_if
-
-The I2S slave callback interface
-................................
-
-.. doxygeninterface:: i2s_slave_callback_if

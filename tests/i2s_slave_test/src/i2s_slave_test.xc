@@ -99,7 +99,7 @@ void app(server interface i2s_callback_if i2s_i){
     set_core_fast_mode_on();
     int first_time = 1;
 
-    i2s_mode current_mode = I2S_MODE_I2S;
+    i2s_mode_t current_mode = I2S_MODE_I2S;
     while(1){
         select {
         case i2s_i.receive(size_t index, int32_t sample):{

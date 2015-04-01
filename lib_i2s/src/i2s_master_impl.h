@@ -81,7 +81,7 @@ static i2s_restart_t i2s_ratio_n(client i2s_callback_if i2s_i,
         out buffered port:32 p_bclk,
         out buffered port:32 p_lrclk,
         unsigned ratio,
-        i2s_mode mode){
+        i2s_mode_t mode){
     unsigned clk_mask = i2s_clk_mask_lookup[ratio-1];
     unsigned lr_mask = 0;
     int32_t data;

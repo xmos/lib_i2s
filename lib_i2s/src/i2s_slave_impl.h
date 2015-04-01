@@ -53,7 +53,7 @@ static void i2s_slave0(client i2s_callback_if i2s_i,
     i2s_slave_init_ports(p_dout, num_out, p_din, num_in, p_bclk, p_lrclk, bclk);
 
     while(1){
-        i2s_mode m;
+        i2s_mode_t m;
         i2s_config_t config;
         i2s_restart_t restart = I2S_NO_RESTART;
         i2s_i.init(config, null);

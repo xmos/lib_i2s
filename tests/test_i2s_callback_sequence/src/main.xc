@@ -72,7 +72,7 @@ static int request_response(){
 #pragma unsafe arrays
 void app(server interface i2s_callback_if i2s){
   int fcount = 0;
-  i2s_mode mode = I2S_MODE_I2S;
+  i2s_mode_t mode = I2S_MODE_I2S;
   int first_time = 1;
   while(1) {
     select {

@@ -155,7 +155,7 @@ void app(server interface i2s_callback_if i2s_i){
     int first_time = 1;
     unsigned mclock_freq_index=0;
     unsigned ratio_log2 = 2;
-    i2s_mode current_mode = I2S_MODE_I2S;
+    i2s_mode_t current_mode = I2S_MODE_I2S;
     unsigned x = 0;
     unsigned y = 0;
     while(1){
