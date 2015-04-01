@@ -808,3 +808,13 @@ The I2S callback interface
 ..........................
 
 .. doxygeninterface:: i2s_callback_if
+
+|appendix|
+
+Known Issues
+------------
+
+No known issues.
+
+.. include:: ../../../CHANGELOG.rst
+
