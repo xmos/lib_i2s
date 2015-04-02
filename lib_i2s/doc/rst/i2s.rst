@@ -460,7 +460,7 @@ and tasks can be be found
 in the  :ref:`XMOS Programming Guide<programming_guide>`.
 
 A template application task is shown below. The specific contents of
-each callback will depend on the application.::
+each callback will depend on the application::
 
   [[distributable]]
   void my_application(server i2s_callback_if i2s) {

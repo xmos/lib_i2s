@@ -17,12 +17,11 @@ Features
 ........
 
  * |i2s| master, TDM master and |i2s| slave modes.
- * Handles multiple input and output data lines
+ * Handles multiple input and output data lines.
  * Support for standard |i2s|, left justified or right justified
    data modes for |i2s|.
- * Support for up to
- * Support for varying formats of TDM synchronization signal.
- * Sample rate support up to 192Khz
+ * Support for multiple formats of TDM synchronization signal.
+ * Sample rate support up to 192KHz.
  * Up to 16 channels in/16 channels out (depending on sample rate)
 
 Resource Usage
