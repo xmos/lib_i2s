@@ -20,6 +20,7 @@ static void tdm_init_ports(
     start_clock(clk);
 }
 
+[[always_inline]]
 static void tdm_send(client i2s_callback_if tdm_i,
         out buffered port:32 p_dout[num_out],
         size_t num_out,
@@ -30,6 +31,7 @@ static void tdm_send(client i2s_callback_if tdm_i,
 }
 
 
+[[always_inline]]
 static void tdm_receive(client i2s_callback_if tdm_i,
         in buffered port:32 p_din[],
         size_t num_in,
@@ -42,7 +44,8 @@ static void tdm_receive(client i2s_callback_if tdm_i,
     }
 }
 
-static i2s_restart_t inline do_tdm(client i2s_callback_if tdm_i,
+[[always_inline]]
+static i2s_restart_t do_tdm(client i2s_callback_if tdm_i,
         out buffered port:32 p_dout[],
         size_t num_out,
         in buffered port:32 p_din[],
