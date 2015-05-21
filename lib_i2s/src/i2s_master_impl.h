@@ -186,15 +186,15 @@ static void i2s_master0(client i2s_callback_if i2s_i,
                 const clock mclk){
 
     while(1){
-        //This ensures that the port time on all the ports is at 0
-        i2s_init_ports(p_dout, num_out, p_din, num_in,
-           p_bclk, p_lrclk, bclk, mclk);
-
         i2s_config_t config;
         unsigned mclk_bclk_ratio_log2;
         i2s_i.init(config, null);
 
         mclk_bclk_ratio_log2 = clz(bitrev(config.mclk_bclk_ratio));
+
+        //This ensures that the port time on all the ports is at 0
+        i2s_init_ports(p_dout, num_out, p_din, num_in,
+           p_bclk, p_lrclk, bclk, mclk);
 
         i2s_restart_t restart =
           i2s_ratio_n(i2s_i, p_dout, num_out, p_din,
