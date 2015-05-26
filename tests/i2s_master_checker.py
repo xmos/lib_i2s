@@ -135,6 +135,9 @@ class I2SMasterChecker(xmostest.SimThread):
           tx_word[i] = tx_data[2*i+word_count][frame_count]
         lr_count = 0
 
+        while (xsi.sample_port_pins(self._bclk) == 0):
+          self.wait_for_port_pins_change([self._bclk])
+
         left = xsi.sample_port_pins(self._lrclk)
 
         #if i2s mode ignore the first bit
