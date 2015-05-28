@@ -22,7 +22,7 @@ Features
    data modes for |i2s|.
  * Support for multiple formats of TDM synchronization signal.
  * Sample rate support up to 192KHz.
- * Up to 16 channels in/16 channels out (depending on sample rate)
+ * Up to 32 channels in/32 channels out (depending on sample rate)
 
 Resource Usage
 ..............
