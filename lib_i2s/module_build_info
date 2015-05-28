@@ -1,8 +1,5 @@
 DEPENDENT_MODULES = lib_xassert(>=2.0.0) lib_logging(>=2.0.0)
 
-VERSION = 2.0.0
+VERSION = 2.0.1
 
-MODULE_XCC_FLAGS = $(XCC_FLAGS) -O3 
-
-OPTIONAL_HEADERS = i2s_callbacks.h
-
+MODULE_XCC_FLAGS = $(XCC_FLAGS) -O3 -g
