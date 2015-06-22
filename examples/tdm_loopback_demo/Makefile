@@ -1,7 +1,7 @@
 # The TARGET variable determines what target system the application is
 # compiled for. It either refers to an XN file in the source directories
 # or a valid argument for the --target option when compiling
-TARGET = x200-mc-audio
+TARGET = XR-AUDIO-216-MC
 
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
