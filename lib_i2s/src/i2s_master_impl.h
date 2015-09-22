@@ -2,6 +2,7 @@
 #include <xs1.h>
 #include <xclib.h>
 #include "i2s.h"
+#include "xassert.h"
 
 static const unsigned i2s_clk_mask_lookup[5] = {
         0xaaaaaaaa, //div 2
@@ -12,9 +13,9 @@ static const unsigned i2s_clk_mask_lookup[5] = {
 };
 
 static void i2s_init_ports(
-        out buffered port:32 p_dout[num_out],
+        out buffered port:32 (&?p_dout)[num_out],
         static const size_t num_out,
-        in buffered port:32 p_din[num_in],
+        in buffered port:32 (&?p_din)[num_in],
         static const size_t num_in,
         out buffered port:32 p_bclk,
         out buffered port:32 p_lrclk,
@@ -75,9 +76,9 @@ static void output_word(
 }
 #pragma unsafe arrays
 static i2s_restart_t i2s_ratio_n(client i2s_callback_if i2s_i,
-        out buffered port:32 p_dout[num_out],
+        out buffered port:32 (&?p_dout)[num_out],
         static const size_t num_out,
-        in buffered port:32 p_din[num_in],
+        in buffered port:32 (&?p_din)[num_in],
         static const size_t num_in,
         out buffered port:32 p_bclk,
         out buffered port:32 p_lrclk,
@@ -176,9 +177,9 @@ static i2s_restart_t i2s_ratio_n(client i2s_callback_if i2s_i,
 #define i2s_master i2s_master0
 
 static void i2s_master0(client i2s_callback_if i2s_i,
-                out buffered port:32 p_dout[num_out],
+                out buffered port:32 (&?p_dout)[num_out],
                 static const size_t num_out,
-                in buffered port:32 p_din[num_in],
+                in buffered port:32 (&?p_din)[num_in],
                 static const size_t num_in,
                 out buffered port:32 p_bclk,
                 out buffered port:32 p_lrclk,
@@ -189,6 +190,10 @@ static void i2s_master0(client i2s_callback_if i2s_i,
         i2s_config_t config;
         unsigned mclk_bclk_ratio_log2;
         i2s_i.init(config, null);
+
+        if (isnull(p_dout) && isnull(p_din)) {
+            fail("Must provide non-null p_dout or p_din");
+        }
 
         mclk_bclk_ratio_log2 = clz(bitrev(config.mclk_bclk_ratio));
 

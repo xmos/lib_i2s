@@ -126,9 +126,9 @@ typedef interface i2s_callback_if {
  *                        an incoming master system clock.
  */
 void i2s_master(client i2s_callback_if i2s_i,
-                out buffered port:32 p_dout[num_out],
+                out buffered port:32 (&?p_dout)[num_out],
                 static const size_t num_out,
-                in buffered port:32 p_din[num_in],
+                in buffered port:32 (&?p_din)[num_in],
                 static const size_t num_in,
                 out buffered port:32 p_bclk,
                 out buffered port:32 p_lrclk,
