@@ -5,9 +5,9 @@
 #include "tdm_common.h"
 
 static void tdm_init_ports(
-        out buffered port:32 p_dout[num_out],
+        out buffered port:32 (&?p_dout)[num_out],
         const size_t num_out,
-        in buffered port:32 p_din[num_in],
+        in buffered port:32 (&?p_din)[num_in],
         const size_t num_in,
         out buffered port:32 p_fsync,
         clock clk){
@@ -22,7 +22,7 @@ static void tdm_init_ports(
 
 [[always_inline]]
 static void tdm_send(client i2s_callback_if tdm_i,
-        out buffered port:32 p_dout[num_out],
+        out buffered port:32 (&?p_dout)[num_out],
         size_t num_out,
         unsigned channels_per_data_line,
         unsigned word){
@@ -33,7 +33,7 @@ static void tdm_send(client i2s_callback_if tdm_i,
 
 [[always_inline]]
 static void tdm_receive(client i2s_callback_if tdm_i,
-        in buffered port:32 p_din[],
+        in buffered port:32 (&?p_din)[num_in],
         size_t num_in,
         unsigned channels_per_data_line,
         unsigned word){
@@ -46,9 +46,9 @@ static void tdm_receive(client i2s_callback_if tdm_i,
 
 [[always_inline]]
 static i2s_restart_t do_tdm(client i2s_callback_if tdm_i,
-        out buffered port:32 p_dout[],
+        out buffered port:32 (&?p_dout)[num_out],
         size_t num_out,
-        in buffered port:32 p_din[],
+        in buffered port:32 (&?p_din)[num_in],
         size_t num_in,
         out buffered port:32 p_fsync,
         int offset,
@@ -123,11 +123,15 @@ static i2s_restart_t do_tdm(client i2s_callback_if tdm_i,
 
 static void tdm_master0(client interface i2s_callback_if tdm_i,
         out buffered port:32 p_fsync,
-        out buffered port:32 p_dout[num_out],
+        out buffered port:32 (&?p_dout)[num_out],
         size_t num_out,
-        in buffered port:32 p_din[num_in],
+        in buffered port:32 (&?p_din)[num_in],
         size_t num_in,
         clock clk){
+
+    if (isnull(p_dout) && isnull(p_din)) {
+        fail("Must provide non-null p_dout or p_din");
+    }
 
     tdm_init_ports(p_dout, num_out, p_din, num_in, p_fsync, clk);
 
@@ -153,9 +157,9 @@ static void tdm_master0(client interface i2s_callback_if tdm_i,
 // tdm_master0,it should never be called.
 inline void tdm_master1(client interface i2s_callback_if tdm_i,
         out buffered port:32 p_fsync,
-        out buffered port:32 p_dout[num_out],
+        out buffered port:32 (&?p_dout)[num_out],
         size_t num_out,
-        in buffered port:32 p_din[num_in],
+        in buffered port:32 (&?p_din)[num_in],
         size_t num_in,
         clock clk){
   tdm_master0(tdm_i, p_fsync, p_dout, num_out, p_din, num_in, clk);

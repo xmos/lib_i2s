@@ -156,9 +156,9 @@ void i2s_master(client i2s_callback_if i2s_i,
  *                        the bit clock
  */
 void i2s_slave(client i2s_callback_if i2s_i,
-        out buffered port:32 p_dout[num_out],
+        out buffered port:32 (&?p_dout)[num_out],
         static const size_t num_out,
-        in buffered port:32 p_din[num_in],
+        in buffered port:32 (&?p_din)[num_in],
         static const size_t num_in,
         in port p_bclk,
         in buffered port:32 p_lrclk,
@@ -185,9 +185,9 @@ void i2s_slave(client i2s_callback_if i2s_i,
  */
 void tdm_master(client interface i2s_callback_if tdm_i,
         out buffered port:32 p_fsync,
-        out buffered port:32 p_dout[num_out],
+        out buffered port:32 (&?p_dout)[num_out],
         size_t num_out,
-        in buffered port:32 p_din[num_in],
+        in buffered port:32 (&?p_din)[num_in],
         size_t num_in,
         clock clk);
 
