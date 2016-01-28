@@ -53,7 +53,7 @@ includes::
 Includes
 ........
 
-All XC files which declare the application ``main()`` function need
+All xC files which declare the application ``main()`` function need
 to include ``platform.h``. XMOS xCORE specific defines for declaring
 and initialising hardware are defined in ``xs1.h``.
 
@@ -107,7 +107,7 @@ The application main() function
 
 The ``main()`` function in the program sets up the tasks in the application.
 
-Firstly, the ``interfaces`` are declared. In XC interfaces provide a
+Firstly, the ``interfaces`` are declared. In xC interfaces provide a
 means of concurrent tasks communicating with each other. In this
 application there is an interface for the |I2S| master, an interface
 for the |I2C| master and one for the GPIO output.
@@ -117,7 +117,7 @@ for the |I2C| master and one for the GPIO output.
    :end-on: interface output
 
 The rest of the ``main`` function starts all the tasks in parallel
-using the XC ``par`` construct:
+using the xC ``par`` construct:
 
 .. literalinclude:: main.xc
    :start-on: par {
@@ -166,7 +166,7 @@ so that all |I2S| samples received by the device will be forwarded on.
 
 The task itself is declared as a ``[[distributable]]`` function
 ensuring that it can share a logical core with other tasks. This
-is an XC feature of any task that is of the form::
+is an xC feature of any task that is of the form::
 
   ...
   while(1) {
