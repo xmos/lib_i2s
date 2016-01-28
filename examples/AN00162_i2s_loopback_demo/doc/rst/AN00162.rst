@@ -8,16 +8,16 @@ Overview
 Introduction
 ............
 
-The XMOS I\ :sup:`2`\ S library provides software defined, industry-standard,
-I\ :sup:`2`\ S (Integrated Interchip Sound) components that allows you to
+The XMOS |i2s| library provides software defined, industry-standard,
+|i2s| (Integrated Interchip Sound) components that allows you to
 stream audio between devices using xCORE GPIO ports.
 
-I\ :sup:`2`\ S is a specific type of PCM digital audio communication using
+|i2s| is a specific type of PCM digital audio communication using
 a bit clock line, word clock line and at least one multiplexed data line.
 
-The library includes features such as I\ :sup:`2`\ S master, I\ :sup:`2`\ S slave,
+The library includes features such as |i2s| master, |i2s| slave,
 and TDM master components. This application note uses the
-library to create an I\ :sup:`2`\ S master digital loopback.
+library to create an |i2s| master digital loopback.
 
 Block Diagram
 .............
@@ -27,17 +27,17 @@ Block Diagram
 
    Application block diagram
 
-The application fits entirely within one logical core. The I\ :sup:`2`\ S, GPIO,
+The application fits entirely within one logical core. The |i2s|, GPIO,
 and I\ :sup:`2`\ C drivers are all time-multiplexed with the loopback application.
 
 
-I\ :sup:`2`\ S loopback demo
-----------------------------
+|i2s| loopback demo
+-------------------
 
 The Makefile
 ............
 
-To start using the I\ :sup:`2`\ S, you need to add ``lib_i2s`` to you Makefile::
+To start using the |i2s|, you need to add ``lib_i2s`` to you Makefile::
 
   USED_MODULES = .. lib_i2s ...
 
@@ -61,7 +61,7 @@ and initialising hardware are defined in ``xs1.h``.
    :start-on: include <platform.h>
    :end-on: include <xs1.h>
 
-The I\ :sup:`2`\ S library functions are defined in ``i2s.h``. This header must
+The |i2s| library functions are defined in ``i2s.h``. This header must
 be included in your code to use the library.
 
 .. literalinclude:: main.xc
@@ -75,9 +75,9 @@ which this application note relies on.
 Allocating hardware resources
 .............................
 
-An I\ :sup:`2`\ S interface requires both clock and data pins in order to
+An |i2s| interface requires both clock and data pins in order to
 communicate with the audio codec device. On an xCORE
-the pins are controlled by ``ports``. The ports used by the I\ :sup:`2`\ S
+the pins are controlled by ``ports``. The ports used by the |i2s|
 library are declared on the tile they reside and with their
 direction and buffered nature. This loopback application uses
 four 1-bit ports for input and four more for output:
@@ -109,7 +109,7 @@ The ``main()`` function in the program sets up the tasks in the application.
 
 Firstly, the ``interfaces`` are declared. In XC interfaces provide a
 means of concurrent tasks communicating with each other. In this
-application there is an interface for the I\ :sup:`2`\ S master, an interface
+application there is an interface for the |i2s| master, an interface
 for the I\ :sup:`2`\ C master and one for the GPIO output.
 
 .. literalinclude:: main.xc
@@ -123,18 +123,18 @@ using the XC ``par`` construct:
    :start-on: par {
    :end-before: return 0
 
-This code starts the I\ :sup:`2`\ S master, the I\ :sup:`2`\ C master, the GPIO control
+This code starts the |i2s| master, the I\ :sup:`2`\ C master, the GPIO control
 and the loopback application.
 
-Before the I\ :sup:`2`\ S master runs, the system configuration is run and the
+Before the |i2s| master runs, the system configuration is run and the
 master clock is connected from the input port to the clock block and
-then started. The I\ :sup:`2`\ S master task then starts and consumes a logical
+then started. The |i2s| master task then starts and consumes a logical
 core on the xCORE device.
 
 The remaining tasks in the ``par`` are marked with the
 ``[[distribute]]`` attribute. This means they will run on an existing
 logical core if possible. In this case they will all share the
-one logical core with the I\ :sup:`2`\ S master so this entire application
+one logical core with the |i2s| master so this entire application
 requires only one core.
 
 |newpage|
@@ -161,8 +161,8 @@ the relevant codecs for that board.
 The i2s_loopback application
 ............................
 
-The I\ :sup:`2`\ S loopback task provides the function of a digital loopback
-so that all I\ :sup:`2`\ S samples received by the device will be forwarded on.
+The |i2s| loopback task provides the function of a digital loopback
+so that all |i2s| samples received by the device will be forwarded on.
 
 The task itself is declared as a ``[[distributable]]`` function
 ensuring that it can share a logical core with other tasks. This
@@ -181,8 +181,8 @@ The function takes a number of arguments:
    :start-on: [[distributable]]
    :end-on: mclk_select
 
-The interface to the I\ :sup:`2`\ S master is a callback interface that the
-I\ :sup:`2`\ S master will call over when it has received data or is ready to
+The interface to the |i2s| master is a callback interface that the
+|i2s| master will call over when it has received data or is ready to
 send data.
 
 The I\ :sup:`2`\ C interface is used to configure the codecs and the GPIO
@@ -191,13 +191,13 @@ port.
 
 |newpage|
 
-The body of the loopback task handles the I\ :sup:`2`\ S interface calls:
+The body of the loopback task handles the |i2s| interface calls:
 
 .. literalinclude:: main.xc
    :start-on: int32_t samples
    :end-before: static char
 
-The I\ :sup:`2`\ S master library calls the ``init()`` method before it starts
+The |i2s| master library calls the ``init()`` method before it starts
 any data streaming. This allows the application to reset and configure
 the audio codecs.
 
@@ -210,9 +210,9 @@ sample to send on the specified channel. The ``->`` symbol shows
 the return value expected from this call. In this case the application
 simply returns the current sample on that channel.
 
-Finally, the ``restart_check()`` method is called by the I\ :sup:`2`\ S master
+Finally, the ``restart_check()`` method is called by the |i2s| master
 once per frame and allows the application to control restart or
-shutdown of the I\ :sup:`2`\ S master. In this case the application continues to
+shutdown of the |i2s| master. In this case the application continues to
 run forever and so always returns ``I2S_NO_RESTART``.
 
 |newpage|
@@ -234,7 +234,7 @@ demo:
    :scale: 100%
    :align: center
 
-   Hardware setup for XMOS I\ :sup:`2`\ S master loopback demo
+   Hardware setup for XMOS |i2s| master loopback demo
 
 |newpage|
 
@@ -280,7 +280,7 @@ References
 
    http://www.xmos.com/published/xmos-programming-guide
 
- * I\ :sup:`2`\ S Protocol
+ * |i2s| Protocol
 
    https://en.wikipedia.org/wiki/I%C2%B2S
 
