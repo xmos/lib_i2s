@@ -28,7 +28,7 @@ Block Diagram
    Application block diagram
 
 The application fits entirely within one logical core. The I\ :sup:`2`\ S, GPIO,
-and I2C drivers are all time-multiplexed with the loopback application.
+and I\ :sup:`2`\ C drivers are all time-multiplexed with the loopback application.
 
 
 I\ :sup:`2`\ S loopback demo
@@ -41,8 +41,8 @@ To start using the I\ :sup:`2`\ S, you need to add ``lib_i2s`` to you Makefile::
 
   USED_MODULES = .. lib_i2s ...
 
-This demo also uses the I2C library (``lib_i2c``) and the GPIO library
-(``lib_gpio``). The I2C library is used to configure the
+This demo also uses the I\ :sup:`2`\ C library (``lib_i2c``) and the GPIO library
+(``lib_gpio``). The I\ :sup:`2`\ C library is used to configure the
 audio codecs. The GPIO library abstracts the use of a 4-bit port to
 drive four individual reset and select lines. So the Makefile also
 includes::
@@ -68,7 +68,7 @@ be included in your code to use the library.
    :start-on: include <i2s.h>
    :end-on: include <gpio.h>
 
-The other two includes give access to the I2C and GPIO library functions
+The other two includes give access to the I\ :sup:`2`\ C and GPIO library functions
 which this application note relies on.
 
 
@@ -94,7 +94,7 @@ to control a port. In this application two clocks blocks are used:
    :start-on: clock mclk
    :end-on: clock bclk
 
-The other ports declared are used by the I2C library to configure
+The other ports declared are used by the I\ :sup:`2`\ C library to configure
 the audio codecs and by the application to control reset and
 chip select:
 
@@ -110,7 +110,7 @@ The ``main()`` function in the program sets up the tasks in the application.
 Firstly, the ``interfaces`` are declared. In XC interfaces provide a
 means of concurrent tasks communicating with each other. In this
 application there is an interface for the I\ :sup:`2`\ S master, an interface
-for the I2C master and one for the GPIO output.
+for the I\ :sup:`2`\ C master and one for the GPIO output.
 
 .. literalinclude:: main.xc
    :start-on: interface i2s
@@ -123,7 +123,7 @@ using the XC ``par`` construct:
    :start-on: par {
    :end-before: return 0
 
-This code is starts the I\ :sup:`2`\ S master, the I2C master, the GPIO control
+This code is starts the I\ :sup:`2`\ S master, the I\ :sup:`2`\ C master, the GPIO control
 and the loopback application.
 
 Before the I\ :sup:`2`\ S master runs, the system configuration is run and the
@@ -185,7 +185,7 @@ The interface to the I\ :sup:`2`\ S master is a callback interface that the
 I\ :sup:`2`\ S master will call over when it has received data or is ready to
 send data.
 
-The I2C interface is used to configure the codecs and the GPIO
+The I\ :sup:`2`\ C interface is used to configure the codecs and the GPIO
 interfaces abstract the outputting of single-bit values on a multi-bit
 port.
 
