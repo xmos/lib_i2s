@@ -9,7 +9,7 @@ Introduction
 ............
 
 The XMOS I\ :sup:`2`\ S library provides software defined, industry-standard,
-I\ :sup:`2`\ S (Intergrated Interchip Sound) components that allows you to
+I\ :sup:`2`\ S (Integrated Interchip Sound) components that allows you to
 stream audio between devices using xCORE GPIO ports.
 
 I\ :sup:`2`\ S is a specific type of PCM digital audio communication using
