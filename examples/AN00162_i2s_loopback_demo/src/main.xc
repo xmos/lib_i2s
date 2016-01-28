@@ -1,9 +1,9 @@
 // Copyright (c) 2016, XMOS Ltd, All rights reserved
 #include <platform.h>
 #include <xs1.h>
-#include <i2s.h>
-#include <i2c.h>
-#include <gpio.h>
+#include "i2s.h"
+#include "i2c.h"
+#include "gpio.h"
 
 /* Ports and clocks used by the application */
 on tile[0]: out buffered port:32 p_lrclk = XS1_PORT_1G;
