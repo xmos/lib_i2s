@@ -696,7 +696,7 @@ Callback sequences
 ..................
 
 The send/receive callbacks of |i2s| callbacks occur in a
-pre-determined order. The seqeunce consists of receipt of all even
+pre-determined order. The sequence consists of receipt of all even
 channel, sending of all even channels, receipt of all odd channels
 and then sending of all odd channels.
 
