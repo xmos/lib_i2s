@@ -1,0 +1,298 @@
+.. include:: ../../README.rst
+
+|newpage|
+
+Overview
+--------
+
+Introduction
+............
+
+The XMOS I\ :sup:`2`\ S library provides software defined, industry-standard,
+I\ :sup:`2`\ S (Intergrated Interchip Sound) components that allows you to
+stream audio between devices using xCORE GPIO ports.
+
+I\ :sup:`2`\ S is a specific type of PCM digital audio communication using
+a bit clock line, word clock line and at least one multiplexed data line.
+
+The library includes features such as I\ :sup:`2`\ S master, I\ :sup:`2`\ S slave,
+and TDM master components. This application note uses the
+library to create an I\ :sup:`2`\ S master digital loopback.
+
+Block Diagram
+.............
+
+.. figure:: images/block_diagram.*
+   :width: 80%
+
+   Application block diagram
+
+The application fits entirely within one logical core. The I\ :sup:`2`\ S, GPIO,
+and I2C drivers are all time-multiplexed with the loopback application.
+
+
+I\ :sup:`2`\ S loopback demo
+----------------------------
+
+The Makefile
+............
+
+To start using the I\ :sup:`2`\ S, you need to add ``lib_i2s`` to you Makefile::
+
+  USED_MODULES = .. lib_i2s ...
+
+This demo also uses the I2C library (``lib_i2c``) and the GPIO library
+(``lib_gpio``). The I2C library is used to configure the
+audio codecs. The GPIO library abstracts the use of a 4-bit port to
+drive four individual reset and select lines. So the Makefile also
+includes::
+
+  USED_MODULES = .. lib_gpio lib_i2c ..
+
+
+Includes
+........
+
+All XC files which declare the application ``main()`` function need
+to include ``platform.h``. XMOS xCORE specific defines for declaring
+and initialising hardware are defined in ``xs1.h``.
+
+.. literalinclude:: main.xc
+   :start-on: include <platform.h>
+   :end-on: include <xs1.h>
+
+The I\ :sup:`2`\ S library functions are defined in ``i2s.h``. This header must
+be included in your code to use the library.
+
+.. literalinclude:: main.xc
+   :start-on: include <i2s.h>
+   :end-on: include <gpio.h>
+
+The other two includes give access to the I2C and GPIO library functions
+which this application note relies on.
+
+
+Allocating hardware resources
+.............................
+
+An I\ :sup:`2`\ S interface requires both clock and data pins in order to
+communicate with the audio codec device. On an xCORE
+the pins are controlled by ``ports``. The ports used by the I\ :sup:`2`\ S
+library are declared on the tile they reside and with their
+direction and buffered nature. This loopback application uses
+four 1-bit ports for input and four more for output:
+
+.. literalinclude:: main.xc
+   :start-on: out buffered port:32 p_lrclk
+   :end-on: in buffered port:32 p_din
+
+The xCORE also provides ``clock block`` hardware to efficiently generate
+clock singal that can either be driven out on a port or used
+to control a port. In this application two clocks blocks are used:
+
+.. literalinclude:: main.xc
+   :start-on: clock mclk
+   :end-on: clock bclk
+
+The other ports declared are used by the I2C library to configure
+the audio codecs and by the application to control reset and
+chip select:
+
+.. literalinclude:: main.xc
+   :start-on: port p_i2c
+   :end-on: port p_gpio
+
+The application main() function
+...............................
+
+The ``main()`` function in the program sets up the tasks in the application.
+
+Firstly, the ``interfaces`` are declared. In XC interfaces provide a
+means of concurrent tasks communicating with each other. In this
+application there is an interface for the I\ :sup:`2`\ S master, an interface
+for the I2C master and one for the GPIO output.
+
+.. literalinclude:: main.xc
+   :start-on: interface i2s
+   :end-on: interface output
+
+The rest of the ``main`` function starts all the tasks in parallel
+using the XC ``par`` construct:
+
+.. literalinclude:: main.xc
+   :start-on: par {
+   :end-before: return 0
+
+This code is starts the I\ :sup:`2`\ S master, the I2C master, the GPIO control
+and the loopback application.
+
+Before the I\ :sup:`2`\ S master runs, the system configuration is run and the
+master clock is connected from the input port to the clock block and
+then started. The I\ :sup:`2`\ S master task then starts and consumes a logical
+core on the xCORE device.
+
+The remaining tasks in the ``par`` are marked with the
+``[[distribute]]`` attribute. This means they will run on an existing
+logical core if possible. In this case they will all share the
+one logical core with the I\ :sup:`2`\ S master so this entire application
+requires only one core.
+
+|newpage|
+
+Configuring audio codecs
+........................
+
+Two audio codecs are used on the xCORE-200 MC AUDIO board. A Cirrus
+CS5368 for audio input and a Cirrus CS4384 for audio output. These
+codecs have to be configured before they can be used. The
+``reset_codecs()`` function writes to the appropriate codec registers
+to configure them:
+
+.. literalinclude:: main.xc
+   :start-on: void reset_codecs
+   :end-before: [[distributable]]
+
+If porting this application to a different xCORE development board
+then this is the function that will have to be modified to configure
+the relevant codecs for that board.
+
+|newpage|
+
+The i2s_loopback application
+............................
+
+The I\ :sup:`2`\ S loopback task provides the function of a digital loopback
+so that all I\ :sup:`2`\ S samples received by the device will be forwarded on.
+
+The task itself is declared as a ``[[distributable]]`` function
+ensuring that it can share a logical core with other tasks. This
+is an XC feature of any task that is of the form::
+
+  ...
+  while(1) {
+    select {
+      ...
+    }
+  }
+
+The function takes a number of arguments:
+
+.. literalinclude:: main.xc
+   :start-on: [[distributable]]
+   :end-on: mclk_select
+
+The interface to the I\ :sup:`2`\ S master is a callback interface that the
+I\ :sup:`2`\ S master will call over when it has received data or is ready to
+send data.
+
+The I2C interface is used to configure the codecs and the GPIO
+interfaces abstract the outputting of single-bit values on a multi-bit
+port.
+
+|newpage|
+
+The body of the loopback task handles the I\ :sup:`2`\ S interface calls:
+
+.. literalinclude:: main.xc
+   :start-on: int32_t samples
+   :end-before: static char
+
+The I\ :sup:`2`\ S master library calls the ``init()`` method before it starts
+any data streaming. This allows the application to reset and configure
+the audio codecs.
+
+The ``receive()`` interface method is called when the master has
+received an audio sample on the channel specified by ``index``. The sample
+is stored in the ``samples`` array.
+
+The ``send()`` interface method is called when the master needs a new
+sample to send on the specified channel. The ``->`` symbol shows
+the return value expected from this call. In this case the application
+simply returns the current sample on that channel.
+
+Finally, the ``restart_check()`` method is called by the I\ :sup:`2`\ S master
+once per frame and allows the application to control restart or
+shutdown of the I\ :sup:`2`\ S master. In this case the application continues to
+run forever and so always returns ``I2S_NO_RESTART``.
+
+|newpage|
+|appendix|
+
+Demo hardware setup
+-------------------
+
+The demo is designed to run on the xCORE-200 MC Audio board. To run the
+demo:
+
+ * Connect the XTAG-2 or XTAG-3 USB debug adapter to the xCORE-200 MC AUDIO board.
+ * Connect the XTAG-2 or XTAG-3 to the host PC using USB extension cable.
+ * Connect a sound source to the 3.5mm line in. Channels 1-2, 3-4, 5-6 or 7-8 can be used.
+ * Connect headphones or speakers to the corresponding line out.
+ * Connect the 12V power adaptor to the xCORE-200 MC AUDIO board.
+
+.. figure:: images/hardware_setup.*
+   :scale: 100%
+   :align: center
+
+   Hardware setup for XMOS I\ :sup:`2`\ S master loopback demo
+
+|newpage|
+
+Launching the demo device
+-------------------------
+
+Once the application source code is imported into the tools it can
+be built by pressing the :menuitem:`Build` button in the
+xTIMEcomposer. This will create the ``AN00162_i2s_loopback_demo.xe``
+binary in the ``bin`` folder of the project. xTIMEcomposer may
+have to import the dependent libraries if you do not already have them
+in your workspace; this will occur automatically on build.
+
+A *Run Configuration* then needs to be set up. This can be done by
+selecting the :menuitem:`Run,Run Configurations...` menu. You can
+create a new run configuration by right clicking on the
+:menuitem:`xCORE application` group in the left hand pane and
+:menuitem:`New`.
+
+Select your XMOS XTAG in the Target box and click **Apply**. You can
+now click the **Run** button to launch the application.
+
+The audio from the input should now be playing on the corresponding output channel.
+All 8 channels should be active.
+
+Alternatively, the command line tools can be used to build and run the application.
+Building is done by changing to the folder containing the ``src`` sub-folder and
+doing a call to ``xmake``. Running the application is then done using
+``xrun bin/AN00162_i2s_loopback_demo.xe``.
+
+|newpage|
+
+References
+----------
+
+.. nopoints::
+
+ * XMOS Tools User Guide
+
+   http://www.xmos.com/published/xtimecomposer-user-guide
+
+ * XMOS xCORE Programming Guide
+
+   http://www.xmos.com/published/xmos-programming-guide
+
+ * I\ :sup:`2`\ S Protocol
+
+   https://en.wikipedia.org/wiki/I%C2%B2S
+
+|newpage|
+
+Full source code listing
+-------------------------
+
+Source code for main.xc
+.......................
+
+.. literalinclude:: main.xc
+   :largelisting:
+
+|newpage|

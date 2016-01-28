@@ -172,7 +172,7 @@ void i2s_slave(client i2s_callback_if i2s_i,
  *
  *  The component performs as TDM master so will drive the fsync signal.
  *
- *  \param i2s_i          The I2S callback interface to connect to
+ *  \param tdm_i          The TDM callback interface to connect to
  *                        the application
  *  \param p_fsync        The frame sync output port
  *  \param p_dout         An array of data output ports
@@ -206,7 +206,7 @@ void tdm_master(client interface i2s_callback_if tdm_i,
  *  bit clock lines. It will also acts as TDM master and drives the fsync
  *  signal.
  *
- *  \param i2s_i          The I2S callback interface to connect to
+ *  \param tdm_i          The TDM callback interface to connect to
  *                        the application
  *  \param i2s_dout       An array of I2S data output ports
  *  \param num_i2s_out    The number of I2S output data ports
@@ -226,7 +226,7 @@ void tdm_master(client interface i2s_callback_if tdm_i,
  *                        an incoming master system clock. This clock is also
  *                        used as the TDM bit clock.
  */
-void i2s_tdm_master(client interface i2s_callback_if i,
+void i2s_tdm_master(client interface i2s_callback_if tdm_i,
         out buffered port:32 i2s_dout[num_i2s_out],
         static const size_t num_i2s_out,
         in buffered port:32 i2s_din[num_i2s_in],
@@ -238,8 +238,8 @@ void i2s_tdm_master(client interface i2s_callback_if i,
         size_t num_tdm_out,
         in buffered port:32 tdm_din[num_tdm_in],
         size_t num_tdm_in,
-        clock clk_bclk,
-        clock clk_mclk);
+        clock bclk,
+        clock mclk);
 
 #include <i2s_master_impl.h>
 #include <i2s_slave_impl.h>
