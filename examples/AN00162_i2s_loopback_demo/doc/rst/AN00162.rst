@@ -123,7 +123,7 @@ using the XC ``par`` construct:
    :start-on: par {
    :end-before: return 0
 
-This code is starts the I\ :sup:`2`\ S master, the I\ :sup:`2`\ C master, the GPIO control
+This code starts the I\ :sup:`2`\ S master, the I\ :sup:`2`\ C master, the GPIO control
 and the loopback application.
 
 Before the I\ :sup:`2`\ S master runs, the system configuration is run and the
