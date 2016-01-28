@@ -1,4 +1,5 @@
 .. |i2s| replace:: I\ :sup:`2`\ S
+.. |i2c| replace:: I\ :sup:`2`\ C
 
 Using the |i2s| library
 =======================
@@ -27,7 +28,7 @@ Required tools and libraries
  * xTIMEcomposer Tools - Version 14.0.0
  * XMOS |i2s| library - Version 2.1.0
  * XMOS GPIO library - Version 1.0.0
- * XMOS I2C library - Version 3.1.0
+ * XMOS |i2c| library - Version 3.1.0
 
 Required hardware
 .................
