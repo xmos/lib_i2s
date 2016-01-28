@@ -65,8 +65,8 @@ The |i2s| library functions are defined in ``i2s.h``. This header must
 be included in your code to use the library.
 
 .. literalinclude:: main.xc
-   :start-on: include <i2s.h>
-   :end-on: include <gpio.h>
+   :start-on: include "i2s.h"
+   :end-on: include "gpio.h"
 
 The other two includes give access to the |i2c| and GPIO library functions
 which this application note relies on.
