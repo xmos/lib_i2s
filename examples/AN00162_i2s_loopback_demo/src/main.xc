@@ -51,7 +51,7 @@ void reset_codecs(client i2c_master_if i2c)
   /* bit[7:4] : Digital Interface Format (DIF) : 0b1100 for TDM
    * bit[3:2] : Reserved
    * bit[1:0] : Functional Mode (FM) : 0x11 for auto-speed detect (32 to 200kHz)
-  */
+   */
   i2c.write_reg(CS4384_ADDR, CS4384_PCM_CTRL, 0b00010111);
 
   /* Mode Control 1 (Address: 0x02) */
@@ -63,8 +63,8 @@ void reset_codecs(client i2c_master_if i2c)
    */
   i2c.write_reg(CS4384_ADDR, CS4384_MODE_CTRL, 0b10000000);
 
-  unsigned adc_dif = 0x01; // I2S mode
-  unsigned adc_mode = 0x03;    /* Slave mode all speeds */
+  unsigned adc_dif = 0x01;  // I2S mode
+  unsigned adc_mode = 0x03; // Slave mode all speeds
 
   /* Reg 0x01: (GCTL) Global Mode Control Register */
   /* Bit[7]: CP-EN: Manages control-port mode
