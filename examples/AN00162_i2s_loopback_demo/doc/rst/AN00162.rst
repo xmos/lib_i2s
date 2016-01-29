@@ -166,7 +166,7 @@ so that all |I2S| samples received by the device will be forwarded on.
 
 The task itself is declared as a ``[[distributable]]`` function
 ensuring that it can share a logical core with other tasks. This
-is an xC feature of any task that is of the form::
+is an xC feature that can be enabled for any task that is of the form::
 
   ...
   while(1) {
