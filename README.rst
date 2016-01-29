@@ -1,25 +1,25 @@
-I2S/TDM Library
-===============
+.. |I2S| replace:: I\ :sup:`2`\ S
 
-.. |i2s| replace:: I |-| :sup:`2` |-| S
+|I2S|/TDM Library
+=================
 
 Summary
 -------
 
-A software library that allows you to control an |i2s| or TDM (time
-division multiplexed) bus via xCORE ports. |i2s| and TDM are digital
+A software library that allows you to control an |I2S| or TDM (time
+division multiplexed) bus via xCORE ports. |I2S| and TDM are digital
 data streaming interface particularly appropriate for transmission of
 audio data. The components in the libary
 are controlled via C using the XMOS multicore extensions (xC) and
-can either act as |i2s| master, TDM master or |i2s| slave.
+can either act as |I2S| master, TDM master or |I2S| slave.
 
 Features
 ........
 
- * |i2s| master, TDM master and |i2s| slave modes.
+ * |I2S| master, TDM master and |I2S| slave modes.
  * Handles multiple input and output data lines.
- * Support for standard |i2s|, left justified or right justified
-   data modes for |i2s|.
+ * Support for standard |I2S|, left justified or right justified
+   data modes for |I2S|.
  * Support for multiple formats of TDM synchronization signal.
  * Sample rate support up to 192KHz.
  * Up to 32 channels in/32 channels out (depending on sample rate)
@@ -29,7 +29,7 @@ Resource Usage
 
 .. resusage::
 
-  * - configuration: I2S Master
+  * - configuration: |I2S| Master
     - globals:   out buffered port:32 p_dout[2] = {XS1_PORT_1D, XS1_PORT_1E};
                  in buffered port:32 p_din[2]  = {XS1_PORT_1I, XS1_PORT_1K};
                  port p_mclk  = XS1_PORT_1M;
@@ -42,7 +42,7 @@ Resource Usage
     - pins: 3 + data lines
     - ports: 3 x (1-bit) + data lines
     - cores: 1
-  * - configuration: I2S Slave
+  * - configuration: |I2S| Slave
     - globals:   out buffered port:32 p_dout[2] = {XS1_PORT_1D, XS1_PORT_1E};
                  in buffered port:32 p_din[2]  = {XS1_PORT_1I, XS1_PORT_1K};
                  port p_mclk  = XS1_PORT_1M;
@@ -75,4 +75,4 @@ Related application notes
 
 The following application notes use this library:
 
-  * AN00162 - Using the I2S library
+  * AN00162 - Using the |I2S| library
