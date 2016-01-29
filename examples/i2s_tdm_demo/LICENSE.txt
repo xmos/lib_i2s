@@ -275,5 +275,5 @@ Parties
       non-exclusive jurisdiction of the English courts.
 
 Schedule
-XMOS I2S/TDM Library sofware
+XMOS I2S/TDM Library software
 No license fee.
