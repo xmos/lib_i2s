@@ -199,7 +199,7 @@ The body of the loopback task handles the |I2S| interface calls:
 
 The |I2S| master library calls the ``init()`` method before it starts
 any data streaming. This allows the application to reset and configure
-the audio codecs.
+the audio codecs, for example when the sample rate changes.
 
 The ``receive()`` interface method is called when the master has
 received an audio sample on the channel specified by ``index``. The sample
