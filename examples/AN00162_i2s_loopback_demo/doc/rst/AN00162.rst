@@ -282,15 +282,15 @@ References
 
  * XMOS |I2S|/TDM Library
 
-    http://www.xmos.com/support/libraries/lib_i2s
+   http://www.xmos.com/support/libraries/lib_i2s
 
  * XMOS |I2C| Library
 
-    http://www.xmos.com/support/libraries/lib_i2c
+   http://www.xmos.com/support/libraries/lib_i2c
 
  * XMOS GPIO Library
 
-    http://www.xmos.com/support/libraries/lib_gpio
+   http://www.xmos.com/support/libraries/lib_gpio
 
  * |I2S| Protocol
 
