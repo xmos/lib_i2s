@@ -280,7 +280,7 @@ References
 
    http://www.xmos.com/published/xmos-programming-guide
 
- * XMOS |I2S| Library
+ * XMOS |I2S|/TDM Library
 
     http://www.xmos.com/support/libraries/lib_i2s
 
