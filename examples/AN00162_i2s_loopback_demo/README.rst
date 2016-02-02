@@ -26,14 +26,14 @@ Required tools and libraries
 ............................
 
  * xTIMEcomposer Tools - Version 14.0.0
- * XMOS |I2S| library - Version 2.1.0
+ * XMOS |I2S|/TDM library - Version 2.1.0
  * XMOS GPIO library - Version 1.0.0
  * XMOS |I2C| library - Version 3.1.0
 
 Required hardware
 .................
 The example code provided with the application has been implemented
-and tested on the xCORE-200 MC AUDIO board.
+and tested on the xCORE-200 Multichannel Audio Platform.
 
 Prerequisites
 ..............
