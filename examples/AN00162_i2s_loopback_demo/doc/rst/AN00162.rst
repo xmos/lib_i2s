@@ -142,7 +142,7 @@ requires only one core.
 Configuring audio codecs
 ........................
 
-Two audio codecs are used on the xCORE-200 MC AUDIO board. A Cirrus
+Two audio codecs are used on the xCORE-200 Multichannel Audio Platform. A Cirrus
 CS5368 for audio input and a Cirrus CS4384 for audio output. These
 codecs have to be configured before they can be used. The
 ``reset_codecs()`` function writes to the appropriate codec registers
@@ -199,7 +199,7 @@ The body of the loopback task handles the |I2S| interface calls:
 
 The |I2S| master library calls the ``init()`` method before it starts
 any data streaming. This allows the application to reset and configure
-the audio codecs.
+the audio codecs, for example when the sample rate changes.
 
 The ``receive()`` interface method is called when the master has
 received an audio sample on the channel specified by ``index``. The sample
@@ -221,14 +221,14 @@ run forever and so always returns ``I2S_NO_RESTART``.
 Demo hardware setup
 -------------------
 
-The demo is designed to run on the xCORE-200 MC Audio board. To run the
+The demo is designed to run on the xCORE-200 Multichannel Audio Platform. To run the
 demo:
 
- * Connect the XTAG-2 or XTAG-3 USB debug adapter to the xCORE-200 MC AUDIO board.
+ * Connect the XTAG-2 or XTAG-3 USB debug adapter to the xCORE-200 Multichannel Audio Platform.
  * Connect the XTAG-2 or XTAG-3 to the host PC using USB extension cable.
  * Connect a sound source to the 3.5mm line in. Channels 1-2, 3-4, 5-6 or 7-8 can be used.
  * Connect headphones or speakers to the corresponding line out.
- * Connect the 12V power adaptor to the xCORE-200 MC AUDIO board.
+ * Connect the 12V power adaptor to the xCORE-200 Multichannel Audio Platform.
 
 .. figure:: images/hardware_setup.*
    :scale: 100%
@@ -279,6 +279,18 @@ References
  * XMOS xCORE Programming Guide
 
    http://www.xmos.com/published/xmos-programming-guide
+
+ * XMOS |I2S|/TDM Library
+
+    http://www.xmos.com/support/libraries/lib_i2s
+
+ * XMOS |I2C| Library
+
+    http://www.xmos.com/support/libraries/lib_i2c
+
+ * XMOS GPIO Library
+
+    http://www.xmos.com/support/libraries/lib_gpio
 
  * |I2S| Protocol
 
