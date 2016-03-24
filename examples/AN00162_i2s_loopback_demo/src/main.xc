@@ -104,7 +104,7 @@ void i2s_loopback(server i2s_callback_if i2s,
       adc_reset.output(0);
 
       // Select 48Khz family clock (24.576Mhz)
-      mclk_select.output(0);
+      mclk_select.output(1);
       pll_select.output(0);
 
       // Allow the clock to settle
