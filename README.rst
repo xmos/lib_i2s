@@ -1,7 +1,7 @@
 .. |I2S| replace:: I\ :sup:`2`\ S
 
-|I2S|/TDM Library
-=================
+I2S/TDM Library
+===============
 
 Summary
 -------
