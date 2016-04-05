@@ -1,6 +1,11 @@
 I2S library change log
 ======================
 
+2.1.2
+-----
+
+  * Fix github issue 9
+
 2.1.1
 -----
 
