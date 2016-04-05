@@ -1,8 +1,8 @@
 .. |I2S| replace:: I\ :sup:`2`\ S
 .. |I2C| replace:: I\ :sup:`2`\ C
 
-Using the |I2S| library
-=======================
+Using the I2S library
+=====================
 
 .. appnote:: AN00162
 
