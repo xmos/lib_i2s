@@ -3,6 +3,8 @@
 #include <xclib.h>
 #include "i2s.h"
 
+#define I2S_CHANS_PER_FRAME 2
+
 static void i2s_slave_init_ports(
         out buffered port:32 (&?p_dout)[num_out],
         size_t num_out,
@@ -13,7 +15,7 @@ static void i2s_slave_init_ports(
         clock bclk){
     set_clock_on(bclk);
     configure_clock_src(bclk, p_bclk);
-    configure_out_port(p_lrclk, bclk, 1);
+    configure_in_port(p_lrclk, bclk);
     for (size_t i = 0; i < num_out; i++)
         configure_out_port(p_dout[i], bclk, 0);
     for (size_t i = 0; i < num_in; i++)
@@ -50,6 +52,8 @@ static void i2s_slave0(client i2s_callback_if i2s_i,
         in buffered port:32 p_lrclk,
         clock bclk){
 
+    unsigned syncerror;
+    unsigned lrval;
     unsigned port_time;
     i2s_slave_init_ports(p_dout, num_out, p_din, num_in, p_bclk, p_lrclk, bclk);
 
@@ -59,44 +63,54 @@ static void i2s_slave0(client i2s_callback_if i2s_i,
         i2s_restart_t restart = I2S_NO_RESTART;
         i2s_i.init(config, null);
         m = config.mode;
+        
+        syncerror = 0;
 
         clearbuf(p_lrclk);
 
-        p_lrclk when pinseq(0x80000000) :> int @ port_time;
-        port_time += (m == I2S_MODE_I2S);
-
-  
+        /* Wait for LRCLK edge (in I2S LRCLK = 0 is left, TDM rising edge is start of frame) */
+        p_lrclk when pinseq(0) :> void;
+        p_lrclk when pinseq(1) :> void;
+        p_lrclk when pinseq(0) :> void;
+        p_lrclk when pinseq(1) :> void;
+        p_lrclk when pinseq(0) :> void;
+        p_lrclk when pinseq(1) :> void @ port_time;
+        
         for(size_t i=0;i<num_out;i++)
-            p_dout[i] @ port_time + 32+32  <: bitrev(i2s_i.send(i*2));
-
-
+            p_dout[i] @ (port_time+32+32+(m==I2S_MODE_I2S)) <: bitrev(i2s_i.send(i*2));
 
         i2s_slave_send(i2s_i, p_dout, num_out, 1);
 
+        /* Setup input for next frame. Account for the buffering in port */
+        port_time += ((I2S_CHANS_PER_FRAME*32)+32);
+
+        /* XC doesn't have syntax for setting a timed input without waiting for the input */
+        /* -1 on LRClock makes checking a lot easier since data is offset with LRclock by 1 clk */
+        asm("setpt res[%0], %1"::"r"(p_lrclk),"r"(port_time-(m==I2S_MODE_I2S)));
         for(size_t i=0;i<num_in;i++)
-            asm volatile("setpt res[%0], %1"::"r"(p_din[i]), "r"(port_time + 64+32-1):"memory");
+            asm("setpt res[%0], %1"::"r"(p_din[i]),"r"(port_time));
 
         restart = i2s_i.restart_check();
 
-        while(restart == I2S_NO_RESTART){
-  
+        while((!syncerror) && (restart == I2S_NO_RESTART))
+        {
             i2s_slave_receive(i2s_i, p_din, num_in, 0);
-
+            p_lrclk :> lrval;
+            syncerror += (lrval != 0xffffffff);
+            
             i2s_slave_send(i2s_i, p_dout, num_out, 0);
 
-
             i2s_slave_receive(i2s_i, p_din, num_in, 1);
-
+            p_lrclk :> lrval;
+            syncerror += (lrval != 0);  
+            
             i2s_slave_send(i2s_i, p_dout, num_out, 1);
 
             restart = i2s_i.restart_check();
-
         }
-
-        i2s_slave_receive(i2s_i, p_din, num_in, 0);
-        i2s_slave_receive(i2s_i, p_din, num_in, 1);
+        
         if (restart == I2S_SHUTDOWN)
-          return;
+            return;
     }
 }
 
