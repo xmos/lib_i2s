@@ -224,7 +224,7 @@ void i2s_he_master(client i2s_he_callback_if i2s_i,
                 static const size_t num_out,
                 in buffered port:32 (&?p_din)[num_in],
                 static const size_t num_in,
-                out buffered port:32 p_bclk,
+                out port p_bclk,
                 out buffered port:32 p_lrclk,
                 in port p_mclk,
                 clock bclk);
