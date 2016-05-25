@@ -123,10 +123,6 @@ static i2s_restart_t i2s_he_ratio_n(client i2s_he_callback_if i2s_i,
         i2s_restart_t restart = i2s_i.restart_check();
 
         if (restart != I2S_NO_RESTART) {
-            fail("Not yet implemented");
-#if !USE_HW_DIVIDER
-            sync(p_bclk);
-#endif
             return restart;
         }
 
