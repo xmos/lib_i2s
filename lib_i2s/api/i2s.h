@@ -143,20 +143,20 @@ typedef interface i2s_he_callback_if {
    *   This callback will be called when a new sample is read in by the I2S
    *   High Efficiency component.
    *
-   *   \param index     The index of the sample in the frame.
-   *   \param sample    The sample data as a signed 32-bit value. The component
-   *                    may not use all 32 bits of the value (for example, many
+   *  \param num_out    The number of output channels contained within the array
+   *  \param sample     The sample data array as signed 32-bit values.  The component
+   *                    may not have 32-bits of accuracy (for example, many
    *                    I2S codecs are 24-bit), in which case the bottom bits
-   *                    are ignored.
+   *                    will be arbitrary values.
    */
   void receive(size_t num_in, int32_t sample[num_in]);
 
   /** Request an outgoing sample.
    *
-   *  This callback will be called when the I2S High Efficiency component needs a new sample.
+   *  This callback will be called when the I2S High Efficiency component needs a new sample
    *
    *  \param num_out    The number of output channels contained within the array
-   *  \param sample     The sample data as a signed 32-bit value.  The component
+   *  \param sample     The sample data array as signed 32-bit values.  The component
    *                    may not have 32-bits of accuracy (for example, many
    *                    I2S codecs are 24-bit), in which case the bottom bits
    *                    will be arbitrary values.
@@ -198,7 +198,7 @@ void i2s_master(client i2s_callback_if i2s_i,
                 clock bclk,
                 const clock mclk);
 
-/** I2S High Efficiency master component for xCORE200 only
+/** I2S High Efficiency master component **for xCORE200 only**
  *
  *  This task performs I2S on the provided pins. It will perform callbacks over
  *  the i2s_callback_if interface to get/receive data from the application
