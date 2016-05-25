@@ -39,8 +39,11 @@ static i2s_restart_t i2s_he_ratio_n(client i2s_he_callback_if i2s_i,
         unsigned ratio,
         i2s_mode_t mode){
 
-    int32_t in_samps[8]; //Temp hack. should be num_in << 1 but compiler thinks that isn't const
-    int32_t out_samps[8];
+    int32_t in_samps[16]; //Temp hack. should be num_in << 1 but compiler thinks that isn't const..
+    int32_t out_samps[16];//So setting to 16 which should be big enough for most cases
+
+    size_t idx;          //Index into in/out sample arrays
+
 
     unsigned lr_mask = 0;
 
@@ -64,9 +67,11 @@ static i2s_restart_t i2s_he_ratio_n(client i2s_he_callback_if i2s_i,
     start_clock(bclk);
     p_lrclk <: lr_mask;
 
+    //transfer output samps only
+    if (num_out) i2s_i.send(num_out << 1, out_samps);
+
     //Body of main loop
     while(1){
-        size_t idx;
 
         lr_mask = ~lr_mask;
         p_lrclk <: lr_mask;
