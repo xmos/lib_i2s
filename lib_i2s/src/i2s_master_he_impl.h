@@ -152,6 +152,10 @@ static void i2s_he_master0(client i2s_he_callback_if i2s_i,
         unsigned mclk_bclk_ratio_log2;
         i2s_i.init(config, null);
 
+        if(config.mode != I2S_MODE_I2S) {
+            fail("Only I2S_MODE_I2S supported currently");
+        }
+
         if (isnull(p_dout) && isnull(p_din)) {
             fail("Must provide non-null p_dout or p_din");
         }
