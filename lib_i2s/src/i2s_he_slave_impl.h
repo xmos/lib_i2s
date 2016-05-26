@@ -25,7 +25,8 @@ static void i2s_he_slave_send(client i2s_he_callback_if i2s_i,
         out buffered port:32 (&?p_dout)[num_out],
         size_t num_out, unsigned frame_word){
     for(size_t i=0;i<num_out;i++)
-        p_dout[i] <: bitrev(i2s_i.send(i*2+frame_word));
+        ;
+        //p_dout[i] <: bitrev(i2s_i.send(i*2+frame_word));
 }
 
 static void i2s_he_slave_receive(client i2s_he_callback_if i2s_i,
@@ -35,7 +36,7 @@ static void i2s_he_slave_receive(client i2s_he_callback_if i2s_i,
     for(size_t i=0;i<num_in;i++){
               p_din[i] :> data;
       //asm("in %0, res[%1]":"=r"(data):"r"(p_din[i]):"memory");
-        i2s_i.receive(i*2 + frame_word, bitrev(data));
+        //i2s_i.receive(i*2 + frame_word, bitrev(data));
     }
 }
 
@@ -67,7 +68,7 @@ static void i2s_he_slave0(client i2s_he_callback_if i2s_i,
 
   
         for(size_t i=0;i<num_out;i++)
-            p_dout[i] @ port_time + 32+32  <: bitrev(i2s_i.send(i*2));
+            //p_dout[i] @ port_time + 32+32  <: bitrev(i2s_i.send(i*2));
 
 
 
