@@ -52,6 +52,12 @@ on tile[1]: out port  p_bclk_master = XS1_PORT_1H;
 on tile[1]: out buffered port:32 p_dout_master[4] = {XS1_PORT_1M, XS1_PORT_1N, XS1_PORT_1O, XS1_PORT_1P};
 on tile[1]: in buffered port:32 p_din_master[4] = {XS1_PORT_1I, XS1_PORT_1J, XS1_PORT_1K, XS1_PORT_1L};
 
+#if SIM_LOOPBACK_TEST
+on tile[1]: out port  p_mclk = XS1_PORT_1C;
+on tile[1]: clock mclk_master = XS1_CLKBLK_1;
+
+#endif
+
 
 #define CS5368_ADDR           0x4C // I2C address of the CS5368 DAC
 #define CS5368_GCTL_MDE       0x01 // I2C mode control register number
@@ -146,7 +152,7 @@ void i2s_loopback(server i2s_callback_if i2s,
       i2s_config.mode = I2S_MODE_I2S;
       i2s_config.mclk_bclk_ratio = (MASTER_CLOCK_FREQUENCY/SAMPLE_FREQUENCY)/64;
 
-#if !SIM
+#if !SIM_LOOPBACK_TEST
       // Set CODECs in reset
       dac_reset.output(0);
       adc_reset.output(0);
@@ -166,45 +172,36 @@ void i2s_loopback(server i2s_callback_if i2s,
 #endif
       break;
 
-    case i2s.receive(size_t num_chan_in, int32_t sample[num_chan_in]):
+    case i2s.receive(size_t index,  int32_t sample):
       timer t;
       int time;
       t :> time;
 #if SIM_LOOPBACK_TEST
       if(rx_data >= 0){
-          for (size_t i=0; i<num_chan_in; i++) {
-              samples[i] = sample[i];
-              assert(sample[i] == (rx_data << 16) + i);
-          }
+          samples[index] = sample;
+          //assert(samples[index] == (rx_data << 16) + index);
       }
-      rx_data++;
+      if ((index == NUM_I2S_LINES << 1) - 1) rx_data++;
 #else
-      for (size_t i=0; i<num_chan_in; i++) {
-          samples[i] = sample[i];
-      }
+      samples[index] = sample;
 #endif
 
       t when timerafter(time + delay) :> void;
       break;
 
-    case i2s.send(size_t num_chan_out, int32_t sample[num_chan_out]):
+    case i2s.send(size_t index) -> int32_t sample:
       timer t;
       int time;
       t :> time;
-#if SIM
-      for (size_t i=0; i<num_chan_out; i++)
 #if SIM_LOOPBACK_TEST
       {
-          sample[i] = (tx_data << 16) + i;
+          sample = samples[index];
       }
-      tx_data++;
+      if ((index == NUM_I2S_LINES << 1) - 1) tx_data++;
 #else
-      sample[i] = 0xFFFFFFFF;
+      sample = 0xFFFFFFFF;
 #endif
 
-#else
-      for (size_t i=0; i<num_chan_out; i++) sample[i] = samples[i];
-#endif
       t when timerafter(time + delay) :> void;
       break;
 
@@ -229,46 +226,6 @@ static char gpio_pin_map[4] =  {
   GPIO_MCLK_FSEL
 };
 
-#if SIM
-#define JITTER  1   //Allow for rounding so does not break when diff = period + 1
-#define N_CYCLES_AT_DELAY   1 //How many LR clock cycles to measure at each backpressure delay value
-#define DIFF_WRAP_16(new, old)  (new > old ? new - old : new + 0x10000 - old)
-on tile[0]: port p_lr_test = XS1_PORT_1A;
-unsafe void test_lr_period(void){
-    int counter = 0;                //Do a number cycles at each delay value
-    set_core_fast_mode_on();    //Burn all MIPS
-
-    int time, time_old;
-    int diff;
-    for(int i=0; i<4;i++){
-        p_lr_test when pinseq(0) :> void;
-        p_lr_test when pinseq(1) :> void;
-    }
-    const int period = (XS1_TIMER_HZ/(25000000/(MASTER_CLOCK_FREQUENCY/SAMPLE_FREQUENCY)));
-    p_lr_test :> void @ time;
-    time_old = time;
-    while(1){
-        p_lr_test when pinseq(0) :> void;
-        counter++;
-        if (counter == N_CYCLES_AT_DELAY) {
-            (*delay_ptr)++;
-            counter = 0;
-        }
-        p_lr_test when pinseq(1) :> void @ time;
-        //diff = sext(time, 16) - sext(time_old, 16);
-        diff = DIFF_WRAP_16(time, time_old);
-        if (diff > (period + JITTER)){
-            printstr("Case backpressure breaks at delay ticks=");
-            printuintln(*delay_ptr);
-            //printintln(diff);
-            //printintln(period);
-            delay_microseconds(5); //Let the print out
-            _Exit(0);
-        }
-        time_old = time;
-    }
-}
-#endif
 
 #if ADDITIONAL_SERVER_CASE
 void test_client_task(client test_serv_if i_test_serv){
@@ -285,6 +242,9 @@ void i2s_handler_master(server i2s_he_callback_if i2s)
 {
   int32_t samples[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
+  int32_t tx_data = 0;
+  int32_t rx_data = -1; //Need to start one frame later
+
   while (1) {
     select {
     case i2s.init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config):
@@ -296,12 +256,14 @@ void i2s_handler_master(server i2s_he_callback_if i2s)
       for (size_t i=0; i<num_chan_in; i++) {
           samples[i] = sample[i];
       }
+      rx_data++;
       break;
 
     case i2s.send(size_t num_chan_out, int32_t sample[num_chan_out]):
       for (size_t i=0; i<num_chan_out; i++){
-        sample[i] = samples[i];
-      }
+              sample[i] = (tx_data << 16) + i;
+          }
+      tx_data++;
       break;
 
     case i2s.restart_check() -> i2s_restart_t restart:
@@ -342,15 +304,20 @@ int main()
             );
 #endif
 
-#if SIM
-    on tile[0]: unsafe{test_lr_period();}
-#endif
 
-    on tile[1]: i2s_he_master(i_i2s_master, p_dout_master, NUM_I2S_LINES, p_din_master, NUM_I2S_LINES, p_bclk_master, p_lrclk_master, p_mclk_master, bclk_master);
+    on tile[1]: {
+#if SIM_LOOPBACK_TEST
+        configure_clock_ref(mclk_master, 2); //100 / (2*2) = 25MHz
+        set_port_clock(p_mclk, mclk_master);
+        set_port_mode_clock(p_mclk);
+        start_clock(mclk_master);
+#endif
+        i2s_he_master(i_i2s_master, p_dout_master, NUM_I2S_LINES, p_din_master, NUM_I2S_LINES, p_bclk_master, p_lrclk_master, p_mclk_master, bclk_master);
+    }
     on tile[1]: i2s_handler_master(i_i2s_master);
 
 
-    on tile[0]: par (int i=0; i<(BURN_THREADS > 1 ? BURN_THREADS - SIM - ADDITIONAL_SERVER_CASE: 0); i++) {burn();};
+    on tile[0]: par (int i=0; i<(BURN_THREADS > 1 ? BURN_THREADS - ADDITIONAL_SERVER_CASE: 0); i++) {burn();};
   }
   return 0;
 }
