@@ -147,7 +147,7 @@ static void i2s_he_master0(client i2s_he_callback_if i2s_i,
                 in port p_mclk,
                 clock bclk){
     while(1){
-        debug_printf("config.mclk_bclk_ratio=%d\n",config.mclk_bclk_ratio);
+        //debug_printf("config.mclk_bclk_ratio=%d\n",config.mclk_bclk_ratio);
 
         i2s_config_t config;
         unsigned mclk_bclk_ratio_log2;

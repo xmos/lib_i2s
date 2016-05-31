@@ -7,15 +7,19 @@
 #include "xassert.h"
 #include <print.h>
 #include <stdlib.h>
+#include <debug_print.h>
+#include <stdio.h>
+
+#define TEST_LENGTH     256
 
 #ifndef NUM_I2S_LINES
-#define NUM_I2S_LINES   2
+#define NUM_I2S_LINES   1
 #endif
 #ifndef BURN_THREADS
-#define BURN_THREADS    0
+#define BURN_THREADS    7
 #endif
 #ifndef SAMPLE_FREQUENCY
-#define SAMPLE_FREQUENCY 48000
+#define SAMPLE_FREQUENCY 192000
 #endif
 #define MASTER_CLOCK_FREQUENCY 24576000
 #ifndef ADDITIONAL_SERVER_CASE
@@ -207,6 +211,7 @@ void i2s_loopback(server i2s_callback_if i2s,
 
     case i2s.restart_check() -> i2s_restart_t restart:
       restart = I2S_NO_RESTART;
+      delay++;
       break;
 
 #if ADDITIONAL_SERVER_CASE
@@ -240,10 +245,10 @@ void burn(void){
 [[distributable]]
 void i2s_handler_master(server i2s_he_callback_if i2s)
 {
-  int32_t samples[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+  int32_t samples[TEST_LENGTH][8] = {{0}};
 
   int32_t tx_data = 0;
-  int32_t rx_data = -1; //Need to start one frame later
+  int32_t rx_data = -1; //Ignore first..
 
   while (1) {
     select {
@@ -253,10 +258,28 @@ void i2s_handler_master(server i2s_he_callback_if i2s)
       break;
 
     case i2s.receive(size_t num_chan_in, int32_t sample[num_chan_in]):
-      for (size_t i=0; i<num_chan_in; i++) {
-          samples[i] = sample[i];
+
+      if(rx_data > 0){
+          for (size_t i=0; i<num_chan_in; i++) {
+              samples[rx_data][i] = sample[i];
+          }
       }
       rx_data++;
+      if (rx_data == TEST_LENGTH){
+          for (size_t i=0; i<TEST_LENGTH; i++) {
+              //debug_printf("Rx from master %d = 0x%x, sent = 0x%x\n", i, samples[i][0], (i << 16) + 0);
+              if (i >= 3) {
+                  if (samples[i][0] != (i << 16) + 0){
+                      debug_printf("Rx from master at cycle %d. Data = 0x%x, sent = 0x%x\n", i, samples[i][0], (i << 16) + 0);
+                      fail("Data mismatch");
+                  }
+              }
+          }
+          debug_printf("Test pass\n");
+          delay_microseconds(10);
+          _Exit(0);
+      }
+      //unsafe {(*delay_ptr)++;} Doesn't work as wrong tile!!
       break;
 
     case i2s.send(size_t num_chan_out, int32_t sample[num_chan_out]):
