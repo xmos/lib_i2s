@@ -4,7 +4,8 @@ I2S library change log
 2.1.3
 -----
 
-  * Slave mode now includes sync error detection and correction e.g. when bit-clock is interrupted
+  * Slave mode now includes sync error detection and correction e.g. when
+    bit-clock is interrupted
 
 2.1.2
 -----
