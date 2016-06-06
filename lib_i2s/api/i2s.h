@@ -143,7 +143,7 @@ typedef interface i2s_he_callback_if {
    *   This callback will be called when a new sample is read in by the I2S
    *   High Efficiency component.
    *
-   *  \param num_out    The number of output channels contained within the array
+   *  \param num_out    The number of input channels contained within the array
    *  \param sample     The sample data array as signed 32-bit values.  The component
    *                    may not have 32-bits of accuracy (for example, many
    *                    I2S codecs are 24-bit), in which case the bottom bits
