@@ -60,7 +60,7 @@ class I2SSlaveChecker(xmostest.SimThread):
         self._no_start_msg = no_start_msg
 
     def run(self):
-        
+
       xsi = self.xsi
 
 
@@ -73,7 +73,7 @@ class I2SSlaveChecker(xmostest.SimThread):
       while True:
         xsi.drive_port_pins(self._setup_resp_port, 0)
         strobe_val = xsi.sample_port_pins(self._setup_strobe_port)
-	if strobe_val == 1:
+        if strobe_val == 1:
            self.wait_for_port_pins_change([self._setup_strobe_port])
 
         bclk_frequency_u      = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
@@ -110,7 +110,7 @@ class I2SSlaveChecker(xmostest.SimThread):
         #there is one frame lead in for the slave to sync to
         time =float(xsi.get_time())
 
-	lr_counter = 32+16+(is_i2s_justified)
+        lr_counter = 32+16+(is_i2s_justified)
         for i in range(0, 16):
           xsi.drive_port_pins(self._lrclk, lr_counter>=32)
           lr_counter = (lr_counter + 1)&0x3f
@@ -120,7 +120,7 @@ class I2SSlaveChecker(xmostest.SimThread):
           xsi.drive_port_pins(self._bclk, 1)
           time = time + clock_half_period
           self.wait_until(time)
-            
+
         for i in range(0, 32):
           xsi.drive_port_pins(self._lrclk, lr_counter>=32)
           lr_counter = (lr_counter + 1)&0x3f
@@ -171,7 +171,7 @@ class I2SSlaveChecker(xmostest.SimThread):
 
           for p in range(0, num_outs):
              if rx_data[p*2][frame_count] != rx_word[p]:
-                print "ERROR: actual (%d) expected (%d)" % (rx_word[p],rx_data[p*2][frame_count])
+                print "ERROR: frame %d: actual (%d) expected (%d)" % (frame_count, rx_word[p],rx_data[p*2][frame_count])
                 error = True
 
           for i in range(0, 4):
@@ -186,7 +186,7 @@ class I2SSlaveChecker(xmostest.SimThread):
 
              for p in range(0, num_ins):
                 xsi.drive_port_pins(self._dout[p], tx_word[p]>>31)
-                tx_word[p] = tx_word[p]<<1  
+                tx_word[p] = tx_word[p]<<1
              time = time + clock_half_period
              self.wait_until(time)
              xsi.drive_port_pins(self._bclk, 1)
@@ -200,17 +200,16 @@ class I2SSlaveChecker(xmostest.SimThread):
 
           for p in range(0, num_outs):
              if rx_data[p*2 + 1][frame_count] != rx_word[p]:
-                error = True
-                print "ERROR: actual (%d) expected (%d)" % (rx_word[p],rx_data[p*2 + 1][frame_count])
+                print "ERROR: frame %d: actual (%d) expected (%d)" % (frame_count, rx_word[p],rx_data[p*2 + 1][frame_count])
                 error = True
 
 
         xsi.drive_port_pins(self._setup_resp_port, 1)
         #send the response
-        self.wait_for_port_pins_change([self._setup_strobe_port])        
+        self.wait_for_port_pins_change([self._setup_strobe_port])
         xsi.drive_port_pins(self._setup_resp_port, error)
         #print error
-        self.wait_for_port_pins_change([self._setup_strobe_port]) 
+        self.wait_for_port_pins_change([self._setup_strobe_port])
 
 
-       
+

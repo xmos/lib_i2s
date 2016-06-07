@@ -79,9 +79,10 @@ static void broadcast(unsigned bclk_freq,
 static int request_response(
         out port setup_strobe_port,
         in port setup_resp_port){
-    int r=0;
-    while(!r)
+    int r = 0;
+    while(!r) {
         setup_resp_port :> r;
+    }
     setup_strobe_port <: 1;
     setup_strobe_port <: 0;
     setup_resp_port :> r;
@@ -91,7 +92,7 @@ static int request_response(
 [[distributable]]
 #pragma unsafe arrays
 void app(server interface i2s_callback_if i2s_i){
-    unsigned bclk_freq_index=0;
+    unsigned bclk_freq_index = 0;
     unsigned frames_sent = 0;
     unsigned rx_data_counter[MAX_CHANNELS] = {0};
     unsigned tx_data_counter[MAX_CHANNELS] = {0};
@@ -101,7 +102,7 @@ void app(server interface i2s_callback_if i2s_i){
     int first_time = 1;
 
     i2s_mode_t current_mode = I2S_MODE_I2S;
-    while(1){
+    while(1) {
         select {
         case i2s_i.receive(size_t index, int32_t sample):{
             error |= (sample != rx_data[index][rx_data_counter[index]]);
@@ -109,26 +110,28 @@ void app(server interface i2s_callback_if i2s_i){
             break;
         }
         case i2s_i.send(size_t index) -> int32_t r:{
-          r = tx_data[index][tx_data_counter[index]];
+            r = tx_data[index][tx_data_counter[index]];
             tx_data_counter[index]++;
             break;
         }
         case i2s_i.restart_check() -> i2s_restart_t restart:{
             frames_sent++;
-            if(frames_sent == 4)
+            if (frames_sent == 4) {
                 restart = I2S_RESTART;
-            else
+            } else {
                 restart = I2S_NO_RESTART;
+            }
             break;
         }
         case i2s_i.init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config):{
-            if(!first_time){
+            if (!first_time){
                 error |= request_response(setup_strobe_port, setup_resp_port);
 
-                if(error)
+                if (error) {
                     printf("Error\n");
+                }
 
-                if(bclk_freq_index == NUM_BCLKS_TO_CHECK-1){
+                if (bclk_freq_index == NUM_BCLKS_TO_CHECK-1) {
                     if (current_mode == I2S_MODE_I2S) {
                         current_mode = I2S_MODE_LEFT_JUSTIFIED;
                         bclk_freq_index = 0;
@@ -146,7 +149,7 @@ void app(server interface i2s_callback_if i2s_i){
 
             i2s_config.mode = current_mode;
 
-            for(unsigned i=0;i<MAX_CHANNELS;i++){
+            for(unsigned i=0;i<MAX_CHANNELS;i++) {
                 tx_data_counter[i] = 0;
                 rx_data_counter[i] = 0;
             }

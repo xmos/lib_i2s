@@ -16,27 +16,29 @@ static void i2s_slave_init_ports(
     set_clock_on(bclk);
     configure_clock_src(bclk, p_bclk);
     configure_in_port(p_lrclk, bclk);
-    for (size_t i = 0; i < num_out; i++)
+    for (size_t i = 0; i < num_out; i++) {
         configure_out_port(p_dout[i], bclk, 0);
-    for (size_t i = 0; i < num_in; i++)
+    }
+    for (size_t i = 0; i < num_in; i++) {
         configure_in_port(p_din[i], bclk);
+    }
     start_clock(bclk);
 }
 
 static void i2s_slave_send(client i2s_callback_if i2s_i,
         out buffered port:32 (&?p_dout)[num_out],
         size_t num_out, unsigned frame_word){
-    for(size_t i=0;i<num_out;i++)
+    for(size_t i=0;i<num_out;i++) {
         p_dout[i] <: bitrev(i2s_i.send(i*2+frame_word));
+    }
 }
 
 static void i2s_slave_receive(client i2s_callback_if i2s_i,
         in buffered port:32 (&?p_din)[num_in],
         size_t num_in, unsigned frame_word){
-    unsigned data;
-    for(size_t i=0;i<num_in;i++){
-              p_din[i] :> data;
-      //asm("in %0, res[%1]":"=r"(data):"r"(p_din[i]):"memory");
+    for (size_t i=0;i<num_in;i++) {
+        unsigned data;
+        p_din[i] :> data;
         i2s_i.receive(i*2 + frame_word, bitrev(data));
     }
 }
@@ -57,7 +59,7 @@ static void i2s_slave0(client i2s_callback_if i2s_i,
     unsigned port_time;
     i2s_slave_init_ports(p_dout, num_out, p_din, num_in, p_bclk, p_lrclk, bclk);
 
-    while(1){
+    while(1) {
         i2s_mode_t m;
         i2s_config_t config;
         i2s_restart_t restart = I2S_NO_RESTART;
@@ -76,10 +78,11 @@ static void i2s_slave0(client i2s_callback_if i2s_i,
         p_lrclk when pinseq(0) :> void;
         p_lrclk when pinseq(1) :> void @ port_time;
         
-        for(size_t i=0;i<num_out;i++)
-            p_dout[i] @ (port_time+32+32+(m==I2S_MODE_I2S)) <: bitrev(i2s_i.send(i*2));
 
         i2s_slave_send(i2s_i, p_dout, num_out, 1);
+        for (size_t i=0;i<num_out;i++) {
+            p_dout[i] @ (port_time+32+32+(m==I2S_MODE_I2S)) <: bitrev(i2s_i.send(i*2));
+        }
 
         /* Setup input for next frame. Account for the buffering in port */
         port_time += ((I2S_CHANS_PER_FRAME*32)+32);
@@ -87,13 +90,13 @@ static void i2s_slave0(client i2s_callback_if i2s_i,
         /* XC doesn't have syntax for setting a timed input without waiting for the input */
         /* -1 on LRClock makes checking a lot easier since data is offset with LRclock by 1 clk */
         asm("setpt res[%0], %1"::"r"(p_lrclk),"r"(port_time-(m==I2S_MODE_I2S)));
-        for(size_t i=0;i<num_in;i++)
             asm("setpt res[%0], %1"::"r"(p_din[i]),"r"(port_time));
+        for (size_t i=0;i<num_in;i++) {
+        }
 
         restart = i2s_i.restart_check();
+        while (!syncerror && (restart == I2S_NO_RESTART)) {
 
-        while((!syncerror) && (restart == I2S_NO_RESTART))
-        {
             i2s_slave_receive(i2s_i, p_din, num_in, 0);
             p_lrclk :> lrval;
             syncerror += (lrval != 0xffffffff);
@@ -108,9 +111,10 @@ static void i2s_slave0(client i2s_callback_if i2s_i,
 
             restart = i2s_i.restart_check();
         }
-        
-        if (restart == I2S_SHUTDOWN)
+
+        if (restart == I2S_SHUTDOWN) {
             return;
+        }
     }
 }
 
@@ -124,10 +128,10 @@ inline void i2s_slave1(client i2s_callback_if i2s_i,
         in port p_bclk,
         in buffered port:32 p_lrclk,
         clock bclk){
-    
-if (isnull(p_dout) && isnull(p_din)) {
-    fail("Must provide non-null p_dout or p_din");
-}
 
-  i2s_slave0(i2s_i, p_dout, num_out, p_din, num_in, p_bclk, p_lrclk, bclk);
+    if (isnull(p_dout) && isnull(p_din)) {
+        fail("Must provide non-null p_dout or p_din");
+    }
+
+    i2s_slave0(i2s_i, p_dout, num_out, p_din, num_in, p_bclk, p_lrclk, bclk);
 }
