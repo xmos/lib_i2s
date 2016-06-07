@@ -65,21 +65,18 @@ static void i2s_slave0(client i2s_callback_if i2s_i,
         i2s_restart_t restart = I2S_NO_RESTART;
         i2s_i.init(config, null);
         m = config.mode;
-        
+
+        unsigned expected_low  = (m==I2S_MODE_I2S) ? 0 : 0x80000000;
+        unsigned expected_high = (m==I2S_MODE_I2S) ? 0xffffffff : 0x7fffffff;
+
         syncerror = 0;
 
         clearbuf(p_lrclk);
 
         /* Wait for LRCLK edge (in I2S LRCLK = 0 is left, TDM rising edge is start of frame) */
-        p_lrclk when pinseq(0) :> void;
         p_lrclk when pinseq(1) :> void;
-        p_lrclk when pinseq(0) :> void;
-        p_lrclk when pinseq(1) :> void;
-        p_lrclk when pinseq(0) :> void;
-        p_lrclk when pinseq(1) :> void @ port_time;
-        
+        p_lrclk when pinseq(0) :> void @ port_time;
 
-        i2s_slave_send(i2s_i, p_dout, num_out, 1);
         for (size_t i=0;i<num_out;i++) {
             p_dout[i] @ (port_time+32+32+(m==I2S_MODE_I2S)) <: bitrev(i2s_i.send(i*2));
         }
@@ -90,26 +87,25 @@ static void i2s_slave0(client i2s_callback_if i2s_i,
         /* XC doesn't have syntax for setting a timed input without waiting for the input */
         /* -1 on LRClock makes checking a lot easier since data is offset with LRclock by 1 clk */
         asm("setpt res[%0], %1"::"r"(p_lrclk),"r"(port_time-(m==I2S_MODE_I2S)));
-            asm("setpt res[%0], %1"::"r"(p_din[i]),"r"(port_time));
         for (size_t i=0;i<num_in;i++) {
+            asm("setpt res[%0], %1"::"r"(p_din[i]),"r"(port_time-(m!=I2S_MODE_I2S)));
         }
 
-        restart = i2s_i.restart_check();
         while (!syncerror && (restart == I2S_NO_RESTART)) {
+            i2s_slave_send(i2s_i, p_dout, num_out, 1);
 
             i2s_slave_receive(i2s_i, p_din, num_in, 0);
             p_lrclk :> lrval;
-            syncerror += (lrval != 0xffffffff);
-            
-            i2s_slave_send(i2s_i, p_dout, num_out, 0);
+            syncerror += (lrval != expected_low);
+
+            restart = i2s_i.restart_check();
+            if (restart == I2S_NO_RESTART) {
+                i2s_slave_send(i2s_i, p_dout, num_out, 0);
+            }
 
             i2s_slave_receive(i2s_i, p_din, num_in, 1);
             p_lrclk :> lrval;
-            syncerror += (lrval != 0);  
-            
-            i2s_slave_send(i2s_i, p_dout, num_out, 1);
-
-            restart = i2s_i.restart_check();
+            syncerror += (lrval != expected_high);
         }
 
         if (restart == I2S_SHUTDOWN) {

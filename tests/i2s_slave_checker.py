@@ -203,6 +203,15 @@ class I2SSlaveChecker(xmostest.SimThread):
                 print "ERROR: frame %d: actual (%d) expected (%d)" % (frame_count, rx_word[p],rx_data[p*2 + 1][frame_count])
                 error = True
 
+        for i in range(0, 32):
+          xsi.drive_port_pins(self._lrclk, lr_counter>=32)
+          lr_counter = (lr_counter + 1)&0x3f
+          xsi.drive_port_pins(self._bclk, 0)
+          time = time + clock_half_period
+          self.wait_until(time)
+          xsi.drive_port_pins(self._bclk, 1)
+          time = time + clock_half_period
+          self.wait_until(time)
 
         xsi.drive_port_pins(self._setup_resp_port, 1)
         #send the response
