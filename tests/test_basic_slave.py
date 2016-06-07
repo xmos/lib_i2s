@@ -11,14 +11,14 @@ def do_slave_test(num_in, num_out, testlevel):
     binary = 'i2s_slave_test/bin/{tl}_{i}{o}/i2s_slave_test_{tl}_{i}{o}.xe'.format(i=num_in, o=num_out, tl=testlevel)
 
     clk = Clock("tile[0]:XS1_PORT_1A")
-    
+
     checker = I2SSlaveChecker(
         "tile[0]:XS1_PORT_1B",
         "tile[0]:XS1_PORT_1C",
         ["tile[0]:XS1_PORT_1H","tile[0]:XS1_PORT_1I","tile[0]:XS1_PORT_1J", "tile[0]:XS1_PORT_1K"],
         ["tile[0]:XS1_PORT_1D","tile[0]:XS1_PORT_1E","tile[0]:XS1_PORT_1F", "tile[0]:XS1_PORT_1G"],
-        "tile[0]:XS1_PORT_1L", 
-        "tile[0]:XS1_PORT_16A", 
+        "tile[0]:XS1_PORT_1L",
+        "tile[0]:XS1_PORT_16A",
         "tile[0]:XS1_PORT_1M",
          clk)
 

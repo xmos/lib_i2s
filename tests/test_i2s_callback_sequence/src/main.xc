@@ -98,7 +98,7 @@ void app(server interface i2s_callback_if i2s){
       if (index < 8)
         break;
       printstr(" S");
-      printint(index-8);      
+      printint(index-8);
       #elif  I2S_TDM_I2S
       if (index >= 8)
         break;
