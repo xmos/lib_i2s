@@ -32,15 +32,15 @@ def do_master_test(num_in, num_out, testlevel):
 
     xmostest.run_on_simulator(resources['xsim'], binary,
                               simthreads = [clk, checker],
-                              # simargs=[],
-                              simargs=['--trace-to', 'sim.log', '--vcd-tracing', '-o ./i2s_frame_master_test/trace.vcd -tile tile[0] -ports-detailed -functions'],
+                              simargs=[],
+                              # simargs=['--trace-to', 'sim.log', '--vcd-tracing', '-o ./i2s_frame_master_test/trace.vcd -tile tile[0] -ports-detailed -functions'],
                               suppress_multidrive_messages = True,
                               tester = tester)
 
 def runtest():
    do_master_test(4, 4, "smoke")
-   # do_master_test(1, 1, "smoke")
-   # do_master_test(4, 0, "smoke")
-   # do_master_test(0, 4, "smoke")
-   # do_master_test(4, 4, "nightly")
+   do_master_test(1, 1, "smoke")
+   do_master_test(4, 0, "smoke")
+   do_master_test(0, 4, "smoke")
+   do_master_test(4, 4, "nightly")
 
