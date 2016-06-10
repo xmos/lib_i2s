@@ -1,6 +1,13 @@
 I2S library change log
 ======================
 
+2.2.0
+-----
+
+  * Added High Efficiency I2S master.
+  * Reduce number of LR clock ticks needed to synchronise.
+  * Fixed bugs with slave mode and non I2S mode.
+
 2.1.3
 -----
 
