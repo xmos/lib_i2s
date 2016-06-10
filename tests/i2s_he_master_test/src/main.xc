@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 in port p_mclk  = XS1_PORT_1A;
-out buffered port:32 p_bclk = XS1_PORT_1B;
+out port p_bclk = XS1_PORT_1B;
 out buffered port:32 p_lrclk = XS1_PORT_1C;
 
 in buffered port:32 p_din [4] = {XS1_PORT_1D, XS1_PORT_1E, XS1_PORT_1F, XS1_PORT_1G};
@@ -122,22 +122,22 @@ void app(server interface i2s_he_callback_if i2s_i){
     unsigned ratio_log2 = 1;
     i2s_mode_t current_mode = I2S_MODE_I2S;
 
-    int samples_in[NUM_IN*2];
-    int samples_out[NUM_OUT*2];
-
     while(1){
         select {
-        case i2s_i.send(NUM_OUT*2, samples_out): {
-            for(int c=0; c<NUM_OUT*2, c++){;}
-            r = tx_data[index][tx_data_counter[index]];
-            tx_data_counter[index]++;
+        case i2s_i.send(size_t n, int32_t send_data[n]):{
+            for(size_t c=0; c<n; c++){
+                unsigned i = tx_data_counter[c];
+                send_data[c] = tx_data[c][i];
+                tx_data_counter[c] = i+1;
+            }
             break;
         }
-        case i2s_i.receive(NUM_IN*2, samples_in):{
-            for(int c=0; c<NUM_IN*2, c++){}
-            unsigned i = rx_data_counter[index];
-            error |= (sample != rx_data[index][i]);
-            rx_data_counter[index]=i+1;
+        case i2s_i.receive(size_t n, int32_t receive_data[n]):{
+            for(size_t c=0; c<n; c++){
+                unsigned i = rx_data_counter[c];
+                error |= (receive_data[c] != rx_data[c][i]);
+                rx_data_counter[c] = i+1;
+            }
             break;
         }
         case i2s_i.restart_check() -> i2s_restart_t restart:{
@@ -207,7 +207,7 @@ int main(){
         [[distribute]]
          app(i2s_i);
       i2s_he_master(i2s_i, p_dout, NUM_OUT, p_din, NUM_IN,
-                 p_bclk, p_lrclk, bclk, p_mclk);
+                 p_bclk, p_lrclk, p_mclk, bclk);
       par(int i=0;i<7;i++)while(1);
     }
     return 0;

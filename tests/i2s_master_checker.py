@@ -64,7 +64,7 @@ class I2SMasterChecker(xmostest.SimThread):
         self.wait_for_port_pins_change([setup_strobe_port])
         return xsi.sample_port_pins(setup_data_port)
 
-    def __init__(self,  bclk, lrclk, din, dout, setup_strobe_port, setup_data_port, setup_resp_port, c):
+    def __init__(self,  bclk, lrclk, din, dout, setup_strobe_port, setup_data_port, setup_resp_port, c, check_extra_bclk=True):
         self._din = din
         self._dout = dout
         self._bclk = bclk
@@ -73,6 +73,7 @@ class I2SMasterChecker(xmostest.SimThread):
         self._setup_data_port = setup_data_port
         self._setup_resp_port = setup_resp_port
         self._clk = c
+        self._check_extra_bclk = check_extra_bclk
 
     def run(self):
       xsi = self.xsi
@@ -239,8 +240,8 @@ class I2SMasterChecker(xmostest.SimThread):
 
           bclk_val_n              =  xsi.sample_port_pins(self._bclk)
           setup_strobe_port_val_n =  xsi.sample_port_pins(self._setup_strobe_port)
-          if bclk_val_n != bclk_val:
 
+          if self._check_extra_bclk and (bclk_val_n != bclk_val):
             if not error:
               self.print_setup(mclk_frequency, mclk_bclk_ratio, num_outs, num_ins, is_i2s_justified)
               print "Unexpected bclk edge MCLK:%d ratio:%d"%(mclk_frequency, mclk_bclk_ratio)
