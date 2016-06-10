@@ -5,7 +5,7 @@
 #include <xclib.h>
 #include "i2s.h"
 
-static void i2s_he_init_ports(
+static void i2s_frame_init_ports(
         out buffered port:32 (&?p_dout)[num_out],
         static const size_t num_out,
         in buffered port:32 (&?p_din)[num_in],
@@ -27,7 +27,7 @@ static void i2s_he_init_ports(
 }
 
 #pragma unsafe arrays
-static i2s_restart_t i2s_he_ratio_n(client i2s_he_callback_if i2s_i,
+static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
         out buffered port:32 (&?p_dout)[num_out],
         static const size_t num_out,
         in buffered port:32 (&?p_din)[num_in],
@@ -124,9 +124,9 @@ static i2s_restart_t i2s_he_ratio_n(client i2s_he_callback_if i2s_i,
     return I2S_RESTART;
 }
 
-#define i2s_he_master i2s_he_master0
+#define i2s_frame_master i2s_frame_master0
 
-static void i2s_he_master0(client i2s_he_callback_if i2s_i,
+static void i2s_frame_master0(client i2s_frame_callback_if i2s_i,
                 out buffered port:32 (&?p_dout)[num_out],
                 static const size_t num_out,
                 in buffered port:32 (&?p_din)[num_in],
@@ -147,11 +147,11 @@ static void i2s_he_master0(client i2s_he_callback_if i2s_i,
         mclk_bclk_ratio_log2 = clz(bitrev(config.mclk_bclk_ratio));
 
         //This ensures that the port time on all the ports is at 0
-        i2s_he_init_ports(p_dout, num_out, p_din, num_in, p_bclk, p_lrclk, bclk,
+        i2s_frame_init_ports(p_dout, num_out, p_din, num_in, p_bclk, p_lrclk, bclk,
             p_mclk, config.mclk_bclk_ratio);
 
         i2s_restart_t restart =
-          i2s_he_ratio_n(i2s_i, p_dout, num_out, p_din,
+          i2s_frame_ratio_n(i2s_i, p_dout, num_out, p_din,
                       num_in, p_bclk, bclk, p_lrclk,
                       mclk_bclk_ratio_log2, config.mode);
 
@@ -162,7 +162,7 @@ static void i2s_he_master0(client i2s_he_callback_if i2s_i,
 
 // This function is just to avoid unused static function warnings for i2s_tdm_master0,
 // it should never be called.
-inline void i2s_he_master1(client interface i2s_he_callback_if i,
+inline void i2s_frame_master1(client interface i2s_frame_callback_if i,
         out buffered port:32 i2s_dout[num_i2s_out],
         static const size_t num_i2s_out,
         in buffered port:32 i2s_din[num_i2s_in],
@@ -171,7 +171,7 @@ inline void i2s_he_master1(client interface i2s_he_callback_if i,
         out buffered port:32 i2s_lrclk,
         in port p_mclk,
         clock clk_bclk) {
-    i2s_he_master0(i, i2s_dout, num_i2s_out, i2s_din, num_i2s_in,
+    i2s_frame_master0(i, i2s_dout, num_i2s_out, i2s_din, num_i2s_in,
                 i2s_bclk, i2s_lrclk, p_mclk, clk_bclk);
 }
 

@@ -8,7 +8,7 @@ def do_master_test(num_in, num_out, testlevel):
 
     resources = xmostest.request_resource("xsim")
 
-    binary = 'i2s_he_master_test/bin/{tl}_{i}{o}/i2s_he_master_test_{tl}_{i}{o}.xe'.format(i=num_in, o=num_out,tl=testlevel)
+    binary = 'i2s_frame_master_test/bin/{tl}_{i}{o}/i2s_frame_master_test_{tl}_{i}{o}.xe'.format(i=num_in, o=num_out,tl=testlevel)
 
     clk = Clock("tile[0]:XS1_PORT_1A")
 
@@ -25,7 +25,7 @@ def do_master_test(num_in, num_out, testlevel):
          False) # Don't check the bclk stops precisely as the hardware can't do that
 
     tester = xmostest.ComparisonTester(open('master_test.expect'),
-                                       'lib_i2s', 'i2s_he_master_sim_tests',
+                                       'lib_i2s', 'i2s_frame_master_sim_tests',
                                        'basic_test_%s'%testlevel, {'num_in':num_in, 'num_out':num_out},ignore=["CONFIG:.*"])
 
     tester.set_min_testlevel(testlevel)
@@ -33,7 +33,7 @@ def do_master_test(num_in, num_out, testlevel):
     xmostest.run_on_simulator(resources['xsim'], binary,
                               simthreads = [clk, checker],
                               # simargs=[],
-                              simargs=['--trace-to', 'sim.log', '--vcd-tracing', '-o ./i2s_he_master_test/trace.vcd -tile tile[0] -ports-detailed -functions'],
+                              simargs=['--trace-to', 'sim.log', '--vcd-tracing', '-o ./i2s_frame_master_test/trace.vcd -tile tile[0] -ports-detailed -functions'],
                               suppress_multidrive_messages = True,
                               tester = tester)
 

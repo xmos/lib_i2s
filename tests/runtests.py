@@ -24,8 +24,8 @@ run at different sampling rates of 192 KHz to 22.1 KHz.
 """)
 
     xmostest.register_group("lib_i2s",
-                            "i2s_he_master_sim_tests",
-                            "I2S High Efficiency master simulator tests",
+                            "i2s_frame_master_sim_tests",
+                            "I2S frame-based master simulator tests",
     """
 Tests are performed by running the I2S library connected to a
 simulator model (written as a python plugin to xsim). The simulator

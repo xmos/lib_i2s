@@ -32,8 +32,8 @@ void i2s_master(client i2s_callback_if i2s_i,
 
 #if defined(__XS2A__)
 
-#undef i2s_he_master
-void i2s_he_master(client i2s_he_callback_if i2s_i,
+#undef i2s_frame_master
+void i2s_frame_master(client i2s_frame_callback_if i2s_i,
                 out buffered port:32 (&?p_dout)[num_out],
                 static const size_t num_out,
                 in buffered port:32 (&?p_din)[num_in],

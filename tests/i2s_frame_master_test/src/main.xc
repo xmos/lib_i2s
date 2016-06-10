@@ -110,7 +110,7 @@ static int request_response(
 }
 [[distributable]]
 #pragma unsafe arrays
-void app(server interface i2s_he_callback_if i2s_i){
+void app(server interface i2s_frame_callback_if i2s_i){
 
     int error=0;
     unsigned frames_sent = 0;
@@ -200,13 +200,12 @@ void app(server interface i2s_he_callback_if i2s_i){
 }
 
 int main(){
-    interface i2s_he_callback_if i2s_i;
-
+    interface i2s_frame_callback_if i2s_i;
 
     par {
         [[distribute]]
          app(i2s_i);
-      i2s_he_master(i2s_i, p_dout, NUM_OUT, p_din, NUM_IN,
+      i2s_frame_master(i2s_i, p_dout, NUM_OUT, p_din, NUM_IN,
                  p_bclk, p_lrclk, p_mclk, bclk);
       par(int i=0;i<7;i++)while(1);
     }

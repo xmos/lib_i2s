@@ -201,14 +201,14 @@ and the logical core speed.
        - 4 (8)
        - 4 (8)
 
-On the xCORE-200 the High Efficiency |I2S| master can be used. This uses hardware
+On the xCORE-200 the frame-based |I2S| master can be used. This uses hardware
 clock dividers only available in the the xCORE-200 and a more efficient callback
-interface to achieve much higher throughputs. :ref:`i2s_he_master_62_5_speeds`
+interface to achieve much higher throughputs. :ref:`i2s_frame_master_62_5_speeds`
 shows the known working configurations:
 
-.. _i2s_he_master_62_5_speeds:
+.. _i2s_frame_master_62_5_speeds:
 
-.. list-table:: Known working |I2S| High Efficiency master configurations on a 62.5MHz core
+.. list-table:: Known working |I2S| frame-based master configurations on a 62.5MHz core
      :class: vertical-borders horizontal-borders
      :header-rows: 1
      :widths: 20 20 20 25 25
@@ -545,13 +545,13 @@ the following code instantiates an |I2S| master component and connects to it::
     return 0;
   }
 
-|I2S| High Efficiency master usage
-..................................
+|I2S| frame-based master usage
+..............................
 
-The |I2S| High Efficiency master task (only supported on xCORE-200) is
+The |I2S| frame-based master task (only supported on xCORE-200) is
 instantiated as a parallel task that run in a ``par`` statement. The application
-can connect via the ``i2s_he_callback_if`` interface connection. For example,
-the following code instantiates an |I2S| High Efficiency master component and
+can connect via the ``i2s_frame_callback_if`` interface connection. For example,
+the following code instantiates an |I2S| frame-based master component and
 connects to it::
 
   out buffered port:32 p_dout[2] = {XS1_PORT_1D, XS1_PORT_1E};
@@ -564,9 +564,9 @@ connects to it::
   clock bclk = XS1_CLKBLK_2;
 
   int main(void) {
-    i2s_he_callback_if i_i2s;
+    i2s_frame_callback_if i_i2s;
     par {
-      i2s_he_master(i_i2s, p_dout, 4, p_din, 4,
+      i2s_frame_master(i_i2s, p_dout, 4, p_din, 4,
                p_bclk, p_lrclk, p_mclk, bclk);
       my_application(i_i2s);
     }
@@ -838,7 +838,7 @@ Creating an |I2S| instance
 
 |newpage|
 
-.. doxygenfunction:: i2s_he_master
+.. doxygenfunction:: i2s_frame_master
 
 |newpage|
 
@@ -864,10 +864,10 @@ The |I2S| callback interface
 
 |newpage|
 
-The |I2S| High Efficiency callback interface
-............................................
+The |I2S| frame-based callback interface
+........................................
 
-.. doxygeninterface:: i2s_he_callback_if
+.. doxygeninterface:: i2s_frame_callback_if
 
 |appendix|
 
