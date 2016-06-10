@@ -71,7 +71,7 @@ typedef interface i2s_callback_if {
    *
    *   \return          The return value should be set to
    *                    ``I2S_NO_RESTART``, ``I2S_RESTART`` or
-   *                    ``I2S_SHUTDOWN``..
+   *                    ``I2S_SHUTDOWN``.
    */
   i2s_restart_t restart_check();
 
@@ -101,6 +101,8 @@ typedef interface i2s_callback_if {
   int32_t send(size_t index);
 
 } i2s_callback_if;
+
+#if defined(__XS2A__) || defined(__DOXYGEN__)
 
 /** Interface representing callback events that can occur during the
  *   operation of the I2S task. This is specific to the High Efficiency
@@ -166,6 +168,8 @@ typedef interface i2s_he_callback_if {
 
 } i2s_he_callback_if;
 
+#endif // __XS2A__
+
 /** I2S master component.
  *
  *  This task performs I2S on the provided pins. It will perform callbacks over
@@ -199,6 +203,8 @@ void i2s_master(client i2s_callback_if i2s_i,
                 clock bclk,
                 const clock mclk);
 
+#if defined(__XS2A__) || defined(__DOXYGEN__)
+
 /** I2S High Efficiency master component **for xCORE200 only**
  *
  *  This task performs I2S on the provided pins. It will perform callbacks over
@@ -229,6 +235,8 @@ void i2s_he_master(client i2s_he_callback_if i2s_i,
                 out buffered port:32 p_lrclk,
                 in port p_mclk,
                 clock bclk);
+
+#endif // __XS2A__
 
 /** I2S slave component.
  *

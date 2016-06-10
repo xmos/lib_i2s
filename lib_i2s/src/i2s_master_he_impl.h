@@ -1,4 +1,6 @@
 // Copyright (c) 2016, XMOS Ltd, All rights reserved
+#if defined(__XS2A__)
+
 #include <xs1.h>
 #include <xclib.h>
 #include "i2s.h"
@@ -191,3 +193,4 @@ inline void i2s_he_master1(client interface i2s_he_callback_if i,
                 i2s_bclk, i2s_lrclk, p_mclk, clk_bclk);
 }
 
+#endif // __XS2A__

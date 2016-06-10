@@ -30,6 +30,8 @@ void i2s_master(client i2s_callback_if i2s_i,
                 const clock mclk)
 {}
 
+#if defined(__XS2A__)
+
 #undef i2s_he_master
 void i2s_he_master(client i2s_he_callback_if i2s_i,
                 out buffered port:32 (&?p_dout)[num_out],
@@ -41,6 +43,8 @@ void i2s_he_master(client i2s_he_callback_if i2s_i,
                 in port p_mclk,
                 clock bclk)
 {}
+
+#endif // __XS2A__
 
 #undef i2s_slave
 void i2s_slave(client i2s_callback_if i2s_i,
