@@ -45,7 +45,7 @@ class Clock(xmostest.SimThread):
 
     def get_name(self):
         return self._name
- 
+
 class I2SMasterChecker(xmostest.SimThread):
     """"
     This simulator thread will act as I2S master and check any transactions
@@ -78,7 +78,7 @@ class I2SMasterChecker(xmostest.SimThread):
       xsi = self.xsi
       print "I2S Master Checker Started"
 
-      while True: 
+      while True:
         xsi.drive_port_pins(self._setup_resp_port, 0)
         strobe_val = xsi.sample_port_pins(self._setup_strobe_port)
 	if strobe_val == 1:
@@ -91,7 +91,7 @@ class I2SMasterChecker(xmostest.SimThread):
         num_ins               = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
         is_i2s_justified      = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
         mclk_frequency = (mclk_frequency_u<<16) + mclk_frequency_l
-        
+
         self.print_setup(mclk_frequency, mclk_bclk_ratio, num_outs, num_ins, is_i2s_justified,prefix="CONFIG:")
 
         bclk_frequency = mclk_frequency / mclk_bclk_ratio
@@ -99,7 +99,7 @@ class I2SMasterChecker(xmostest.SimThread):
         time = xsi.get_time()
         max_num_in_or_outs = 4
         num_test_frames = 4
-        error = False 
+        error = False
         frame_count = 0
         bit_count = 0
         word_count = 0
@@ -150,7 +150,7 @@ class I2SMasterChecker(xmostest.SimThread):
           #print "frame %d  word %d  bit %d"%(frame_count, word_count, bit_count)
           self.wait_for_port_pins_change([self._bclk])
           fall_time = xsi.get_time()
-          
+
           if frame_count > 0:
             t = fall_time - rise_time
             if abs(t - half_period) > 4.0:
@@ -160,7 +160,7 @@ class I2SMasterChecker(xmostest.SimThread):
                 print "elapsed %dns expected %dns"%(t, half_period)
               error = True
 
-          #drive 
+          #drive
           for i in range(0, num_outs):
              xsi.drive_port_pins(self._dout[i], tx_word[i]>>31)
              tx_word[i] = tx_word[i]<<1
@@ -181,7 +181,7 @@ class I2SMasterChecker(xmostest.SimThread):
           for i in range(0, num_ins):
             val = xsi.sample_port_pins(self._din[i])
             rx_word[i] = (rx_word[i]<<1) + val
-          
+
           #check the lr clock
           if xsi.sample_port_pins(self._lrclk) == left:
             lr_count += 1;
@@ -236,11 +236,11 @@ class I2SMasterChecker(xmostest.SimThread):
 
           #send the response
           self.wait_for_port_pins_change([self._setup_strobe_port, self._bclk])
-          
+
           bclk_val_n              =  xsi.sample_port_pins(self._bclk)
           setup_strobe_port_val_n =  xsi.sample_port_pins(self._setup_strobe_port)
-          
           if bclk_val_n != bclk_val:
+
             if not error:
               self.print_setup(mclk_frequency, mclk_bclk_ratio, num_outs, num_ins, is_i2s_justified)
               print "Unexpected bclk edge MCLK:%d ratio:%d"%(mclk_frequency, mclk_bclk_ratio)
@@ -248,8 +248,8 @@ class I2SMasterChecker(xmostest.SimThread):
 
           if setup_strobe_port_val_n != setup_strobe_port_val:
             xsi.drive_port_pins(self._setup_resp_port, error)
-            self.wait_for_port_pins_change([self._setup_strobe_port]) 
+            self.wait_for_port_pins_change([self._setup_strobe_port])
             not_done = False
-          
-        
-   
+
+
+

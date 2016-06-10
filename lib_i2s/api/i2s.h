@@ -107,7 +107,7 @@ typedef interface i2s_callback_if {
  *   I2S master task which uses hardware generation of BCLK and transfers
  *   samples as arrays rather than individual channels, resulting in much
  *   less senesitivity to back pressure in the send/recieve cases.
- *   This interface is supported on xCORE200 processors only
+ *   This interface is supported on xCORE200 processors only.
  */
 typedef interface i2s_he_callback_if {
 
@@ -134,7 +134,7 @@ typedef interface i2s_he_callback_if {
    *
    *   \return          The return value should be set to
    *                    ``I2S_NO_RESTART``, ``I2S_RESTART`` or
-   *                    ``I2S_SHUTDOWN``..
+   *                    ``I2S_SHUTDOWN``.
    */
   i2s_restart_t restart_check();
 
@@ -143,7 +143,7 @@ typedef interface i2s_he_callback_if {
    *   This callback will be called when a new sample is read in by the I2S
    *   High Efficiency component.
    *
-   *  \param num_out    The number of input channels contained within the array
+   *  \param num_out    The number of input channels contained within the array.
    *  \param sample     The sample data array as signed 32-bit values.  The component
    *                    may not have 32-bits of accuracy (for example, many
    *                    I2S codecs are 24-bit), in which case the bottom bits
@@ -153,9 +153,10 @@ typedef interface i2s_he_callback_if {
 
   /** Request an outgoing sample.
    *
-   *  This callback will be called when the I2S High Efficiency component needs a new sample
+   *  This callback will be called when the I2S High Efficiency component needs
+   *  a new sample.
    *
-   *  \param num_out    The number of output channels contained within the array
+   *  \param num_out    The number of output channels contained within the array.
    *  \param sample     The sample data array as signed 32-bit values.  The component
    *                    may not have 32-bits of accuracy (for example, many
    *                    I2S codecs are 24-bit), in which case the bottom bits

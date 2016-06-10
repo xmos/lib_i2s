@@ -130,7 +130,6 @@ static i2s_restart_t i2s_he_ratio_n(client i2s_he_callback_if i2s_i,
         if (restart != I2S_NO_RESTART) {
             return restart;
         }
-
     }
     return I2S_RESTART;
 }
@@ -171,12 +170,11 @@ static void i2s_he_master0(client i2s_he_callback_if i2s_i,
           i2s_he_ratio_n(i2s_i, p_dout, num_out, p_din,
                       num_in, p_bclk, bclk, p_lrclk,
                       mclk_bclk_ratio_log2, config.mode);
+
         if (restart == I2S_SHUTDOWN)
           return;
     }
 }
-
-
 
 // This function is just to avoid unused static function warnings for i2s_tdm_master0,
 // it should never be called.

@@ -303,7 +303,6 @@ with different offset and sync length values.
     { node : '.D........C'}
     ],
    edge: ['a|A','A<->B offset','b|B','a|D','D<->C fsync_len','c|C'],
- 
   }
 
 The master signals a frame by driving the *FSYNC* signal high. After a
@@ -502,7 +501,7 @@ The |I2S| master task is instantiated as a parallel task that run in a
 ``par`` statement. The application can connect via the
 ``i2s_callback_if``  interface connection. For example,
 the following code instantiates an |I2S| master component and connects to it::
-     
+
   out buffered port:32 p_dout[2] = {XS1_PORT_1D, XS1_PORT_1E};
   in buffered port:32 p_din[2]  = {XS1_PORT_1I, XS1_PORT_1K};
   port p_mclk  = XS1_PORT_1M;
@@ -625,7 +624,7 @@ channel indices to the physical interface begin used.
 The data words within |I2S| frames have even channel numbers
 assigned to the left samples (first within the frame)
 and odd numbers assigned to the right (second within the frame)
-samples. 
+samples.
 
 The actual sample number will be given with respect to the order that
 the ports are provided in the data in and data out array

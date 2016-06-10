@@ -18,13 +18,13 @@ def do_master_test(num_in, num_out, testlevel):
         "tile[0]:XS1_PORT_1C",
         ["tile[0]:XS1_PORT_1H","tile[0]:XS1_PORT_1I","tile[0]:XS1_PORT_1J", "tile[0]:XS1_PORT_1K"],
         ["tile[0]:XS1_PORT_1D","tile[0]:XS1_PORT_1E","tile[0]:XS1_PORT_1F", "tile[0]:XS1_PORT_1G"],
-        "tile[0]:XS1_PORT_1L", 
-        "tile[0]:XS1_PORT_16A", 
+        "tile[0]:XS1_PORT_1L",
+        "tile[0]:XS1_PORT_16A",
         "tile[0]:XS1_PORT_1M",
          clk)
 
     tester = xmostest.ComparisonTester(open('master_test.expect'),
-                                     'lib_i2s', 'i2s_master_sim_tests',
+                                       'lib_i2s', 'i2s_master_sim_tests',
                                        'basic_test_%s'%testlevel, {'num_in':num_in, 'num_out':num_out},ignore=["CONFIG:.*"])
 
     tester.set_min_testlevel(testlevel)
