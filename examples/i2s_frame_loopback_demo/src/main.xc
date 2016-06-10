@@ -87,7 +87,7 @@ void reset_codecs(client i2c_master_if i2c)
 }
 
 [[distributable]]
-void i2s_loopback(server i2s_he_callback_if i2s,
+void i2s_loopback(server i2s_frame_callback_if i2s,
                   client i2c_master_if i2c,
                   client output_gpio_if dac_reset,
                   client output_gpio_if adc_reset,
@@ -151,12 +151,12 @@ static char gpio_pin_map[4] =  {
 
 int main()
 {
-  interface i2s_he_callback_if i_i2s;
+  interface i2s_frame_callback_if i_i2s;
   interface i2c_master_if i_i2c[1];
   interface output_gpio_if i_gpio[4];
 
   par {
-    on tile[0]: i2s_he_master(i_i2s, p_dout, 4, p_din, 4, p_bclk, p_lrclk, p_mclk, bclk);
+    on tile[0]: i2s_frame_master(i_i2s, p_dout, 4, p_din, 4, p_bclk, p_lrclk, p_mclk, bclk);
 
     on tile[0]: [[distribute]] i2c_master_single_port(i_i2c, 1, p_i2c, 100, 0, 1, 0);
     on tile[0]: [[distribute]] output_gpio(i_gpio, 4, p_gpio, gpio_pin_map);
