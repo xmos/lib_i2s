@@ -86,6 +86,14 @@ varying number of input and output channels. The tests are
 run at different sampling rates of 384 KHz to 22.1 KHz.
 """)
 
+    xmostest.register_group("lib_i2s",
+                            "i2s_backpressure_tests",
+                            "I2S backpressure tests",
+    """
+Tests that ensure that an acceptable level of backpressure can be asserted by
+the user of the i2s frame based master.
+""")
+
     xmostest.runtests()
 
     xmostest.finish()

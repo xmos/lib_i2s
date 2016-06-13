@@ -11,7 +11,6 @@ class Clock(xmostest.SimThread):
           self._half_period = float(500000000) / rate
         return
 
-
     def __init__(self, port):
         rate = 1000000
         self._driving = True
@@ -29,7 +28,6 @@ class Clock(xmostest.SimThread):
             self.xsi.drive_port_pins(self._port, 1)
             t += self._half_period
             self.wait_until(t)
-
 
     def is_high(self):
         return (self._val == 1)
