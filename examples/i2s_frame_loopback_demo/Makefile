@@ -6,7 +6,7 @@ TARGET = XR-AUDIO-216-MC
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
 # the project name
-APP_NAME = i2s_he_loopback_demo
+APP_NAME = i2s_frame_loopback_demo
 
 # The USED_MODULES variable lists other module used by the application.
 USED_MODULES = lib_gpio lib_i2c lib_i2s lib_logging
