@@ -64,14 +64,18 @@ void i2s_loopback(server i2s_frame_callback_if i2s)
       break;
 
     case i2s.receive(size_t num_chan_in, int32_t sample[num_chan_in]):
-      delay_ticks(receive_delay);
+      if (receive_delay) {
+        delay_ticks(receive_delay);
+      }
       break;
 
     case i2s.send(size_t num_chan_out, int32_t sample[num_chan_out]):
       for (size_t i = 0; i < num_chan_out; i++) {
-        sample[i] = 0;
+        sample[i] = i;
       }
-      delay_ticks(send_delay);
+      if (send_delay) {
+        delay_ticks(send_delay);
+      }
       break;
 
     case i2s.restart_check() -> i2s_restart_t restart:
@@ -81,15 +85,15 @@ void i2s_loopback(server i2s_frame_callback_if i2s)
   }
 }
 
-#define OVERHEAD_TICKS 30 // Some of the period needs to be allowed for the interface handling
+#define OVERHEAD_TICKS 150 // Some of the period needs to be allowed for the interface handling
 #define JITTER  1   //Allow for rounding so does not break when diff = period + 1
-#define N_CYCLES_AT_DELAY   3 //How many LR clock cycles to measure at each backpressure delay value
+#define N_CYCLES_AT_DELAY   1 //How many LR clock cycles to measure at each backpressure delay value
 #define DIFF_WRAP_16(new, old)  (new > old ? new - old : new + 0x10000 - old)
 on tile[0]: port p_lr_test = XS1_PORT_1A;
 void test_lr_period(void){
     unsafe {
       const int ref_tick_per_sample = XS1_TIMER_HZ/SAMPLE_FREQUENCY;
-      const int period = ref_tick_per_sample * 2;
+      const int period = ref_tick_per_sample;
 
       set_core_fast_mode_on();
 
@@ -110,7 +114,7 @@ void test_lr_period(void){
           if (counter == N_CYCLES_AT_DELAY) {
               *(p_receive_delay) += RECEIVE_DELAY_INCREMENT;
               *(p_send_delay) += SEND_DELAY_INCREMENT;
-              if ((*p_receive_delay + *p_send_delay) > ((period/2) - OVERHEAD_TICKS)) {
+              if ((*p_receive_delay + *p_send_delay) > (period - OVERHEAD_TICKS)) {
                 debug_printf("PASS\n");
                 _Exit(0);
               }

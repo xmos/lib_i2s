@@ -30,7 +30,7 @@ def do_test(sample_rate, num_channels, receive_increment, send_increment, testle
                               tester=tester)
 
 def runtest():
-  for sample_rate in [768000, 384000]:
+  for sample_rate in [768000, 384000, 192000]:
     for num_channels in [1, 4]:
       do_test(sample_rate, num_channels, 5,  5, "smoke" if (num_channels == 4) else "nightly")
       do_test(sample_rate, num_channels, 0, 10, "smoke" if (num_channels == 4) else "nightly")
