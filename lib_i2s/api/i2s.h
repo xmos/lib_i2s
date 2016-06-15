@@ -71,7 +71,7 @@ typedef interface i2s_callback_if {
    *
    *   \return          The return value should be set to
    *                    ``I2S_NO_RESTART``, ``I2S_RESTART`` or
-   *                    ``I2S_SHUTDOWN``..
+   *                    ``I2S_SHUTDOWN``.
    */
   i2s_restart_t restart_check();
 
@@ -101,6 +101,74 @@ typedef interface i2s_callback_if {
   int32_t send(size_t index);
 
 } i2s_callback_if;
+
+#if defined(__XS2A__) || defined(__DOXYGEN__)
+
+/** Interface representing callback events that can occur during the
+ *   operation of the I2S task. This is specific to the frame-based
+ *   I2S master task which uses hardware generation of BCLK and transfers
+ *   samples as arrays rather than individual channels, resulting in much
+ *   less senesitivity to back pressure in the send/recieve cases.
+ *   This interface is supported on xCORE200 processors only.
+ */
+typedef interface i2s_frame_callback_if {
+
+  /**  I2S frame-based initialization event callback.
+   *
+   *   The I2S component will call this
+   *   when it first initializes on first run of after a restart.
+   *
+   *   \param i2s_config        This structure is provided if the connected
+   *                            component drives an I2S bus. The members
+   *                            of the structure should be set to the
+   *                            required configuration.
+   *   \param tdm_config        This structure is provided if the connected
+   *                            component drives an TDM bus. The members
+   *                            of the structure should be set to the
+   *                            required configuration.
+   */
+  void init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config);
+
+  /**  I2S frame-based restart check callback.
+   *
+   *   This callback is called once per frame. The application must return the
+   *   required restart behaviour.
+   *
+   *   \return          The return value should be set to
+   *                    ``I2S_NO_RESTART``, ``I2S_RESTART`` or
+   *                    ``I2S_SHUTDOWN``.
+   */
+  i2s_restart_t restart_check();
+
+  /**  Receive an incoming sample.
+   *
+   *   This callback will be called when a new sample is read in by the I2S
+   *   frame-based component.
+   *
+   *  \param num_out    The number of input channels contained within the array.
+   *  \param sample     The sample data array as signed 32-bit values.  The component
+   *                    may not have 32-bits of accuracy (for example, many
+   *                    I2S codecs are 24-bit), in which case the bottom bits
+   *                    will be arbitrary values.
+   */
+  void receive(size_t num_in, int32_t sample[num_in]);
+
+  /** Request an outgoing sample.
+   *
+   *  This callback will be called when the I2S frame-based component needs
+   *  a new sample.
+   *
+   *  \param num_out    The number of output channels contained within the array.
+   *  \param sample     The sample data array as signed 32-bit values.  The component
+   *                    may not have 32-bits of accuracy (for example, many
+   *                    I2S codecs are 24-bit), in which case the bottom bits
+   *                    will be arbitrary values.
+   */
+  void send(size_t num_out, int32_t sample[num_out]);
+
+} i2s_frame_callback_if;
+
+#endif // __XS2A__
 
 /** I2S master component.
  *
@@ -134,6 +202,41 @@ void i2s_master(client i2s_callback_if i2s_i,
                 out buffered port:32 p_lrclk,
                 clock bclk,
                 const clock mclk);
+
+#if defined(__XS2A__) || defined(__DOXYGEN__)
+
+/** I2S frame-based master component **for xCORE200 only**
+ *
+ *  This task performs I2S on the provided pins. It will perform callbacks over
+ *  the i2s_frame_callback_if interface to get/receive frames of data from the
+ *  application using this component.
+ *
+ *  The component performs I2S master so will drive the word clock and
+ *  bit clock lines.
+ *
+ *  \param i2s_i          The I2S frame callback interface to connect to
+ *                        the application
+ *  \param p_dout         An array of data output ports
+ *  \param num_out        The number of output data ports
+ *  \param p_din          An array of data input ports
+ *  \param num_in         The number of input data ports
+ *  \param p_bclk         The bit clock output port
+ *  \param p_lrclk        The word clock output port
+ *  \param p_mclk         Input port which supplies the master clock
+ *  \param bclk           A clock that will get configured for use with
+ *                        the bit clock
+ */
+void i2s_frame_master(client i2s_frame_callback_if i2s_i,
+                out buffered port:32 (&?p_dout)[num_out],
+                static const size_t num_out,
+                in buffered port:32 (&?p_din)[num_in],
+                static const size_t num_in,
+                out port p_bclk,
+                out buffered port:32 p_lrclk,
+                in port p_mclk,
+                clock bclk);
+
+#endif // __XS2A__
 
 /** I2S slave component.
  *
@@ -242,6 +345,7 @@ void i2s_tdm_master(client interface i2s_callback_if tdm_i,
         clock mclk);
 
 #include <i2s_master_impl.h>
+#include <i2s_frame_master_impl.h>
 #include <i2s_slave_impl.h>
 #include <tdm_master_impl.h>
 #include <i2s_tdm_master_impl.h>

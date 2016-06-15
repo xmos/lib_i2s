@@ -16,7 +16,7 @@ can either act as |I2S| master, TDM master or |I2S| slave.
 Features
 ........
 
- * |I2S| master, TDM master and |I2S| slave modes.
+ * |I2S| master (sample and frame-based), TDM master and |I2S| slave modes.
  * Handles multiple input and output data lines.
  * Support for standard |I2S|, left justified or right justified
    data modes for |I2S|.
@@ -42,6 +42,21 @@ Resource Usage
     - pins: 3 + data lines
     - ports: 3 x (1-bit) + data lines
     - cores: 1
+    - target: XCORE-200-EXPLORER
+  * - configuration: |I2S| Master (frame-based)
+    - globals:   out buffered port:32 p_dout[2] = {XS1_PORT_1D, XS1_PORT_1E};
+                 in buffered port:32 p_din[2]  = {XS1_PORT_1I, XS1_PORT_1K};
+                 port p_mclk  = XS1_PORT_1M;
+                 out port p_bclk  = XS1_PORT_1A;
+                 out buffered port:32 p_lrclk = XS1_PORT_1C;
+                 clock mclk = XS1_CLKBLK_1;
+                 clock bclk = XS1_CLKBLK_2;
+    - locals: interface i2s_frame_callback_if i;
+    - fn: i2s_frame_master(i, p_dout, 2, p_din, 2, p_bclk, p_lrclk, p_mclk, bclk);
+    - pins: 3 + data lines
+    - ports: 3 x (1-bit) + data lines
+    - cores: 1
+    - target: XCORE-200-EXPLORER
   * - configuration: |I2S| Slave
     - globals:   out buffered port:32 p_dout[2] = {XS1_PORT_1D, XS1_PORT_1E};
                  in buffered port:32 p_din[2]  = {XS1_PORT_1I, XS1_PORT_1K};
@@ -54,6 +69,7 @@ Resource Usage
     - pins: 2 + data lines
     - ports: 2 x (1-bit) + data lines
     - cores: 1
+    - target: XCORE-200-EXPLORER
   * - configuration: TDM Master
     - globals:   out buffered port:32 p_dout[2] = {XS1_PORT_1D, XS1_PORT_1E};
                  in buffered port:32 p_din[2]  = {XS1_PORT_1I, XS1_PORT_1K};
@@ -64,6 +80,7 @@ Resource Usage
     - pins: 2 + data lines
     - ports: 2 x (1-bit) + data lines
     - cores: 1
+    - target: XCORE-200-EXPLORER
 
 Software version and dependencies
 .................................
