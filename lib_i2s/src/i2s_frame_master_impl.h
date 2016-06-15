@@ -52,31 +52,45 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
     if (num_out) i2s_i.send(num_out << 1, out_samps);
 
     //Start outputting evens (0,2,4..) data at correct point relative to the clock
-#pragma loop unroll
     int offset = 0;
     if (mode==I2S_MODE_I2S) {
         offset = 1;
     }
+
+#pragma loop unroll
     for (size_t i=0, idx=0; i<num_out; i++, idx+=2){
         p_dout[i] @ (1 + offset) <: bitrev(out_samps[idx]);
     }
 
     p_lrclk @ 1 <: lr_mask;
 
+    start_clock(bclk);
+
+    //And pre-load the odds (1,3,5..)
+#pragma loop unroll
+    for (size_t i=0, idx=1; i<num_out; i++, idx+=2){
+        p_dout[i] <: bitrev(out_samps[idx]);
+    }
+
+    lr_mask = ~lr_mask;
+    p_lrclk <: lr_mask;
+
     for (size_t i=0;i<num_in;i++) {
         asm("setpt res[%0], %1"::"r"(p_din[i]), "r"(32 + offset));
     }
 
-    start_clock(bclk);
-
     while(1) {
-        lr_mask = ~lr_mask;
-        p_lrclk <: lr_mask;
+        // Check for restart
+        i2s_restart_t restart = i2s_i.restart_check();
 
-        //Output i2s odds (1,3,5..)
+        if (restart == I2S_NO_RESTART) {
+            if (num_out) i2s_i.send(num_out << 1, out_samps);
+
+            //Output i2s evens (0,2,4..)
 #pragma loop unroll
-        for (size_t i=0, idx=1; i<num_out; i++, idx+=2){
-            p_dout[i] <: bitrev(out_samps[idx]);
+            for (size_t i=0, idx=0; i<num_out; i++, idx+=2){
+                p_dout[i] <: bitrev(out_samps[idx]);
+            }
         }
 
         //Input i2s evens (0,2,4..)
@@ -90,17 +104,15 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
         lr_mask = ~lr_mask;
         p_lrclk <: lr_mask;
 
-        // Check for restart
-        i2s_restart_t restart = i2s_i.restart_check();
-
         if (restart == I2S_NO_RESTART) {
-            if (num_out) i2s_i.send(num_out << 1, out_samps);
-
-            //Output i2s evens (0,2,4..)
-    #pragma loop unroll
-            for (size_t i=0, idx=0; i<num_out; i++, idx+=2){
+            //Output i2s odds (1,3,5..)
+#pragma loop unroll
+            for (size_t i=0, idx=1; i<num_out; i++, idx+=2){
                 p_dout[i] <: bitrev(out_samps[idx]);
             }
+
+            lr_mask = ~lr_mask;
+            p_lrclk <: lr_mask;
         }
 
         //Input i2s odds (1,3,5..)
@@ -111,13 +123,15 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
             in_samps[idx] = bitrev(data);
         }
 
-        if (restart != I2S_NO_RESTART) {
-            stop_clock(bclk);
-        }
-
         if (num_in) i2s_i.receive(num_in << 1, in_samps);
 
         if (restart != I2S_NO_RESTART) {
+            if (!num_in) {
+                // Prevent the clock from being stopped before the last word
+                // has been sent if there are no RX ports.
+                sync(p_dout[0]);
+            }
+            stop_clock(bclk);
             return restart;
         }
     }
