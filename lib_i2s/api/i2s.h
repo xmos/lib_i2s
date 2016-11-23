@@ -28,7 +28,7 @@ typedef struct i2s_config_t {
  *  This structure describes the configuration of a TDM bus.
  */
 typedef struct tdm_config_t {
-  int offset;               ///< The number of bits that the FSYNC signal transitions before the data. Must be a value between 0 and 31.
+  int offset;               ///< The number of bits that the FSYNC signal transitions before the data. Must be a value between -31 and 31.
   unsigned sync_len;        ///< The length that the FSYNC signal stays high counted as ticks of the bit clock.
   unsigned channels_per_frame; ///< The number of channels in a TDM frame. This must be a power of 2.
 } tdm_config_t;
