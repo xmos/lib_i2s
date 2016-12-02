@@ -4,6 +4,7 @@
 #include <xs1.h>
 #include <xclib.h>
 #include "i2s.h"
+#include "xassert.h"
 
 static void i2s_frame_init_ports(
         out buffered port:32 (&?p_dout)[num_out],
@@ -38,8 +39,11 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
         unsigned ratio,
         i2s_mode_t mode){
 
-    int32_t in_samps[16]; //Temp hack. should be num_in << 1 but compiler thinks that isn't const..
-    int32_t out_samps[16];//So setting to 16 which should be big enough for most cases
+    int32_t in_samps[16]; //Workaround: should be (num_in << 1) but compiler thinks that isn't const,
+    int32_t out_samps[16];//so setting to 16 which should be big enough for most cases
+
+    // Since #pragma unsafe arrays is used need to ensure array won't overflow.
+    assert((num_in << 1) <= 16);
 
     unsigned lr_mask = 0;
 
