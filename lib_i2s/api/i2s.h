@@ -14,6 +14,11 @@ typedef enum i2s_mode_t {
     I2S_MODE_LEFT_JUSTIFIED, ///< The LR clock and data are phase aligned.
 } i2s_mode_t;
 
+typedef enum i2s_slave_bclk_polarity_t {
+    I2S_SLAVE_LRCLK_RISING_BCLK,
+    I2S_SLAVE_LRCLK_FALLING_BCLK,
+} i2s_slave_bclk_polarity_t;
+
 /** I2S configuration structure.
  *
  *  This structure describes the configuration of an I2S bus.
@@ -21,6 +26,7 @@ typedef enum i2s_mode_t {
 typedef struct i2s_config_t {
   unsigned mclk_bclk_ratio; ///< The ratio between the master clock and bit clock signals.
   i2s_mode_t mode;          ///< The mode of the LR clock.
+  i2s_slave_bclk_polarity_t slave_bclk_polarity;
 } i2s_config_t;
 
 /** TDM configuration structure.
