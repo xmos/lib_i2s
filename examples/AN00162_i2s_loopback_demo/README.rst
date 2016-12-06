@@ -6,7 +6,7 @@ Using the I2S library
 
 .. appnote:: AN00162
 
-.. version:: 1.0.2
+.. version:: 1.0.3
 
 Summary
 -------
