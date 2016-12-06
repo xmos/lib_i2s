@@ -27,6 +27,12 @@ $(foreach out,0 1 2 3 4,\
    $(eval \
     XCC_FLAGS_nightly_$(out)$(in) = $(COMMON_FLAGS) -DNUM_OUT=$(out) -DNUM_IN=$(in)\
     ) \
+   $(eval \
+    XCC_FLAGS_smoke_$(out)$(in)_inv = $(COMMON_FLAGS) -DNUM_OUT=$(out) -DNUM_IN=$(in) -DSMOKE -DSLAVE_INVERT_BCLK\
+    ) \
+   $(eval \
+    XCC_FLAGS_nightly_$(out)$(in)_inv = $(COMMON_FLAGS) -DNUM_OUT=$(out) -DNUM_IN=$(in) -DSLAVE_INVERT_BCLK\
+    ) \
  ) \
 )
 

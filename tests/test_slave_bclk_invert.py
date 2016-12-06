@@ -8,7 +8,7 @@ def do_slave_test(num_in, num_out, testlevel):
 
     resources = xmostest.request_resource("xsim")
 
-    binary = 'i2s_slave_test/bin/{tl}_{i}{o}/i2s_slave_test_{tl}_{i}{o}.xe'.format(i=num_in, o=num_out, tl=testlevel)
+    binary = 'i2s_slave_test/bin/{tl}_{i}{o}_inv/i2s_slave_test_{tl}_{i}{o}_inv.xe'.format(i=num_in, o=num_out, tl=testlevel)
 
     clk = Clock("tile[0]:XS1_PORT_1A")
 
@@ -20,11 +20,12 @@ def do_slave_test(num_in, num_out, testlevel):
         "tile[0]:XS1_PORT_1L",
         "tile[0]:XS1_PORT_16A",
         "tile[0]:XS1_PORT_1M",
-         clk)
+         clk,
+         invert_bclk = True)
 
-    tester = xmostest.ComparisonTester(open('slave_test.expect'),
+    tester = xmostest.ComparisonTester(open('bclk_invert.expect'),
                                      'lib_i2s', 'i2s_slave_sim_tests',
-                                     'basic_test_%s'%testlevel,
+                                     'slave_bclk_invert_%s'%testlevel,
                                      {'num_in':num_in, 'num_out':num_out},
                                        regexp=True,
                                        ignore=["CONFIG:.*"])
@@ -33,12 +34,10 @@ def do_slave_test(num_in, num_out, testlevel):
 
     xmostest.run_on_simulator(resources['xsim'], binary,
                               simthreads = [clk, checker],
-                              simargs=['--vcd-tracing', '-o ./i2s_slave_test/trace.vcd -tile tile[0] -ports-detailed'],
+                              #simargs=['--vcd-tracing', '-o ./i2s_slave_test/trace.vcd -tile tile[0] -ports-detailed'],
                               suppress_multidrive_messages = True,
                               tester = tester)
 
 def runtest():
-    do_slave_test(4, 4, "smoke")
-    do_slave_test(4, 0, "smoke")
-    do_slave_test(0, 4, "smoke")
-    do_slave_test(4, 4, "nightly")
+    do_slave_test(2, 2, "smoke")
+    do_slave_test(2, 2, "nightly")

@@ -24,6 +24,7 @@ def do_slave_test(num_in, num_out, testlevel):
         "tile[0]:XS1_PORT_1M",
          clk,
         no_start_msg = True)
+
     tester = xmostest.ComparisonTester(open('sequence_check_{o}{i}.expect'.format(i=num_in, o=num_out)),
                                      'lib_i2s', 'i2s_slave_sim_tests',
                                      'sequence_check',
@@ -34,7 +35,7 @@ def do_slave_test(num_in, num_out, testlevel):
 
     xmostest.run_on_simulator(resources['xsim'], binary,
               simthreads = [clk, checker],
-              #simargs=['--vcd-tracing', '-o ./i2s_slave_test/trace.vcd -tile tile[0] -ports'],
+              #simargs=['--vcd-tracing', '-o ./test_i2s_callback_sequence/trace.vcd -tile tile[0] -ports'],
               tester = tester)
 
 def runtest():
@@ -44,4 +45,3 @@ def runtest():
     do_slave_test(1, 1, "nightly")
     do_slave_test(2, 2, "nightly")
     do_slave_test(3, 3, "nightly")
-
