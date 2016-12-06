@@ -4,9 +4,9 @@ I2S library change log
 2.3.0
 -----
 
-   * ADDED: Configuration option for slave bit clock polarity. This allows
-     supporting masters that toggle word clock and data on rising edge of
-     bit clock.
+  * ADDED: Configuration option for slave bit clock polarity. This allows
+    supporting masters that toggle word clock and data on rising edge of bit
+    clock.
 
 2.2.0
 -----
