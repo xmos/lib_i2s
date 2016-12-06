@@ -14,6 +14,17 @@ typedef enum i2s_mode_t {
     I2S_MODE_LEFT_JUSTIFIED, ///< The LR clock and data are phase aligned.
 } i2s_mode_t;
 
+/** I2S slave bit clock polarity.
+ *
+ *  Standard I2S is positive, that is toggle data and LR clock on falling
+ *  edge of bit clock and sample them on rising edge of bit clock. Some
+ *  masters have it the other way around.
+ */
+typedef enum i2s_slave_bclk_polarity_t {
+    I2S_SLAVE_SAMPLE_ON_BCLK_RISING,   ///<< Toggle falling, sample rising (default if not set)
+    I2S_SLAVE_SAMPLE_ON_BCLK_FALLING,  ///<< Toggle rising, sample falling
+} i2s_slave_bclk_polarity_t;
+
 /** I2S configuration structure.
  *
  *  This structure describes the configuration of an I2S bus.
@@ -21,6 +32,7 @@ typedef enum i2s_mode_t {
 typedef struct i2s_config_t {
   unsigned mclk_bclk_ratio; ///< The ratio between the master clock and bit clock signals.
   i2s_mode_t mode;          ///< The mode of the LR clock.
+  i2s_slave_bclk_polarity_t slave_bclk_polarity;  ///< Slave bit clock polarity.
 } i2s_config_t;
 
 /** TDM configuration structure.

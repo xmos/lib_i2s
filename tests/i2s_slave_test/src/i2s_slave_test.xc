@@ -124,6 +124,10 @@ void app(server interface i2s_callback_if i2s_i){
             break;
         }
         case i2s_i.init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config):{
+#if SLAVE_INVERT_BCLK
+            i2s_config.slave_bclk_polarity = I2S_SLAVE_SAMPLE_ON_BCLK_FALLING;
+#endif
+
             if (!first_time){
                 error |= request_response(setup_strobe_port, setup_resp_port);
 
@@ -169,8 +173,12 @@ int main(){
     par {
       [[distribute]] app(i2s_i);
       i2s_slave(i2s_i, p_dout, NUM_OUT, p_din, NUM_IN,
-                 p_bclk, p_lrclk, bclk);
-      par(int i=0;i<7;i++)while(1);
+                p_bclk, p_lrclk, bclk);
+      par(int i=0;i<7;i++){
+        { set_core_fast_mode_on();
+          while(1);
+        }
+      }
     }
     return 0;
 }

@@ -597,6 +597,11 @@ the following code instantiates an |I2S| slave component and connects to it::
     return 0;
   }
 
+Slave has an additional config option to sample data and word clock on falling
+edge of bit clock, instead of rising edge. Data is then output on rising edge
+instesd of falling edge. This option is useful with non-standard masters that
+invert their bit clock.
+
 TDM usage
 .........
 

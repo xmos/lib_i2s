@@ -14,3 +14,5 @@
 **/.settings/*
 *.pyc
 *.log
+.*.swp
+test_results.csv

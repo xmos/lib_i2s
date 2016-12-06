@@ -63,8 +63,14 @@ static void i2s_slave0(client i2s_callback_if i2s_i,
         i2s_mode_t m;
         i2s_config_t config;
         i2s_restart_t restart = I2S_NO_RESTART;
+        config.slave_bclk_polarity = I2S_SLAVE_SAMPLE_ON_BCLK_RISING;
         i2s_i.init(config, null);
         m = config.mode;
+
+        if (config.slave_bclk_polarity == I2S_SLAVE_SAMPLE_ON_BCLK_FALLING)
+            set_port_inv(p_bclk);
+        else
+            set_port_no_inv(p_bclk);
 
         unsigned expected_low  = (m==I2S_MODE_I2S) ? 0 : 0x80000000;
         unsigned expected_high = (m==I2S_MODE_I2S) ? 0xffffffff : 0x7fffffff;
