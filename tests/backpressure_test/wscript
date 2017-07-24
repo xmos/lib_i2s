@@ -1,0 +1,90 @@
+import fnmatch
+import re
+from waflib import Build, Options
+from waflib.Build import BuildContext, CleanContext
+
+def options(ctx):
+    ctx.add_option('--config', action='store', default='')
+
+def configure(conf):
+    def make_config(name, flags):
+        conf.setenv(name)
+        conf.load('xwaf.compiler_xcc')
+        conf.env.XCC_FLAGS = flags
+    for key, value in CONFIGS.iteritems():
+        make_config(key, value)
+
+def build(bld):
+    if not bld.variant:
+        if not bld.options.config:
+            bld.fatal('specify a config with --config')
+
+        build_configs = [
+            c for c in CONFIGS.keys()
+            if fnmatch.fnmatch(c, bld.options.config)
+        ]
+        build_commands = ['{}_{}'.format(bld.cmd, c) for c in build_configs]
+
+        if not build_commands:
+            bld.fatal(
+                '{} does not match any configs'.format(bld.options.config))
+
+        cmd_str = {'build': 'Building', 'clean': 'Cleaning'}[bld.cmd]
+        print('{} configs:\\n    {}'.format(cmd_str, '\\n    '.join(
+            build_configs)))
+        Options.commands = build_commands + Options.commands
+        return
+
+    depends_on = ['lib_logging', 'lib_i2c', 'lib_i2s']
+
+    bld.env.TARGET_ARCH = 'src/XR-AUDIO-216-MC.xn'
+    bld.env.XSCOPE = 'src/config.xscope'
+
+    prog = bld.program(depends_on=depends_on)
+
+CONFIGS = {
+    '768000_2_0_10': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=768000', '-DNUM_I2S_LINES=2', '-DRECEIVE_DELAY_INCREMENT=0', '-DSEND_DELAY_INCREMENT=10'],
+    '192000_3_0_10': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=192000', '-DNUM_I2S_LINES=3', '-DRECEIVE_DELAY_INCREMENT=0', '-DSEND_DELAY_INCREMENT=10'],
+    '768000_1_5_5': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=768000', '-DNUM_I2S_LINES=1', '-DRECEIVE_DELAY_INCREMENT=5', '-DSEND_DELAY_INCREMENT=5'],
+    '192000_3_10_0': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=192000', '-DNUM_I2S_LINES=3', '-DRECEIVE_DELAY_INCREMENT=10', '-DSEND_DELAY_INCREMENT=0'],
+    '192000_1_5_5': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=192000', '-DNUM_I2S_LINES=1', '-DRECEIVE_DELAY_INCREMENT=5', '-DSEND_DELAY_INCREMENT=5'],
+    '384000_3_5_5': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=384000', '-DNUM_I2S_LINES=3', '-DRECEIVE_DELAY_INCREMENT=5', '-DSEND_DELAY_INCREMENT=5'],
+    '384000_2_10_0': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=384000', '-DNUM_I2S_LINES=2', '-DRECEIVE_DELAY_INCREMENT=10', '-DSEND_DELAY_INCREMENT=0'],
+    '192000_2_0_10': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=192000', '-DNUM_I2S_LINES=2', '-DRECEIVE_DELAY_INCREMENT=0', '-DSEND_DELAY_INCREMENT=10'],
+    'SIM': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DRECEIVE_DELAY_INCREMENT=0', '-DSEND_DELAY_INCREMENT=10'],
+    '768000_2_5_5': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=768000', '-DNUM_I2S_LINES=2', '-DRECEIVE_DELAY_INCREMENT=5', '-DSEND_DELAY_INCREMENT=5'],
+    '384000_4_0_10': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=384000', '-DNUM_I2S_LINES=4', '-DRECEIVE_DELAY_INCREMENT=0', '-DSEND_DELAY_INCREMENT=10'],
+    '384000_4_10_0': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=384000', '-DNUM_I2S_LINES=4', '-DRECEIVE_DELAY_INCREMENT=10', '-DSEND_DELAY_INCREMENT=0'],
+    '384000_1_10_0': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=384000', '-DNUM_I2S_LINES=1', '-DRECEIVE_DELAY_INCREMENT=10', '-DSEND_DELAY_INCREMENT=0'],
+    '192000_2_5_5': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=192000', '-DNUM_I2S_LINES=2', '-DRECEIVE_DELAY_INCREMENT=5', '-DSEND_DELAY_INCREMENT=5'],
+    '768000_4_5_5': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=768000', '-DNUM_I2S_LINES=4', '-DRECEIVE_DELAY_INCREMENT=5', '-DSEND_DELAY_INCREMENT=5'],
+    '768000_4_0_10': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=768000', '-DNUM_I2S_LINES=4', '-DRECEIVE_DELAY_INCREMENT=0', '-DSEND_DELAY_INCREMENT=10'],
+    '768000_1_10_0': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=768000', '-DNUM_I2S_LINES=1', '-DRECEIVE_DELAY_INCREMENT=10', '-DSEND_DELAY_INCREMENT=0'],
+    '768000_1_0_10': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=768000', '-DNUM_I2S_LINES=1', '-DRECEIVE_DELAY_INCREMENT=0', '-DSEND_DELAY_INCREMENT=10'],
+    '192000_4_5_5': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=192000', '-DNUM_I2S_LINES=4', '-DRECEIVE_DELAY_INCREMENT=5', '-DSEND_DELAY_INCREMENT=5'],
+    '192000_1_10_0': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=192000', '-DNUM_I2S_LINES=1', '-DRECEIVE_DELAY_INCREMENT=10', '-DSEND_DELAY_INCREMENT=0'],
+    '384000_3_10_0': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=384000', '-DNUM_I2S_LINES=3', '-DRECEIVE_DELAY_INCREMENT=10', '-DSEND_DELAY_INCREMENT=0'],
+    '384000_1_5_5': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=384000', '-DNUM_I2S_LINES=1', '-DRECEIVE_DELAY_INCREMENT=5', '-DSEND_DELAY_INCREMENT=5'],
+    '768000_3_5_5': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=768000', '-DNUM_I2S_LINES=3', '-DRECEIVE_DELAY_INCREMENT=5', '-DSEND_DELAY_INCREMENT=5'],
+    '384000_1_0_10': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=384000', '-DNUM_I2S_LINES=1', '-DRECEIVE_DELAY_INCREMENT=0', '-DSEND_DELAY_INCREMENT=10'],
+    '768000_2_10_0': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=768000', '-DNUM_I2S_LINES=2', '-DRECEIVE_DELAY_INCREMENT=10', '-DSEND_DELAY_INCREMENT=0'],
+    '768000_3_0_10': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=768000', '-DNUM_I2S_LINES=3', '-DRECEIVE_DELAY_INCREMENT=0', '-DSEND_DELAY_INCREMENT=10'],
+    '192000_4_0_10': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=192000', '-DNUM_I2S_LINES=4', '-DRECEIVE_DELAY_INCREMENT=0', '-DSEND_DELAY_INCREMENT=10'],
+    '384000_3_0_10': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=384000', '-DNUM_I2S_LINES=3', '-DRECEIVE_DELAY_INCREMENT=0', '-DSEND_DELAY_INCREMENT=10'],
+    '192000_1_0_10': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=192000', '-DNUM_I2S_LINES=1', '-DRECEIVE_DELAY_INCREMENT=0', '-DSEND_DELAY_INCREMENT=10'],
+    '192000_3_5_5': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=192000', '-DNUM_I2S_LINES=3', '-DRECEIVE_DELAY_INCREMENT=5', '-DSEND_DELAY_INCREMENT=5'],
+    '192000_2_10_0': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=192000', '-DNUM_I2S_LINES=2', '-DRECEIVE_DELAY_INCREMENT=10', '-DSEND_DELAY_INCREMENT=0'],
+    '768000_4_10_0': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=768000', '-DNUM_I2S_LINES=4', '-DRECEIVE_DELAY_INCREMENT=10', '-DSEND_DELAY_INCREMENT=0'],
+    '384000_2_5_5': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=384000', '-DNUM_I2S_LINES=2', '-DRECEIVE_DELAY_INCREMENT=5', '-DSEND_DELAY_INCREMENT=5'],
+    '384000_2_0_10': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=384000', '-DNUM_I2S_LINES=2', '-DRECEIVE_DELAY_INCREMENT=0', '-DSEND_DELAY_INCREMENT=10'],
+    '768000_3_10_0': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=768000', '-DNUM_I2S_LINES=3', '-DRECEIVE_DELAY_INCREMENT=10', '-DSEND_DELAY_INCREMENT=0'],
+    '192000_4_10_0': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=192000', '-DNUM_I2S_LINES=4', '-DRECEIVE_DELAY_INCREMENT=10', '-DSEND_DELAY_INCREMENT=0'],
+    '384000_4_5_5': ['-O2', '-report', '-g', '-DSIM=1', '-DDEBUG_PRINT_ENABLE=1', '-DGENERATE_MCLK', '-DSAMPLE_FREQUENCY=384000', '-DNUM_I2S_LINES=4', '-DRECEIVE_DELAY_INCREMENT=5', '-DSEND_DELAY_INCREMENT=5'],
+}
+
+for config in CONFIGS.keys():
+    for ctx in (BuildContext, CleanContext):
+        raw_context = ctx.__name__.replace('Context', '').lower()
+        class tmp(ctx):
+            cmd = raw_context + '_' + config
+            variant = config
