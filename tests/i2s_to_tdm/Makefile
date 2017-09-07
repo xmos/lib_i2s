@@ -1,3 +1,7 @@
+ifeq ($(USING_XWAF),1)
+all:
+	xwaf configure build 
+else # USING_XWAF
 # The TARGET variable determines what target system the application is
 # compiled for. It either refers to an XN file in the source directories
 # or a valid argument for the --target option when compiling.
@@ -30,3 +34,4 @@ USED_MODULES = lib_i2s lib_logging
 
 XMOS_MAKE_PATH ?= ../..
 include $(XMOS_MAKE_PATH)/xcommon/module_xcommon/build/Makefile.common
+endif # USING_XWAF

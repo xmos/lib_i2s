@@ -1,0 +1,9 @@
+def configure(conf):
+    conf.load('xwaf.compiler_xcc')
+
+def build(bld):
+    bld.env.XCC_FLAGS = ['-O3', '-g', '-save-temps', '-DDEBUG_PRINT_ENABLE=1', '-report']
+    bld.env.TARGET_ARCH = 'SLICEKIT-L16'
+
+    depends_on = ['lib_i2s', 'lib_logging']
+    prog = bld.program(depends_on=depends_on)
