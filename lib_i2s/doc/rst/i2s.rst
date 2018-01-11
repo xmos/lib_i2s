@@ -54,14 +54,10 @@ second falling edge after the *LRCLK* transitions.
 
 .. _i2s_i2s_mode_signal:
 
-.. wavedrom:: |I2S| Mode
+.. figure:: images/mode.png
+   :width: 100%
 
-  {signal: [
-  {name: 'BCLK',  wave: '1010101|010101|01..'},
-  {name: 'LRCLK', wave: '10.....|1.....|0..'},
-  {name: 'DOUT',  wave: 'xxx2.2.|2.2.2.|2.x.', data: ['MSB(l)',,'LSB(l)', 'MSB(r)',,'LSB(r)']},
-  {name: 'DIN',   wave: 'xxx2.2.|2.2.2.|2.x.', data: ['MSB(l)',,'LSB(l)', 'MSB(r)',,'LSB(r)']},]
-  }
+   |I2S| Mode
 
 |newpage|
 
@@ -71,14 +67,10 @@ transition.
 
 .. _i2s_left_justified_mode_signal:
 
-.. wavedrom:: Left Justified Mode
+.. figure:: images/left_justified_mode.png
+   :width: 100%
 
-  {signal: [
-  {name: 'BCLK',  wave: '10101|010101|01..'},
-  {name: 'LRCLK', wave: '10...|..1...|....'},
-  {name: 'DOUT',  wave: 'x2.2.|2.2.2.|2.x.', data: ['MSB(l)',,'LSB(l)', 'MSB(r)',,'LSB(r)']},
-  {name: 'DIN',   wave: 'x2.2.|2.2.2.|2.x.', data: ['MSB(l)',,'LSB(l)', 'MSB(r)',,'LSB(r)']},]
-  }
+   Left Justified Mode
 
 In either case the signal multiplexes two channels of data onto one
 data line. When the *LRCLK* is low, the *left* channel is
@@ -87,7 +79,7 @@ transmitted.
 
 All data is transmitted most significant bit first. The xCORE |I2S|
 library assumes 32 bits of data between *LRCLK* transitions. How the
-data is aligned is expeced to be done in software by the
+data is aligned is expected to be done in software by the
 application. For example, some audio codecs have a *Right Justified*
 mode; to attain this mode the library should be set to
 *Left Justified* mode to align the *LRCLK* signal and then the data
@@ -303,29 +295,17 @@ with different offset and sync length values.
 
 .. _tdm_sig_1:
 
-.. wavedrom:: TDM signal (sync offset 0, sync length 1)
+.. figure:: images/tdm_sig_1.png
+   :width: 100%
 
- { signal: [
-  { name: 'FSYNC', wave: '0..1.0..|......|......|...10..', node: '...a.b' },
-   {name: 'BCLK',  wave: '01010101|010101|010101|0101010', node: '....'},
-  { name: 'DATA', wave: 'x..2.2.2|.2.2.2|.2.2.2|.2.2.2.', data: ['MSB(c0)',,,'LSB(c0)','MSB(c1)',,'LSB(c1)','MSB(c2)',,'LSB(cN)','MSB(c0)'], node: '...................'},
- { node:'...A.B'}],
- edge: ['a|A','A<->B fsync_len','b|B']
- }
+   TDM signal (sync offset 0, sync length 1)
 
 .. _tdm_sig_2:
 
-.. wavedrom:: TDM signal (sync offset 1, sync length 32)
+.. figure:: images/tdm_sig_2.png
+   :width: 100%
 
-  { signal: [
-    { name: 'FSYNC', wave: '01......|.0....|......|.1.....', node: '.a.b......c' },
-    {name: 'BCLK',  wave: '01010101|010101|010101|0101010'},
-   { name: 'DATA', wave: 'x..2.2.2|.2.2.2|.2.2.2|.2.2.2.', data: ['MSB(c0)',,,'LSB(c0)','MSB(c1)',,'LSB(c1)','MSB(c2)',,'LSB(cN)','MSB(c0)'], node: '...................'},
-    { node : '.A.B......'},
-    { node : '.D........C'}
-    ],
-   edge: ['a|A','A<->B offset','b|B','a|D','D<->C fsync_len','c|C'],
-  }
+   TDM signal (sync offset 1, sync length 32)
 
 The master signals a frame by driving the *FSYNC* signal high. After a
 delay of *FSYNC_OFFSET* bits, data is driven. Data is driven most
@@ -694,19 +674,10 @@ The channels wil be numbered as indicated in :ref:`i2s_chan_diag`:
 
 .. _i2s_chan_diag:
 
-.. wavedrom:: |I2S| channel numbering
+.. figure:: images/chan_num.png
+   :width: 100%
 
-  {signal: [
-  {name: 'LRCLK', wave: '1.0.1.0.1..'},
-  {name: 'DOUT[0]',  wave: 'xx2.2.2.2.x.', data: ['0','1', '0','1']},
-  {name: 'DOUT[1]',  wave: 'xx2.2.2.2.x.', data: ['2','3', '2','3']},
-  {name: 'DOUT[2]',  wave: 'xx2.2.2.2.x.', data: ['4','5', '4','5']},
-  {name: 'DOUT[3]',  wave: 'xx2.2.2.2.x.', data: ['6','7', '6','7']},
-  {name: 'DIN[0]',  wave: 'xx2.2.2.2.x.', data: ['0','1', '0','1']},
-  {name: 'DIN[1]',  wave: 'xx2.2.2.2.x.', data: ['2','3', '2','3']},
-  {name: 'DIN[2]',  wave: 'xx2.2.2.2.x.', data: ['4','5', '4','5']},
-  {name: 'DIN[3]',  wave: 'xx2.2.2.2.x.', data: ['6','7', '6','7']}]
-  }
+   |I2S| channel numbering
 
 |newpage|
 
@@ -728,16 +699,10 @@ numbered as indicated in :ref:`tdm_chan_diag`:
 
 .. _tdm_chan_diag:
 
-.. wavedrom:: TDM channel numbering
+.. figure:: images/tdm_chan_num.png
+   :width: 100%
 
-   {signal: [
-   {name: 'FSYNC', wave: '0.10......10'},
-   {name: 'DOUT[0]',  wave: 'xx2.2.2.2.x.', data: ['0','1', '2','3']},
-   {name: 'DOUT[1]',  wave: 'xx2.2.2.2.x.', data: ['4','5', '6','7']},
-   {name: 'DIN[0]',  wave: 'xx2.2.2.2.x.', data: ['0','1', '2','3']},
-   {name: 'DIN[1]',  wave: 'xx2.2.2.2.x.', data: ['4','5', '6','7']},
-   ]
-   }
+   TDM channel numbering
 
 |I2S| and TDM combined numbering
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -882,4 +847,3 @@ Known Issues
 No known issues.
 
 .. include:: ../../../CHANGELOG.rst
-
