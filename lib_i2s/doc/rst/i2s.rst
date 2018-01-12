@@ -54,7 +54,7 @@ second falling edge after the *LRCLK* transitions.
 
 .. _i2s_i2s_mode_signal:
 
-.. figure:: images/mode.png
+.. figure:: images/i2s_mode.png
    :width: 100%
 
    |I2S| Mode
