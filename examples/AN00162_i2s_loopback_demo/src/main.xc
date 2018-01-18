@@ -92,7 +92,7 @@ void i2s_loopback(server i2s_callback_if i2s,
                   client output_gpio_if pll_select,
                   client output_gpio_if mclk_select)
 {
-  int32_t samples[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+  int32_t samples[8] = {0};
   while (1) {
     select {
     case i2s.init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config):
