@@ -1,0 +1,331 @@
+import xwaf.utils.configs as config_utils
+
+
+def options(ctx):
+    ctx.add_option('--config', action='store', default='')
+
+
+def configure(conf):
+    def make_config(name, flags):
+        conf.setenv(name)
+        conf.load('xwaf.compiler_xcc')
+        conf.env.XCC_FLAGS = flags
+
+    for key, value in CONFIGS.iteritems():
+        make_config(key, value)
+
+
+def build(bld):
+    if not config_utils.check_build_config(bld, CONFIGS):
+        return
+
+    bld.env.PROJECT_ROOT = '../../..'
+
+    depends_on = ['lib_i2s']
+
+    bld.env.TARGET_ARCH = 'SLICEKIT-A16'
+
+    prog = bld.program(depends_on=depends_on)
+
+
+CONFIGS = {
+    'smoke_03_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=0', '-DNUM_IN=3', '-DSMOKE',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'smoke_21_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=2', '-DNUM_IN=1', '-DSMOKE',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'smoke_32_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=3', '-DNUM_IN=2', '-DSMOKE',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'nightly_40': ['-O2', '-g', '-save-temps', '-DNUM_OUT=4', '-DNUM_IN=0'],
+    'smoke_14':
+    ['-O2', '-g', '-save-temps', '-DNUM_OUT=1', '-DNUM_IN=4', '-DSMOKE'],
+    'smoke_40_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=4', '-DNUM_IN=0', '-DSMOKE',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'nightly_31': ['-O2', '-g', '-save-temps', '-DNUM_OUT=3', '-DNUM_IN=1'],
+    'nightly_22': ['-O2', '-g', '-save-temps', '-DNUM_OUT=2', '-DNUM_IN=2'],
+    'nightly_13': ['-O2', '-g', '-save-temps', '-DNUM_OUT=1', '-DNUM_IN=3'],
+    'nightly_00_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=0', '-DNUM_IN=0',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'nightly_11': ['-O2', '-g', '-save-temps', '-DNUM_OUT=1', '-DNUM_IN=1'],
+    'nightly_41': ['-O2', '-g', '-save-temps', '-DNUM_OUT=4', '-DNUM_IN=1'],
+    'smoke_13_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=1', '-DNUM_IN=3', '-DSMOKE',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'smoke_41_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=4', '-DNUM_IN=1', '-DSMOKE',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'nightly_01_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=0', '-DNUM_IN=1',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'nightly_13_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=1', '-DNUM_IN=3',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'nightly_10_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=1', '-DNUM_IN=0',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'nightly_42': ['-O2', '-g', '-save-temps', '-DNUM_OUT=4', '-DNUM_IN=2'],
+    'smoke_42_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=4', '-DNUM_IN=2', '-DSMOKE',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'nightly_02_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=0', '-DNUM_IN=2',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'nightly_11_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=1', '-DNUM_IN=1',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'smoke_00':
+    ['-O2', '-g', '-save-temps', '-DNUM_OUT=0', '-DNUM_IN=0', '-DSMOKE'],
+    'smoke_33':
+    ['-O2', '-g', '-save-temps', '-DNUM_OUT=3', '-DNUM_IN=3', '-DSMOKE'],
+    'nightly_44_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=4', '-DNUM_IN=4',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'smoke_24': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=2', '-DNUM_IN=4', '-DSMOKE'
+    ],
+    'nightly_23': ['-O2', '-g', '-save-temps', '-DNUM_OUT=2', '-DNUM_IN=3'],
+    'smoke_22_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=2', '-DNUM_IN=2', '-DSMOKE',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'smoke_01': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=0', '-DNUM_IN=1', '-DSMOKE'
+    ],
+    'smoke_23_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=2', '-DNUM_IN=3', '-DSMOKE',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'nightly_30': ['-O2', '-g', '-save-temps', '-DNUM_OUT=3', '-DNUM_IN=0'],
+    'smoke_11': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=1', '-DNUM_IN=1', '-DSMOKE'
+    ],
+    'smoke_44': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=4', '-DNUM_IN=4', '-DSMOKE'
+    ],
+    'smoke_10': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=1', '-DNUM_IN=0', '-DSMOKE'
+    ],
+    'nightly_12_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=1', '-DNUM_IN=2',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'smoke_30_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=3', '-DNUM_IN=0', '-DSMOKE',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'smoke_30': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=3', '-DNUM_IN=0', '-DSMOKE'
+    ],
+    'nightly_04': ['-O2', '-g', '-save-temps', '-DNUM_OUT=0', '-DNUM_IN=4'],
+    'nightly_20': ['-O2', '-g', '-save-temps', '-DNUM_OUT=2', '-DNUM_IN=0'],
+    'smoke_02': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=0', '-DNUM_IN=2', '-DSMOKE'
+    ],
+    'smoke_31_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=3', '-DNUM_IN=1', '-DSMOKE',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'smoke_04_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=0', '-DNUM_IN=4', '-DSMOKE',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'nightly_43': ['-O2', '-g', '-save-temps', '-DNUM_OUT=4', '-DNUM_IN=3'],
+    'nightly_03_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=0', '-DNUM_IN=3',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'nightly_21_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=2', '-DNUM_IN=1',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'smoke_43_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=4', '-DNUM_IN=3', '-DSMOKE',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'nightly_32': ['-O2', '-g', '-save-temps', '-DNUM_OUT=3', '-DNUM_IN=2'],
+    'nightly_14': ['-O2', '-g', '-save-temps', '-DNUM_OUT=1', '-DNUM_IN=4'],
+    'nightly_24_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=2', '-DNUM_IN=4',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'smoke_34_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=3', '-DNUM_IN=4', '-DSMOKE',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'smoke_12': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=1', '-DNUM_IN=2', '-DSMOKE'
+    ],
+    'nightly_40_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=4', '-DNUM_IN=0',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'smoke_14_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=1', '-DNUM_IN=4', '-DSMOKE',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'nightly_34_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=3', '-DNUM_IN=4',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'nightly_20_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=2', '-DNUM_IN=0',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'smoke_20': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=2', '-DNUM_IN=0', '-DSMOKE'
+    ],
+    'nightly_22_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=2', '-DNUM_IN=2',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'nightly_41_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=4', '-DNUM_IN=1',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'nightly_33_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=3', '-DNUM_IN=3',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'smoke_43': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=4', '-DNUM_IN=3', '-DSMOKE'
+    ],
+    'smoke_33_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=3', '-DNUM_IN=3', '-DSMOKE',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'smoke_21': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=2', '-DNUM_IN=1', '-DSMOKE'
+    ],
+    'smoke_03': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=0', '-DNUM_IN=3', '-DSMOKE'
+    ],
+    'nightly_34': ['-O2', '-g', '-save-temps', '-DNUM_OUT=3', '-DNUM_IN=4'],
+    'smoke_34': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=3', '-DNUM_IN=4', '-DSMOKE'
+    ],
+    'nightly_42_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=4', '-DNUM_IN=2',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'smoke_32': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=3', '-DNUM_IN=2', '-DSMOKE'
+    ],
+    'nightly_00': ['-O2', '-g', '-save-temps', '-DNUM_OUT=0', '-DNUM_IN=0'],
+    'nightly_33': ['-O2', '-g', '-save-temps', '-DNUM_OUT=3', '-DNUM_IN=3'],
+    'smoke_22': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=2', '-DNUM_IN=2', '-DSMOKE'
+    ],
+    'smoke_13': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=1', '-DNUM_IN=3', '-DSMOKE'
+    ],
+    'smoke_00_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=0', '-DNUM_IN=0', '-DSMOKE',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'smoke_41': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=4', '-DNUM_IN=1', '-DSMOKE'
+    ],
+    'smoke_24_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=2', '-DNUM_IN=4', '-DSMOKE',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'nightly_01': ['-O2', '-g', '-save-temps', '-DNUM_OUT=0', '-DNUM_IN=1'],
+    'nightly_23_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=2', '-DNUM_IN=3',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'smoke_01_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=0', '-DNUM_IN=1', '-DSMOKE',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'nightly_10': ['-O2', '-g', '-save-temps', '-DNUM_OUT=1', '-DNUM_IN=0'],
+    'nightly_30_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=3', '-DNUM_IN=0',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'smoke_10_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=1', '-DNUM_IN=0', '-DSMOKE',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'smoke_42': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=4', '-DNUM_IN=2', '-DSMOKE'
+    ],
+    'nightly_02': ['-O2', '-g', '-save-temps', '-DNUM_OUT=0', '-DNUM_IN=2'],
+    'nightly_31_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=3', '-DNUM_IN=1',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'nightly_04_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=0', '-DNUM_IN=4',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'nightly_44': ['-O2', '-g', '-save-temps', '-DNUM_OUT=4', '-DNUM_IN=4'],
+    'smoke_02_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=0', '-DNUM_IN=2', '-DSMOKE',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'smoke_11_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=1', '-DNUM_IN=1', '-DSMOKE',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'smoke_40': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=4', '-DNUM_IN=0', '-DSMOKE'
+    ],
+    'smoke_44_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=4', '-DNUM_IN=4', '-DSMOKE',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'nightly_24': ['-O2', '-g', '-save-temps', '-DNUM_OUT=2', '-DNUM_IN=4'],
+    'nightly_43_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=4', '-DNUM_IN=3',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'smoke_23': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=2', '-DNUM_IN=3', '-DSMOKE'
+    ],
+    'nightly_12': ['-O2', '-g', '-save-temps', '-DNUM_OUT=1', '-DNUM_IN=2'],
+    'nightly_32_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=3', '-DNUM_IN=2',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'nightly_14_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=1', '-DNUM_IN=4',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'smoke_12_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=1', '-DNUM_IN=2', '-DSMOKE',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'smoke_31': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=3', '-DNUM_IN=1', '-DSMOKE'
+    ],
+    'smoke_04': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=0', '-DNUM_IN=4', '-DSMOKE'
+    ],
+    'smoke_20_inv': [
+        '-O2', '-g', '-save-temps', '-DNUM_OUT=2', '-DNUM_IN=0', '-DSMOKE',
+        '-DSLAVE_INVERT_BCLK'
+    ],
+    'nightly_21': ['-O2', '-g', '-save-temps', '-DNUM_OUT=2', '-DNUM_IN=1'],
+    'nightly_03': ['-O2', '-g', '-save-temps', '-DNUM_OUT=0', '-DNUM_IN=3'],
+}
+
+config_utils.register_configs(CONFIGS)

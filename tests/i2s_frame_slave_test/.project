@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>i2s_master_test</name>
+	<name>i2s_slave_test</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -11,12 +11,12 @@
 			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>com.xmos.cdt.core.LegacyProjectCheckerBuilder</name>
+			<name>com.xmos.cdt.core.ModulePathBuilder</name>
 			<arguments>
 			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>com.xmos.cdt.core.ModulePathBuilder</name>
+			<name>com.xmos.cdt.core.LegacyProjectCheckerBuilder</name>
 			<arguments>
 			</arguments>
 		</buildCommand>
