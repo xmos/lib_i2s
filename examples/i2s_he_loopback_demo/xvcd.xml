@@ -1,0 +1,8 @@
+<Xvcd zoomFactor="1.280000e+02" hScrollPos="391" vScrollPos="0" markerBarPos="1.011120e+05">
+    <Signals>
+        <Signal name="tile[0]_XS1_PORT_1B" radix="HEX"/>
+        <Signal name="tile[0]_XS1_PORT_1G" radix="HEX"/>
+        <Signal name="tile[0]_XS1_PORT_1M" radix="HEX"/>
+        <Signal name="tile[0]_XS1_PORT_1H" radix="HEX"/>
+    </Signals>
+</Xvcd>
