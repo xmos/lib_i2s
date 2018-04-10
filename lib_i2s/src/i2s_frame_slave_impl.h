@@ -3,7 +3,7 @@
 #include <xclib.h>
 #include "i2s.h"
 
-static void i2s_he_slave_init_ports(
+static void i2s_frame_slave_init_ports(
         out buffered port:32 (&?p_dout)[num_out],
         size_t num_out,
         in buffered port:32 (&?p_din)[num_in],
@@ -21,7 +21,7 @@ static void i2s_he_slave_init_ports(
     start_clock(bclk);
 }
 
-static void i2s_he_slave_send(client i2s_he_callback_if i2s_i,
+static void i2s_frame_slave_send(client i2s_frame_callback_if i2s_i,
         out buffered port:32 (&?p_dout)[num_out],
         size_t num_out, unsigned frame_word){
     for(size_t i=0;i<num_out;i++)
@@ -29,7 +29,7 @@ static void i2s_he_slave_send(client i2s_he_callback_if i2s_i,
         //p_dout[i] <: bitrev(i2s_i.send(i*2+frame_word));
 }
 
-static void i2s_he_slave_receive(client i2s_he_callback_if i2s_i,
+static void i2s_frame_slave_receive(client i2s_frame_callback_if i2s_i,
         in buffered port:32 (&?p_din)[num_in],
         size_t num_in, unsigned frame_word){
     unsigned data;
@@ -40,9 +40,9 @@ static void i2s_he_slave_receive(client i2s_he_callback_if i2s_i,
     }
 }
 
-#define i2s_he_slave i2s_he_slave0
+#define i2s_frame_slave i2s_frame_slave0
 
-static void i2s_he_slave0(client i2s_he_callback_if i2s_i,
+static void i2s_frame_slave0(client i2s_frame_callback_if i2s_i,
         out buffered port:32 (&?p_dout)[num_out],
         static const size_t num_out,
         in buffered port:32 (&?p_din)[num_in],
@@ -52,7 +52,7 @@ static void i2s_he_slave0(client i2s_he_callback_if i2s_i,
         clock bclk){
 
     unsigned port_time;
-    i2s_he_slave_init_ports(p_dout, num_out, p_din, num_in, p_bclk, p_lrclk, bclk);
+    i2s_frame_slave_init_ports(p_dout, num_out, p_din, num_in, p_bclk, p_lrclk, bclk);
 
     while(1){
         i2s_mode_t m;
@@ -72,7 +72,7 @@ static void i2s_he_slave0(client i2s_he_callback_if i2s_i,
 
 
 
-        i2s_he_slave_send(i2s_i, p_dout, num_out, 1);
+        i2s_frame_slave_send(i2s_i, p_dout, num_out, 1);
 
         for(size_t i=0;i<num_in;i++)
             asm volatile("setpt res[%0], %1"::"r"(p_din[i]), "r"(port_time + 64+32-1):"memory");
@@ -81,29 +81,29 @@ static void i2s_he_slave0(client i2s_he_callback_if i2s_i,
 
         while(restart == I2S_NO_RESTART){
   
-            i2s_he_slave_receive(i2s_i, p_din, num_in, 0);
+            i2s_frame_slave_receive(i2s_i, p_din, num_in, 0);
 
-            i2s_he_slave_send(i2s_i, p_dout, num_out, 0);
+            i2s_frame_slave_send(i2s_i, p_dout, num_out, 0);
 
 
-            i2s_he_slave_receive(i2s_i, p_din, num_in, 1);
+            i2s_frame_slave_receive(i2s_i, p_din, num_in, 1);
 
-            i2s_he_slave_send(i2s_i, p_dout, num_out, 1);
+            i2s_frame_slave_send(i2s_i, p_dout, num_out, 1);
 
             restart = i2s_i.restart_check();
 
         }
 
-        i2s_he_slave_receive(i2s_i, p_din, num_in, 0);
-        i2s_he_slave_receive(i2s_i, p_din, num_in, 1);
+        i2s_frame_slave_receive(i2s_i, p_din, num_in, 0);
+        i2s_frame_slave_receive(i2s_i, p_din, num_in, 1);
         if (restart == I2S_SHUTDOWN)
           return;
     }
 }
 
 // This function is just to avoid unused static function warnings for
-// i2s_he_slave0,it should never be called.
-inline void i2s_he_slave1(client i2s_he_callback_if i2s_i,
+// i2s_frame_slave0,it should never be called.
+inline void i2s_frame_slave1(client i2s_frame_callback_if i2s_i,
         out buffered port:32 (&?p_dout)[num_out],
         static const size_t num_out,
         in buffered port:32 (&?p_din)[num_in],
@@ -116,5 +116,5 @@ if (isnull(p_dout) && isnull(p_din)) {
     fail("Must provide non-null p_dout or p_din");
 }
 
-  i2s_he_slave0(i2s_i, p_dout, num_out, p_din, num_in, p_bclk, p_lrclk, bclk);
+  i2s_frame_slave0(i2s_i, p_dout, num_out, p_din, num_in, p_bclk, p_lrclk, bclk);
 }

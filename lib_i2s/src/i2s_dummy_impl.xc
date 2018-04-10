@@ -58,8 +58,8 @@ void i2s_slave(client i2s_callback_if i2s_i,
 {
 }
 
-#undef i2s_he_slave
-void i2s_he_slave(client i2s_he_callback_if i2s_i,
+#undef i2s_frame_slave
+void i2s_frame_slave(client i2s_frame_callback_if i2s_i,
         out buffered port:32 (&?p_dout)[num_out],
         static const size_t num_out,
         in buffered port:32 (&?p_din)[num_in],

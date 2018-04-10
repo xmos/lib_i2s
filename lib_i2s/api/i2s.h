@@ -299,7 +299,7 @@ void i2s_slave(client i2s_callback_if i2s_i,
  *  \param bclk           A clock that will get configured for use with
  *                        the bit clock
  */
-void i2s_he_slave(client i2s_he_callback_if i2s_i,
+void i2s_frame_slave(client i2s_frame_callback_if i2s_i,
         out buffered port:32 (&?p_dout)[num_out],
         static const size_t num_out,
         in buffered port:32 (&?p_din)[num_in],
@@ -388,7 +388,7 @@ void i2s_tdm_master(client interface i2s_callback_if tdm_i,
 #include <i2s_master_impl.h>
 #include <i2s_frame_master_impl.h>
 #include <i2s_slave_impl.h>
-#include <i2s_he_slave_impl.h>
+#include <i2s_frame_slave_impl.h>
 #include <tdm_master_impl.h>
 #include <i2s_tdm_master_impl.h>
 

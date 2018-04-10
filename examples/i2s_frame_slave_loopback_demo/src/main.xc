@@ -144,16 +144,11 @@ void i2s_loopback(server i2s_callback_if i2s,
 #endif
                    )
 {
-<<<<<<< HEAD
   int32_t samples[8] = {0};
-=======
-  int32_t samples[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 #if SIM_LOOPBACK_TEST
   int32_t tx_data = 0;
   int32_t rx_data = -1; //Need to start one frame later
 #endif
-
->>>>>>> master/block_slave
   while (1) {
     select {
     case i2s.init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config):
@@ -247,7 +242,7 @@ void burn(void){
 }
 
 [[distributable]]
-void i2s_handler_master(server i2s_he_callback_if i2s)
+void i2s_handler_master(server i2s_frame_callback_if i2s)
 {
   int32_t samples[TEST_LENGTH][8] = {{0}};
 
@@ -304,7 +299,7 @@ void i2s_handler_master(server i2s_he_callback_if i2s)
 int main()
 {
   interface i2s_callback_if i_i2s;
-  interface i2s_he_callback_if i_i2s_master;
+  interface i2s_frame_callback_if i_i2s_master;
   interface i2c_master_if i_i2c[1];
   interface output_gpio_if i_gpio[4];
 
@@ -339,7 +334,7 @@ int main()
         set_port_mode_clock(p_mclk);
         start_clock(mclk_master);
 #endif
-        i2s_he_master(i_i2s_master, p_dout_master, NUM_I2S_LINES, p_din_master, NUM_I2S_LINES, p_bclk_master, p_lrclk_master, p_mclk_master, bclk_master);
+        i2s_frame_master(i_i2s_master, p_dout_master, NUM_I2S_LINES, p_din_master, NUM_I2S_LINES, p_bclk_master, p_lrclk_master, p_mclk_master, bclk_master);
     }
     on tile[1]: i2s_handler_master(i_i2s_master);
 
