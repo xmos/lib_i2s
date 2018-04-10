@@ -59,8 +59,8 @@ static void i2s_frame_slave0(client i2s_frame_callback_if i2s_i,
         else
             set_port_no_inv(p_bclk);
 
-        const unsigned expected_low  = 0x80000000;
-        const unsigned expected_high = 0x7fffffff;
+        const unsigned expected_low  = (mode == I2S_MODE_I2S ? 0x80000000 : 0x00000000);
+        const unsigned expected_high = (mode == I2S_MODE_I2S ? 0x7fffffff : 0xffffffff);
 
         unsigned syncerror = 0;
         unsigned lrval;
