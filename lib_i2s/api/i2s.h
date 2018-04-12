@@ -114,14 +114,10 @@ typedef interface i2s_callback_if {
 
 } i2s_callback_if;
 
-#if defined(__XS2A__) || defined(__DOXYGEN__)
 
 /** Interface representing callback events that can occur during the
- *   operation of the I2S task. This is specific to the frame-based
- *   I2S master task which uses hardware generation of BCLK and transfers
- *   samples as arrays rather than individual channels, resulting in much
- *   less senesitivity to back pressure in the send/recieve cases.
- *   This interface is supported on xCORE200 processors only.
+ *  operation of the I2S task. This is a much more efficient interface
+ *  and reccomended for new designs
  */
 typedef interface i2s_frame_callback_if {
 
@@ -180,8 +176,6 @@ typedef interface i2s_frame_callback_if {
 
 } i2s_frame_callback_if;
 
-#endif // __XS2A__
-
 /** I2S master component.
  *
  *  This task performs I2S on the provided pins. It will perform callbacks over
@@ -225,6 +219,11 @@ void i2s_master(client i2s_callback_if i2s_i,
  *
  *  The component performs I2S master so will drive the word clock and
  *  bit clock lines.
+ *
+ *  This is a much more efficient version of i2s master which reduces callback
+ *  frequency and allows useful processing to be done in distributable i2s handler tasks.
+ *  It also uses xCORE200 specific features to remove the need for software
+ *  BCLK generation which increases efficency
  *
  *  \param i2s_i          The I2S frame callback interface to connect to
  *                        the application
