@@ -43,15 +43,15 @@ static void i2s_frame_slave0(client i2s_frame_callback_if i2s_i,
 
 
     while(1){
-
-        //Get initial send data if output enabled
-        if (num_out) i2s_i.send(num_out << 1, out_samps);
-
         i2s_frame_slave_init_ports(p_dout, num_out, p_din, num_in, p_bclk, p_lrclk, bclk);
 
         i2s_config_t config;
         i2s_restart_t restart = I2S_NO_RESTART;
         i2s_i.init(config, null);
+        
+        //Get initial send data if output enabled
+        if (num_out) i2s_i.send(num_out << 1, out_samps);
+
         unsigned mode = config.mode;
 
         if (config.slave_bclk_polarity == I2S_SLAVE_SAMPLE_ON_BCLK_FALLING)
@@ -97,13 +97,12 @@ static void i2s_frame_slave0(client i2s_frame_callback_if i2s_i,
         port_time += (I2S_CHANS_PER_FRAME*32) - (mode!=I2S_MODE_I2S);
 
         // XC doesn't have syntax for setting a timed input without waiting for the input 
-        // -1 on LRClock makes checking a lot easier since data is offset with LRclock by 1 clk 
         asm("setpt res[%0], %1"::"r"(p_lrclk),"r"(initial_in_port_time));
         for (size_t i=0;i<num_in;i++) {
             asm("setpt res[%0], %1"::"r"(p_din[i]),"r"(initial_in_port_time));
         }
 
-
+        //Main loop
         while (!syncerror && (restart == I2S_NO_RESTART)) {
             restart = i2s_i.restart_check();
 
@@ -117,7 +116,7 @@ static void i2s_frame_slave0(client i2s_frame_callback_if i2s_i,
                 }
             }
 
-            //Read lrclk value. Comes one bclk earlier than dats in I2S
+            //Read lrclk value
             p_lrclk :> lrval;
 
             //Input i2s evens (0,2,4..)
@@ -129,29 +128,15 @@ static void i2s_frame_slave0(client i2s_frame_callback_if i2s_i,
             }
 
             syncerror += (lrval != expected_low);
-            if (syncerror){
-                printstrln("SYNCVAL");
-                printhexln(lrval);
-                printhexln(expected_low);
-            }
 
+            //Read lrclk value
+            p_lrclk :> lrval;
 
             if (restart == I2S_NO_RESTART) {
-
-                //Read lrclk value. Comes one bclk earlier than dats in I2S
-                p_lrclk :> lrval;
-
             //Output i2s odds (1,3,5..)
 #pragma loop unroll
                 for (size_t i=0, idx=1; i<num_out; i++, idx+=2){
                     p_dout[i] <: bitrev(out_samps[idx]);
-                }
-
-                syncerror += (lrval != expected_high);
-                if (syncerror){
-                    printstrln("SYNCVAL");
-                    printhexln(lrval);
-                    printhexln(expected_low);
                 }
             }
 
@@ -163,12 +148,13 @@ static void i2s_frame_slave0(client i2s_frame_callback_if i2s_i,
                 in_samps[idx] = bitrev(data);
             }
 
+            syncerror += (lrval != expected_high);
+
             if (num_in)
                 i2s_i.receive(num_in << 1, in_samps);
-        }
+        }//main loop
         if (syncerror) {
-            printstrln("**syncerror**");
-            printbinln(syncerror);
+            printstrln("**sync error**");
         }
     }
 }
