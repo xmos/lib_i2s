@@ -18,6 +18,8 @@ in port  setup_resp_port = XS1_PORT_1M;
 
 #define MAX_CHANNELS 8
 
+#define I2S_LOOPBACK_LATENCY 1
+
 #if defined(SMOKE)
 #define NUM_BCLKS 1
 #define NUM_BCLKS_TO_CHECK 1
@@ -91,7 +93,7 @@ static int request_response(
 
 [[distributable]]
 #pragma unsafe arrays
-void app(server interface i2s_callback_if i2s_i){
+void app(server interface i2s_frame_callback_if i2s_i){
     unsigned bclk_freq_index = 0;
     unsigned frames_sent = 0;
     unsigned rx_data_counter[MAX_CHANNELS] = {0};
@@ -104,14 +106,20 @@ void app(server interface i2s_callback_if i2s_i){
     i2s_mode_t current_mode = I2S_MODE_I2S;
     while(1) {
         select {
-        case i2s_i.receive(size_t index, int32_t sample):{
-            error |= (sample != rx_data[index][rx_data_counter[index]]);
-            rx_data_counter[index]++;
+        case i2s_i.receive(size_t n, int32_t receive_data[n]):{
+            for(size_t c=0; c<n; c++){
+                unsigned i = rx_data_counter[c];
+                error |= (receive_data[c] != rx_data[c][i]);
+                rx_data_counter[c] = i+1;
+            }
             break;
         }
-        case i2s_i.send(size_t index) -> int32_t r:{
-            r = tx_data[index][tx_data_counter[index]];
-            tx_data_counter[index]++;
+        case i2s_i.send(size_t n, int32_t send_data[n]):{
+            for(size_t c=0; c<n; c++){
+                unsigned i = tx_data_counter[c];
+                send_data[c] = tx_data[c][i];
+                tx_data_counter[c] = i+1;
+            }
             break;
         }
         case i2s_i.restart_check() -> i2s_restart_t restart:{
@@ -168,11 +176,11 @@ void app(server interface i2s_callback_if i2s_i){
 }
 
 int main(){
-    interface i2s_callback_if i2s_i;
+    interface i2s_frame_callback_if i2s_i;
 
     par {
       [[distribute]] app(i2s_i);
-      i2s_slave(i2s_i, p_dout, NUM_OUT, p_din, NUM_IN,
+      i2s_frame_slave(i2s_i, p_dout, NUM_OUT, p_din, NUM_IN,
                 p_bclk, p_lrclk, bclk);
       par(int i=0;i<7;i++){
         { set_core_fast_mode_on();
