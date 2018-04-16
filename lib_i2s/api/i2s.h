@@ -116,8 +116,8 @@ typedef interface i2s_callback_if {
 
 
 /** Interface representing callback events that can occur during the
- *  operation of the I2S task. This is a much more efficient interface
- *  and reccomended for new designs
+ *  operation of the I2S task. This is a more efficient interface
+ *  and reccomended for new designs.
  */
 typedef interface i2s_frame_callback_if {
 
@@ -153,7 +153,7 @@ typedef interface i2s_frame_callback_if {
    *   This callback will be called when a new frame of samples is read in by the I2S
    *   frame-based component.
    *
-   *  \param num_out    The number of input channels contained within the array.
+   *  \param num_in     The number of input channels contained within the array.
    *  \param samples    The samples data array as signed 32-bit values.  The component
    *                    may not have 32-bits of accuracy (for example, many
    *                    I2S codecs are 24-bit), in which case the bottom bits
@@ -220,10 +220,10 @@ void i2s_master(client i2s_callback_if i2s_i,
  *  The component performs I2S master so will drive the word clock and
  *  bit clock lines.
  *
- *  This is a much more efficient version of i2s master which reduces callback
+ *  This is a more efficient version of i2s master which reduces callback
  *  frequency and allows useful processing to be done in distributable i2s handler tasks.
  *  It also uses xCORE200 specific features to remove the need for software
- *  BCLK generation which increases efficency
+ *  BCLK generation which decreases processor overhead.
  *
  *  \param i2s_i          The I2S frame callback interface to connect to
  *                        the application
