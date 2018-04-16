@@ -44,7 +44,7 @@ in :ref:`i2s_signal_params`.
 The *MCLK_BCLK_RATIO* should be such that 64 bits can be output by the
 bit clock at the data rate of the |I2S| signal. For example, a
 24.576MHz master clock with a ratio of 8 gives a bit clock at
-3.072MHz. This bit clock can output 64 bits at a frequency of 48Khz -
+3.072MHz. This bit clock can output 64 bits at a frequency of 48kHz -
 which is the underlying rate of the data.
 
 The master signals data transfer should occur by a transition on the
@@ -248,7 +248,7 @@ not the underlying master clock frequency.
      :class: vertical-borders horizontal-borders
      :header-rows: 1
 
-     * - **BCLK FREQU**
+     * - **BCLK FREQ**
        - **SAMPLE FREQ**
        - **NUM IN (num channels)**
        - **NUM OUT (num channels)**
@@ -269,7 +269,7 @@ The table :ref:`i2s_frame_slave_62_5_speeds` shows the known working configurati
      :header-rows: 1
      :widths: 20 20 20 20
 
-     * - **BCLK FREQU**
+     * - **BCLK FREQ**
        - **SAMPLE FREQ**
        - **NUM IN (num channels)**
        - **NUM OUT (num channels)**
@@ -286,8 +286,8 @@ The table :ref:`i2s_frame_slave_62_5_speeds` shows the known working configurati
        - 4 (8)
        - 4 (8)
 
-. tip::
-   |I2S| "frame-master" is capable of running at higher rates such as 768kHz within a 62.5MIPS logical core. However, it may be necessary to modify the port timing delays to ensure proper sampling of the data and LRCLK lines. There are methods of doing this using pad and/or sample delays however this is beyond the scope of this document. Please consult `I/O timings for xCORE200` available on xmos.com for further information. 
+.. tip::
+   |I2S| "frame-master" is capable of running at higher rates such as 768kHz within a 62.5MIPS logical core. However, it may be necessary to modify the port timing delays to ensure proper sampling of the data and LRCLK lines. There are methods for doing this using pad and/or sample delays however this is beyond the scope of this document. Please consult `I/O timings for xCORE200` available on xmos.com for further information. 
 
 
 |newpage|

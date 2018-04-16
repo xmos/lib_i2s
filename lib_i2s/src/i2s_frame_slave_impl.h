@@ -25,6 +25,7 @@ static void i2s_frame_slave_init_ports(
 
 #define i2s_frame_slave i2s_frame_slave0
 
+#pragma unsafe arrays
 static void i2s_frame_slave0(client i2s_frame_callback_if i2s_i,
         out buffered port:32 (&?p_dout)[num_out],
         static const size_t num_out,
@@ -71,7 +72,6 @@ static void i2s_frame_slave0(client i2s_frame_callback_if i2s_i,
             clearbuf(p_din[i]);
         clearbuf(p_lrclk);
 
-
         unsigned offset = 0;
         if (mode==I2S_MODE_I2S) {
             offset = 1;
@@ -88,13 +88,6 @@ static void i2s_frame_slave0(client i2s_frame_callback_if i2s_i,
         for (size_t i=0, idx=0; i<num_out; i++, idx+=2){
             p_dout[i] @ initial_out_port_time <: bitrev(out_samps[idx]);
         }
-        //And pre-load the odds (1,3,5..) to follow immediately afterwards
-        for (size_t i=0, idx=1; i<num_out; i++, idx+=2){
-            p_dout[i] <: bitrev(out_samps[idx]);
-        }
-
-        // Setup input for next frame. Account for the buffering in port 
-        port_time += (I2S_CHANS_PER_FRAME*32) - (mode!=I2S_MODE_I2S);
 
         // XC doesn't have syntax for setting a timed input without waiting for the input 
         asm("setpt res[%0], %1"::"r"(p_lrclk),"r"(initial_in_port_time));
@@ -102,12 +95,18 @@ static void i2s_frame_slave0(client i2s_frame_callback_if i2s_i,
             asm("setpt res[%0], %1"::"r"(p_din[i]),"r"(initial_in_port_time));
         }
 
+        //And pre-load the odds (1,3,5..) to follow immediately afterwards
+        for (size_t i=0, idx=1; i<num_out; i++, idx+=2){
+            p_dout[i] <: bitrev(out_samps[idx]);
+        }
+
         //Main loop
         while (!syncerror && (restart == I2S_NO_RESTART)) {
             restart = i2s_i.restart_check();
 
-            if (restart == I2S_NO_RESTART) {
-                if (num_out) i2s_i.send(num_out << 1, out_samps);
+
+            if (num_out && (restart == I2S_NO_RESTART)){
+                i2s_i.send(num_out << 1, out_samps);
 
                 //Output i2s evens (0,2,4..)
 #pragma loop unroll
@@ -115,7 +114,7 @@ static void i2s_frame_slave0(client i2s_frame_callback_if i2s_i,
                     p_dout[i] <: bitrev(out_samps[idx]);
                 }
             }
-
+                
             //Read lrclk value
             p_lrclk :> lrval;
 
@@ -132,9 +131,9 @@ static void i2s_frame_slave0(client i2s_frame_callback_if i2s_i,
             //Read lrclk value
             p_lrclk :> lrval;
 
-            if (restart == I2S_NO_RESTART) {
             //Output i2s odds (1,3,5..)
 #pragma loop unroll
+            if (num_out && (restart == I2S_NO_RESTART)){
                 for (size_t i=0, idx=1; i<num_out; i++, idx+=2){
                     p_dout[i] <: bitrev(out_samps[idx]);
                 }
@@ -152,11 +151,8 @@ static void i2s_frame_slave0(client i2s_frame_callback_if i2s_i,
 
             if (num_in)
                 i2s_i.receive(num_in << 1, in_samps);
-        }//main loop
-        if (syncerror) {
-            printstrln("**sync error**");
-        }
-    }
+        }//main loop, runs until user restart or synch error
+    }// while(1)
 }
 
 // This function is just to avoid unused static function warnings for
