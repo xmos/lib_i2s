@@ -7,7 +7,7 @@
 
 /* Ports and clocks used by the application */
 on tile[0]: out buffered port:32 p_lrclk = XS1_PORT_1G;
-on tile[0]: out buffered port:32 p_bclk = XS1_PORT_1H;
+on tile[0]: out port p_bclk = XS1_PORT_1H;
 on tile[0]: in port p_mclk = XS1_PORT_1F;
 on tile[0]: out buffered port:32 p_dout[4] = {XS1_PORT_1M, XS1_PORT_1N, XS1_PORT_1O, XS1_PORT_1P};
 on tile[0]: in buffered port:32 p_din[4] = {XS1_PORT_1I, XS1_PORT_1J, XS1_PORT_1K, XS1_PORT_1L};
@@ -85,14 +85,14 @@ void reset_codecs(client i2c_master_if i2c)
 }
 
 [[distributable]]
-void i2s_loopback(server i2s_callback_if i2s,
+void i2s_loopback(server i2s_frame_callback_if i2s,
                   client i2c_master_if i2c,
                   client output_gpio_if dac_reset,
                   client output_gpio_if adc_reset,
                   client output_gpio_if pll_select,
                   client output_gpio_if mclk_select)
 {
-  int32_t samples[8] = {0};
+  int32_t samples[8] = {0}; // Array used for looping back samples
   while (1) {
     select {
     case i2s.init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config):
@@ -117,16 +117,16 @@ void i2s_loopback(server i2s_callback_if i2s,
       reset_codecs(i2c);
       break;
 
-    case i2s.receive(size_t index, int32_t sample):
-      samples[index] = sample;
+    case i2s.receive(size_t n_chans, int32_t in_samps[n_chans]):
+    for (int i = 0; i < n_chans; i++) samples[i] = in_samps[i]; // copy samples
       break;
 
-    case i2s.send(size_t index) -> int32_t sample:
-      sample = samples[index];
+    case i2s.send(size_t n_chans, int32_t out_samps[n_chans]):
+      for (int i = 0; i < n_chans; i++) out_samps[i] = samples[i]; // copy samples
       break;
 
     case i2s.restart_check() -> i2s_restart_t restart:
-      restart = I2S_NO_RESTART;
+      restart = I2S_NO_RESTART; // Keep on looping
       break;
     }
   }
@@ -141,17 +141,12 @@ static char gpio_pin_map[4] =  {
 
 int main()
 {
-  interface i2s_callback_if i_i2s;
+  interface i2s_frame_callback_if i_i2s;
   interface i2c_master_if i_i2c[1];
   interface output_gpio_if i_gpio[4];
   par {
-    on tile[0]: {
-      /* System setup, I2S + Codec control over I2C */
-      configure_clock_src(mclk, p_mclk);
-      start_clock(mclk);
-      i2s_master(i_i2s, p_dout, 4, p_din, 4, p_bclk, p_lrclk, bclk, mclk);
-    }
-
+    /* System setup, I2S + Codec control over I2C */
+    on tile[0]: i2s_frame_master(i_i2s, p_dout, 4, p_din, 4, p_bclk, p_lrclk, p_mclk, bclk);
     on tile[0]: [[distribute]] i2c_master_single_port(i_i2c, 1, p_i2c, 100, 0, 1, 0);
     on tile[0]: [[distribute]] output_gpio(i_gpio, 4, p_gpio, gpio_pin_map);
 
