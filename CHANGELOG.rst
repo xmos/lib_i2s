@@ -6,7 +6,6 @@ I2S library change log
 
   * ADDED: Frame-based I2S slave implementation.
 
-
 2.3.0
 -----
 
