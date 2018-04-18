@@ -125,6 +125,8 @@ void test_lr_period(void){
           if (diff > (period + JITTER)) {
               debug_printf("Backpressure breaks at receive delay ticks=%d, send delay ticks=%d\n",
                 *p_receive_delay, *p_send_delay);
+              debug_printf("actual diff: %d, maximum (period + Jitter): %d\n",
+                diff, (period + JITTER));
               _Exit(1);
           }
           time_old = time;
