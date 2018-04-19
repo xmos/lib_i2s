@@ -85,7 +85,7 @@ void i2s_loopback(server i2s_frame_callback_if i2s)
   }
 }
 
-#define OVERHEAD_TICKS 150 // Some of the period needs to be allowed for the interface handling
+#define OVERHEAD_TICKS 160 // Some of the period needs to be allowed for the interface handling
 #define JITTER  1   //Allow for rounding so does not break when diff = period + 1
 #define N_CYCLES_AT_DELAY   1 //How many LR clock cycles to measure at each backpressure delay value
 #define DIFF_WRAP_16(new, old)  (new > old ? new - old : new + 0x10000 - old)
@@ -125,6 +125,8 @@ void test_lr_period(void){
           if (diff > (period + JITTER)) {
               debug_printf("Backpressure breaks at receive delay ticks=%d, send delay ticks=%d\n",
                 *p_receive_delay, *p_send_delay);
+              debug_printf("actual diff: %d, maximum (period + Jitter): %d\n",
+                diff, (period + JITTER));
               _Exit(1);
           }
           time_old = time;
