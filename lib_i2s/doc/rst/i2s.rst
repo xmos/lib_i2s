@@ -44,7 +44,7 @@ in :ref:`i2s_signal_params`.
 The *MCLK_BCLK_RATIO* should be such that 64 bits can be output by the
 bit clock at the data rate of the |I2S| signal. For example, a
 24.576MHz master clock with a ratio of 8 gives a bit clock at
-3.072MHz. This bit clock can output 64 bits at a frequency of 48Khz -
+3.072MHz. This bit clock can output 64 bits at a frequency of 48kHz -
 which is the underlying rate of the data.
 
 The master signals data transfer should occur by a transition on the
@@ -80,7 +80,7 @@ transmitted.
 All data is transmitted most significant bit first. The xCORE |I2S|
 library assumes 32 bits of data between *LRCLK* transitions. How the
 data is aligned is expected to be done in software by the
-application. For example, some audio codecs have a *Right Justified*
+application. For example, some audio CODECs have a *Right Justified*
 mode; to attain this mode the library should be set to
 *Left Justified* mode to align the *LRCLK* signal and then the data
 should be right shifted by the application before being passed to the
@@ -210,11 +210,22 @@ shows the known working configurations:
        - **SAMPLE FREQ**
        - **NUM IN (num channels)**
        - **NUM OUT (num channels)**
+     * - 49.152MHz
+       - 1
+       - 768000
+       - 4 (8)
+       - 4 (8)
      * - 24.576MHz
        - 2
        - 192000
        - 4 (8)
        - 4 (8)
+     * - 24.576MHz
+       - 24
+       - 16000
+       - 4 (8)
+       - 4 (8)
+
 
 |I2S| slave speeds and performance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -237,7 +248,7 @@ not the underlying master clock frequency.
      :class: vertical-borders horizontal-borders
      :header-rows: 1
 
-     * - **BCLK FREQU**
+     * - **BCLK FREQ**
        - **SAMPLE FREQ**
        - **NUM IN (num channels)**
        - **NUM OUT (num channels)**
@@ -245,6 +256,39 @@ not the underlying master clock frequency.
        - 192000
        - 4 (8)
        - 4 (8)
+
+Frame-based |I2S| master can be used. This uses a more efficient callback
+interface to achieve much higher throughputs by transferring a frame (all channels in one sample period)
+at a time and re-ordered callbacks and I/O operations so that maximum back pressure tolerance is achieved.
+The table :ref:`i2s_frame_slave_62_5_speeds` shows the known working configurations. Other configurations may be possible depending on performance:
+
+.. _i2s_frame_slave_62_5_speeds:
+
+.. list-table:: Known working |I2S| frame-based master configurations on a 62.5MHz core
+     :class: vertical-borders horizontal-borders
+     :header-rows: 1
+     :widths: 20 20 20 20
+
+     * - **BCLK FREQ**
+       - **SAMPLE FREQ**
+       - **NUM IN (num channels)**
+       - **NUM OUT (num channels)**
+     * - 24.576MHz
+       - 384000
+       - 4 (8)
+       - 4 (8)
+     * - 12.288MHz
+       - 192000
+       - 4 (8)
+       - 4 (8)
+     * - 3.072MHz
+       - 16000
+       - 4 (8)
+       - 4 (8)
+
+.. tip::
+   |I2S| "frame-master" is capable of running at higher rates such as 768kHz within a 62.5MIPS logical core. However, it may be necessary to modify the port timing delays to ensure proper sampling of the data and LRCLK lines. There are methods for doing this using pad and/or sample delays however this is beyond the scope of this document. Please consult `I/O timings for xCORE200` available on xmos.com for further information. 
+
 
 |newpage|
 
@@ -288,7 +332,7 @@ in :ref:`tdm_signal_params`.
          data being drive on the data line.
      * - *FSYNC_LENGTH*
        - The number of bits that the frame sync signal stays high for
-         when signalling frame start.
+         when signaling frame start.
 
 :ref:`tdm_sig_1` and :ref:`tdm_sig_2` show example waveforms for TDM
 with different offset and sync length values.
@@ -311,7 +355,7 @@ The master signals a frame by driving the *FSYNC* signal high. After a
 delay of *FSYNC_OFFSET* bits, data is driven. Data is driven most
 significant bit first. First, 32 bits of data from Channel 0 is
 driven, then 32 bits from channel 1 up to channel N (when N is the
-number of channels per frame). The next frame is then signalled (there
+number of channels per frame). The next frame is then signaled (there
 is no padding between frames).
 
 |newpage|
@@ -579,7 +623,7 @@ the following code instantiates an |I2S| slave component and connects to it::
 
 Slave has an additional config option to sample data and word clock on falling
 edge of bit clock, instead of rising edge. Data is then output on rising edge
-instesd of falling edge. This option is useful with non-standard masters that
+instead of falling edge. This option is useful with non-standard masters that
 invert their bit clock.
 
 TDM usage
@@ -714,7 +758,7 @@ previous two sections.
 Callback sequences
 ..................
 
-The send/receive callbacks of |I2S| callbacks occur in a
+The send/receive callbacks of "sample-based" |I2S| callbacks occur in a
 pre-determined order. The sequence consists of receipt of all even
 channel, sending of all even channels, receipt of all odd channels
 and then sending of all odd channels.
@@ -727,7 +771,7 @@ output lines and two input lines (four channels in and four channels out).
 
 .. _i2s_callback_seq:
 
-.. list-table:: Sample |I2S| callback sequence
+.. list-table:: Sample-based |I2S| callback sequence
 
  * - Initial send:
    - S0 S2 S1 S3
@@ -741,6 +785,26 @@ output lines and two input lines (four channels in and four channels out).
    - R0 R2 S0 S2 R1 R3 S1 S3
  * - Final receive:
    - R0 R2 R1 R3
+
+
+For "frame-based" |I2S| implementations the callback sequence is much simpler. :ref:`i2s_frame_callback_seq` shows an example sequence.
+
+.. _i2s_frame_callback_seq:
+
+.. list-table:: Frame-based |I2S| callback sequence
+
+ * - Initial send:
+   - Init, Send All
+ * - Frame:
+   - Restart check, Send All, Receive All
+ * - Frame:
+   - Restart check, Send All, Receive All
+ * - ...
+   - ...
+ * - Frame:
+   - Restart check, Send All, Receive All
+ * - Final receive:
+   - Restart check (I2S_RESTART), Receive All
 
 When using TDM, the receive callbacks for a channel occur after the
 send callbacks. The receive callback for the last channel of the frame
@@ -813,6 +877,10 @@ Creating an |I2S| instance
 |newpage|
 
 .. doxygenfunction:: i2s_slave
+
+|newpage|
+
+.. doxygenfunction:: i2s_frame_slave
 
 |newpage|
 

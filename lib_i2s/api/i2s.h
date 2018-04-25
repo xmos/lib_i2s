@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2016, XMOS Ltd, All rights reserved
+// Copyright (c) 2014-2018, XMOS Ltd, All rights reserved
 #ifndef _i2s_h_
 #define _i2s_h_
 #include <xs1.h>
@@ -114,14 +114,10 @@ typedef interface i2s_callback_if {
 
 } i2s_callback_if;
 
-#if defined(__XS2A__) || defined(__DOXYGEN__)
 
 /** Interface representing callback events that can occur during the
- *   operation of the I2S task. This is specific to the frame-based
- *   I2S master task which uses hardware generation of BCLK and transfers
- *   samples as arrays rather than individual channels, resulting in much
- *   less senesitivity to back pressure in the send/recieve cases.
- *   This interface is supported on xCORE200 processors only.
+ *  operation of the I2S task. This is a more efficient interface
+ *  and reccomended for new designs.
  */
 typedef interface i2s_frame_callback_if {
 
@@ -157,7 +153,7 @@ typedef interface i2s_frame_callback_if {
    *   This callback will be called when a new frame of samples is read in by the I2S
    *   frame-based component.
    *
-   *  \param num_out    The number of input channels contained within the array.
+   *  \param num_in     The number of input channels contained within the array.
    *  \param samples    The samples data array as signed 32-bit values.  The component
    *                    may not have 32-bits of accuracy (for example, many
    *                    I2S codecs are 24-bit), in which case the bottom bits
@@ -179,8 +175,6 @@ typedef interface i2s_frame_callback_if {
   void send(size_t num_out, int32_t samples[num_out]);
 
 } i2s_frame_callback_if;
-
-#endif // __XS2A__
 
 /** I2S master component.
  *
@@ -225,6 +219,11 @@ void i2s_master(client i2s_callback_if i2s_i,
  *
  *  The component performs I2S master so will drive the word clock and
  *  bit clock lines.
+ *
+ *  This is a more efficient version of i2s master which reduces callback
+ *  frequency and allows useful processing to be done in distributable i2s handler tasks.
+ *  It also uses xCORE200 specific features to remove the need for software
+ *  BCLK generation which decreases processor overhead.
  *
  *  \param i2s_i          The I2S frame callback interface to connect to
  *                        the application
@@ -271,6 +270,35 @@ void i2s_frame_master(client i2s_frame_callback_if i2s_i,
  *                        the bit clock
  */
 void i2s_slave(client i2s_callback_if i2s_i,
+        out buffered port:32 (&?p_dout)[num_out],
+        static const size_t num_out,
+        in buffered port:32 (&?p_din)[num_in],
+        static const size_t num_in,
+        in port p_bclk,
+        in buffered port:32 p_lrclk,
+        clock bclk);
+
+/** I2S High Efficiency slave component.
+ *
+ *  This task performs I2S on the provided pins. It will perform callbacks over
+ *  the i2s_callback_if interface to get/receive data from the application
+ *  using this component.
+ *
+ *  The component performs I2S slave so will expect the word clock and
+ *  bit clock to be driven externally.
+ *
+ *  \param i2s_i          The I2S callback interface to connect to
+ *                        the application
+ *  \param p_dout         An array of data output ports
+ *  \param num_out        The number of output data ports
+ *  \param p_din          An array of data input ports
+ *  \param num_in         The number of input data ports
+ *  \param p_bclk         The bit clock input port
+ *  \param p_lrclk        The word clock input port
+ *  \param bclk           A clock that will get configured for use with
+ *                        the bit clock
+ */
+void i2s_frame_slave(client i2s_frame_callback_if i2s_i,
         out buffered port:32 (&?p_dout)[num_out],
         static const size_t num_out,
         in buffered port:32 (&?p_din)[num_in],
@@ -359,6 +387,7 @@ void i2s_tdm_master(client interface i2s_callback_if tdm_i,
 #include <i2s_master_impl.h>
 #include <i2s_frame_master_impl.h>
 #include <i2s_slave_impl.h>
+#include <i2s_frame_slave_impl.h>
 #include <tdm_master_impl.h>
 #include <i2s_tdm_master_impl.h>
 

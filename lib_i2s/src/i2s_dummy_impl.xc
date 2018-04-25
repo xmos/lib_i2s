@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2016, XMOS Ltd, All rights reserved
+// Copyright (c) 2015-2018, XMOS Ltd, All rights reserved
 #include <i2s.h>
 
 #undef i2s_tdm_master
@@ -48,6 +48,18 @@ void i2s_frame_master(client i2s_frame_callback_if i2s_i,
 
 #undef i2s_slave
 void i2s_slave(client i2s_callback_if i2s_i,
+        out buffered port:32 (&?p_dout)[num_out],
+        static const size_t num_out,
+        in buffered port:32 (&?p_din)[num_in],
+        static const size_t num_in,
+        in port p_bclk,
+        in buffered port:32 p_lrclk,
+        clock bclk)
+{
+}
+
+#undef i2s_frame_slave
+void i2s_frame_slave(client i2s_frame_callback_if i2s_i,
         out buffered port:32 (&?p_dout)[num_out],
         static const size_t num_out,
         in buffered port:32 (&?p_din)[num_in],

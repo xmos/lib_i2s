@@ -190,7 +190,7 @@ class I2SSlaveChecker(xmostest.SimThread):
 
           for p in range(0, num_outs):
              if rx_data[p*2][frame_count] != rx_word[p]:
-                print "ERROR: frame %d: actual (%d) expected (%d)" % (frame_count, rx_word[p],rx_data[p*2][frame_count])
+                print "ERROR: first half frame %d: actual (%d) expected (%d)" % (frame_count, rx_word[p],rx_data[p*2][frame_count])
                 error = True
 
           for i in range(0, 4):
@@ -227,7 +227,7 @@ class I2SSlaveChecker(xmostest.SimThread):
 
           for p in range(0, num_outs):
              if rx_data[p*2 + 1][frame_count] != rx_word[p]:
-                print "ERROR: frame %d: actual (%d) expected (%d)" % (frame_count, rx_word[p],rx_data[p*2 + 1][frame_count])
+                print "ERROR: second half frame %d: actual (%d) expected (%d)" % (frame_count, rx_word[p],rx_data[p*2 + 1][frame_count])
                 error = True
 
         for i in range(0, 32):

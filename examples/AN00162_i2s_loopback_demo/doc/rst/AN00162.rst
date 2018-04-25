@@ -43,7 +43,7 @@ To start using the |I2S|, you need to add ``lib_i2s`` to you Makefile::
 
 This demo also uses the |I2C| library (``lib_i2c``) and the GPIO library
 (``lib_gpio``). The |I2C| library is used to configure the
-audio codecs. The GPIO library abstracts the use of a 4-bit port to
+audio CODECs. The GPIO library abstracts the use of a 4-bit port to
 drive four individual reset and select lines. So the Makefile also
 includes::
 
@@ -76,7 +76,7 @@ Allocating hardware resources
 .............................
 
 An |I2S| interface requires both clock and data pins in order to
-communicate with the audio codec device. On an xCORE
+communicate with the audio CODEC device. On an xCORE
 the pins are controlled by ``ports``. The ports used by the |I2S|
 library are declared on the tile they reside and with their
 direction and buffered nature. This loopback application uses
@@ -95,7 +95,7 @@ to control a port. In this application two clocks blocks are used:
    :end-on: clock bclk
 
 The other ports declared are used by the |I2C| library to configure
-the audio codecs and by the application to control reset and
+the audio CODECs and by the application to control reset and
 chip select:
 
 .. literalinclude:: main.xc
@@ -139,13 +139,13 @@ requires only one core.
 
 |newpage|
 
-Configuring audio codecs
+Configuring audio CODECs
 ........................
 
-Two audio codecs are used on the xCORE-200 Multichannel Audio Platform. A Cirrus
+Two audio CODECs are used on the xCORE-200 Multichannel Audio Platform. A Cirrus
 CS5368 for audio input and a Cirrus CS4384 for audio output. These
-codecs have to be configured before they can be used. The
-``reset_codecs()`` function writes to the appropriate codec registers
+CODECs have to be configured before they can be used. The
+``reset_codecs()`` function writes to the appropriate CODEC registers
 to configure them:
 
 .. literalinclude:: main.xc
@@ -154,7 +154,7 @@ to configure them:
 
 If porting this application to a different xCORE development board
 then this is the function that will have to be modified to configure
-the relevant codecs for that board.
+the relevant CODECs for that board.
 
 |newpage|
 
@@ -182,10 +182,10 @@ The function takes a number of arguments:
    :end-on: mclk_select
 
 The interface to the |I2S| master is a callback interface that the
-|I2S| master will call over when it has received data or is ready to
-send data.
+|I2S| master will call over when it has received a frame data or requires a
+a frame of data to send.
 
-The |I2C| interface is used to configure the codecs and the GPIO
+The |I2C| interface is used to configure the CODECs and the GPIO
 interfaces abstract the outputting of single-bit values on a multi-bit
 port.
 
@@ -199,16 +199,15 @@ The body of the loopback task handles the |I2S| interface calls:
 
 The |I2S| master library calls the ``init()`` method before it starts
 any data streaming. This allows the application to reset and configure
-the audio codecs, for example when the sample rate changes.
+the audio CODECs, for example when the sample rate changes.
 
 The ``receive()`` interface method is called when the master has
-received an audio sample on the channel specified by ``index``. The sample
-is stored in the ``samples`` array.
+received a frame of audio samples (all channels in one sample period). The samples
+are then stored in the ``samples`` array.
 
 The ``send()`` interface method is called when the master needs a new
-sample to send on the specified channel. The ``->`` symbol shows
-the return value expected from this call. In this case the application
-simply returns the current sample on that channel.
+frame of samples to send. In this case the application
+simply returns the frame of samples previously received.
 
 Finally, the ``restart_check()`` method is called by the |I2S| master
 once per frame and allows the application to control restart or
