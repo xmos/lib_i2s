@@ -5,6 +5,7 @@ I2S library change log
 -----
 
   * ADDED: Frame-based I2S slave implementation.
+  * CHANGE: AN00162 now uses frame-based I2S master component.
 
 2.3.0
 -----
