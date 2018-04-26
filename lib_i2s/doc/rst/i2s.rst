@@ -540,6 +540,34 @@ relevant to the communication bus being used.
 The application can set the parameters
 of the bus (*MCLK/BCLK* ratio, *LRCLK* alignment etc.) at this point.
 
+|I2S| frame-based master usage
+..............................
+
+The |I2S| frame-based master task (only supported on xCORE-200) is
+instantiated as a parallel task that run in a ``par`` statement. The application
+can connect via the ``i2s_frame_callback_if`` interface connection. For example,
+the following code instantiates an |I2S| frame-based master component and
+connects to it::
+
+  out buffered port:32 p_dout[2] = {XS1_PORT_1D, XS1_PORT_1E};
+  in buffered port:32 p_din[2]  = {XS1_PORT_1I, XS1_PORT_1K};
+  port p_mclk  = XS1_PORT_1M;
+  out buffered port:32 p_bclk  = XS1_PORT_1A;
+  out buffered port:32 p_lrclk = XS1_PORT_1C;
+
+  clock bclk = XS1_CLKBLK_1;
+
+  int main(void) {
+    i2s_frame_callback_if i_i2s;
+    par {
+      i2s_frame_master(i_i2s, p_dout, 4, p_din, 4,
+               p_bclk, p_lrclk, p_mclk, bclk);
+      my_application(i_i2s);
+    }
+    return 0;
+  }
+
+
 |I2S| master usage
 ..................
 
@@ -569,33 +597,30 @@ the following code instantiates an |I2S| master component and connects to it::
     return 0;
   }
 
-|I2S| frame-based master usage
-..............................
+|I2S| frame-based slave usage
+.............................
 
-The |I2S| frame-based master task (only supported on xCORE-200) is
-instantiated as a parallel task that run in a ``par`` statement. The application
-can connect via the ``i2s_frame_callback_if`` interface connection. For example,
-the following code instantiates an |I2S| frame-based master component and
-connects to it::
+The |I2S| frame slave task is instantiated as a parallel task that run in a
+``par`` statement. The application can connect via the
+``i2s_frame_callback_if``  interface connection. For example,
+the following code instantiates an |I2S| slave component and connects to it::
 
   out buffered port:32 p_dout[2] = {XS1_PORT_1D, XS1_PORT_1E};
   in buffered port:32 p_din[2]  = {XS1_PORT_1I, XS1_PORT_1K};
-  port p_mclk  = XS1_PORT_1M;
-  out buffered port:32 p_bclk  = XS1_PORT_1A;
-  out buffered port:32 p_lrclk = XS1_PORT_1C;
+  in port p_bclk  = XS1_PORT_1A;
+  in port p_lrclk = XS1_PORT_1C;
 
-  clock mclk = XS1_CLKBLK_1;
-  clock bclk = XS1_CLKBLK_2;
+  clock bclk = XS1_CLKBLK_1;
 
   int main(void) {
-    i2s_frame_callback_if i_i2s;
     par {
-      i2s_frame_master(i_i2s, p_dout, 4, p_din, 4,
-               p_bclk, p_lrclk, p_mclk, bclk);
+      i2s_frame_slave(i2s_i, p_dout, 2, p_din, 2,
+                p_bclk, p_lrclk, bclk);
       my_application(i_i2s);
     }
     return 0;
   }
+
 
 |I2S| slave usage
 .................
