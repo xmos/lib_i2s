@@ -415,65 +415,6 @@ and the logical core speed.
 
 |newpage|
 
-Combined |I2S| and TDM
-......................
-
-The library can drive synchronized |I2S| master and TDM signals from a single
-logical core. In this case, the *MCLK* of the |I2S| interface is the
-same as the *BCLK* of the TDM master. The sample rate must be the
-same. This implies that the TDM channels per frame must be equal
-to the twice the *MCLK*/*BCLK* ratio.
-
-Connecting synchronized |I2S| and TDM signals to the xCORE device
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The |I2S| and TDM wires need to be connected to the xCORE device as shown in
-:ref:`i2s_tdm_xcore_connect`. The signals can be connected to any
-one bit ports on the device provide they do not overlap any other used
-ports and are all on the same tile.
-
-.. _i2s_tdm_xcore_connect:
-
-.. figure:: images/i2s_tdm_connect.*
-   :width: 60%
-
-   |I2S| + TDM connection to the xCORE device
-
-If only one data direction is required then the *DOUT* or *DIN* lines
-need not be connected.
-
-Combined |I2S| and TDM speeds and performance
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The speed and number of data wires that can be driven by the
-library running combined |I2S| master and TDM
-depends on the speed of the logical core that runs the code
-and the amount of processing that occurs in the user callbacks for
-handling the data from the library. :ref:`i2s_tdm_master_62_5_speeds`
-show configurations that are known to
-work for small amounts of callback processing. Other speeds will be
-achievable depending on the amount of processing in the application
-and the logical core speed.
-
-.. _i2s_tdm_master_62_5_speeds:
-
-.. list-table:: Known working |I2S| + TDM configurations on a 62.5MHz core
-     :class: vertical-borders horizontal-borders
-     :header-rows: 1
-
-     * - **MCLK FREQ**
-       - **MCLK/BCLK RATIO**
-       - **SAMPLE FREQ**
-       - **CHANNELS PER TDM FRAME**
-       - **I2S IN/OUT (channels in/out)**
-       - **TDM IN/OUT (channels in/out)**
-     * - 12.288MHz
-       - 4
-       - 48000
-       - 8
-       - 4/4 (8/8)
-       - 1/1 (8/8)
-
 
 Usage
 -----
@@ -678,41 +619,6 @@ the following code instantiates an TDM master component and connects to it::
   }
 
 
-|I2S| + TDM usage
-.................
-
-You can run TDM and |I2S| master on one core via a task that is instantiated in a
-``par`` statement. The application can connect via the
-``i2s_callback_if``  interface connection. For example,
-the following code instantiates an |I2S| + TDM master
-component and connects to it::
-
-  out buffered port:32 p_i2s_dout[2] = {XS1_PORT_1B, XS1_PORT_1F};
-  in buffered port:32 p_i2s_din[2]  = {XS1_PORT_1G, XS1_PORT_1H};
-  out buffered port:32 p_tdm_dout[1] = {XS1_PORT_1D};
-  in buffered port:32 p_tdm_din[1]  = {XS1_PORT_1I};
-  in port p_mclk  = XS1_PORT_1A;
-  out buffered port:32 p_fsync = XS1_PORT_1C;
-  out buffered port:32 p_bclk = XS1_PORT_1E;
-  out buffered port:32 p_lrclk = XS1_PORT_1K;
-  clock bclk = XS1_CLKBLK_1;
-  clock mclk = XS1_CLKBLK_2;
-
-  int main(void) {
-    i2s_callback_if i_i2s;
-    configure_clock_src(mclk, p_mclk);
-    start_clock(mclk);
-    par {
-      i2s_tdm_master(i2s_i, p_i2s_dout, 2, p_i2s_din, 2,
-                     p_bclk, p_lrclk, p_fsync,
-                     tdm_dout, 1, tdm_din, 1,
-                     bclk, mclk);
-      my_application(i_i2s);
-    }
-    return 0;
-  }
-
-
 .. _i2s_channel_map:
 
 Channel numbering
@@ -773,12 +679,6 @@ numbered as indicated in :ref:`tdm_chan_diag`:
 
    TDM channel numbering
 
-|I2S| and TDM combined numbering
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-When using the |I2S|/TDM combined task the TDM channels are numbered
-after the |I2S| channels using the numbering system described in the
-previous two sections.
 
 Callback sequences
 ..................
@@ -893,19 +793,19 @@ Supporting types
 Creating an |I2S| instance
 ..........................
 
-.. doxygenfunction:: i2s_master
-
-|newpage|
-
 .. doxygenfunction:: i2s_frame_master
 
 |newpage|
 
-.. doxygenfunction:: i2s_slave
+.. doxygenfunction:: i2s_master
 
 |newpage|
 
 .. doxygenfunction:: i2s_frame_slave
+
+|newpage|
+
+.. doxygenfunction:: i2s_slave
 
 |newpage|
 
@@ -916,7 +816,10 @@ Creating an TDM instance
 
 |newpage|
 
-.. doxygenfunction:: i2s_tdm_master
+The |I2S| frame-based callback interface
+........................................
+
+.. doxygeninterface:: i2s_frame_callback_if
 
 |newpage|
 
@@ -924,13 +827,6 @@ The |I2S| callback interface
 ............................
 
 .. doxygeninterface:: i2s_callback_if
-
-|newpage|
-
-The |I2S| frame-based callback interface
-........................................
-
-.. doxygeninterface:: i2s_frame_callback_if
 
 |appendix|
 
