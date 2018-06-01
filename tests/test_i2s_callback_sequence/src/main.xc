@@ -5,11 +5,7 @@
 #include <stdio.h>
 #include <print.h>
 
-#ifdef I2S_TDM
-#define RATIO 4
-#else
 #define RATIO 2
-#endif
 
 in port p_mclk  = XS1_PORT_1A;
 
@@ -78,36 +74,12 @@ void app(server interface i2s_callback_if i2s){
   while(1) {
     select {
     case i2s.receive(size_t index, int32_t sample):
-      #ifdef I2S_TDM_TDM
-      if (index < 8)
-        break;
-      printstr(" R");
-      printint(index-8);
-      #elif I2S_TDM_I2S
-      if (index >= 8)
-        break;
       printstr(" R");
       printint(index);
-      #else
-      printstr(" R");
-      printint(index);
-      #endif
       break;
     case i2s.send(size_t index) -> int32_t r:
-      #ifdef I2S_TDM_TDM
-      if (index < 8)
-        break;
-      printstr(" S");
-      printint(index-8);
-      #elif  I2S_TDM_I2S
-      if (index >= 8)
-        break;
       printstr(" S");
       printint(index);
-      #else
-      printstr(" S");
-      printint(index);
-      #endif
       break;
     case i2s.restart_check() -> i2s_restart_t restart:
       fcount++;
@@ -117,7 +89,7 @@ void app(server interface i2s_callback_if i2s){
         restart = I2S_NO_RESTART;
       break;
     case i2s.init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config):
-#if defined(TDM) || defined(I2S_TDM)
+#if defined(TDM)
       tdm_config.offset = 0;
       tdm_config.sync_len = 1;
       tdm_config.channels_per_frame = TDM_CHANS_PER_FRAME;
@@ -161,15 +133,6 @@ int main(){
 #elif defined(MASTER)
       i2s_master(i_i2s, p_dout, NUM_OUT, p_din, NUM_IN,
                  p_bclk, p_lrclk, bclk, mclk);
-#elif defined(I2S_TDM)
-      i2s_tdm_master(i_i2s, p_dout, NUM_OUT, p_din, NUM_IN,
-              p_bclk,
-              p_lrclk,
-              p_fsync,
-              tdm_dout, 1,
-              tdm_din, 1,
-              bclk,
-              mclk);
 #else
       i2s_slave(i_i2s, p_dout, NUM_OUT, p_din, NUM_IN,
                 p_bclk, p_lrclk, bclk);
