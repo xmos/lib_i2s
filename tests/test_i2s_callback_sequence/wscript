@@ -94,14 +94,6 @@ CONFIGS = {
     'slave_10': ['-O2', '-g', '-DSLAVE', '-DNUM_OUT=1', '-DNUM_IN=0'],
     'master_00': ['-O2', '-g', '-DMASTER', '-DNUM_OUT=0', '-DNUM_IN=0'],
     'master_24': ['-O2', '-g', '-DMASTER', '-DNUM_OUT=2', '-DNUM_IN=4'],
-    'i2s_tdm_tdm': [
-        '-O2', '-g', '-DI2S_TDM_TDM', '-DI2S_TDM', '-DNUM_OUT=4', '-DNUM_IN=4',
-        '-DTDM_CHANS_PER_FRAME=8'
-    ],
-    'i2s_tdm_i2s': [
-        '-O2', '-g', '-DI2S_TDM_I2S', '-DI2S_TDM', '-DNUM_OUT=4', '-DNUM_IN=4',
-        '-DTDM_CHANS_PER_FRAME=8'
-    ],
     'master_01': ['-O2', '-g', '-DMASTER', '-DNUM_OUT=0', '-DNUM_IN=1'],
 }
 

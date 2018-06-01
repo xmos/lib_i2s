@@ -1,6 +1,11 @@
 I2S library change log
 ======================
 
+3.0.0
+-----
+
+  * REMOVED: Combined I2S and TDM master
+
 2.4.0
 -----
 
