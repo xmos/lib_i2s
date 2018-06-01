@@ -210,7 +210,7 @@ static void i2s_master0(client i2s_callback_if i2s_i,
     }
 }
 
-// This function is just to avoid unused static function warnings for i2s_tdm_master0,
+// This function is just to avoid unused static function warnings for i2s_master0,
 // it should never be called.
 inline void i2s_master1(client interface i2s_callback_if i,
         out buffered port:32 i2s_dout[num_i2s_out],

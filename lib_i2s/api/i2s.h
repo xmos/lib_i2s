@@ -334,61 +334,11 @@ void tdm_master(client interface i2s_callback_if tdm_i,
         size_t num_in,
         clock clk);
 
-/** I2S master + TDM master component.
- *
- *  This task performs I2S and TDM
- *  on the provided pins. The signals need to be synchronized.
- *  It will perform callbacks over
- *  the i2s_callback_if interface to get/receive data from the application
- *  using this component.
- *
- *  The component assumes that the bit clock of the TDM signal is the
- *  same as the master clock of the I2S signal.
- *
- *  The component performs I2S master so will drive the word clock and
- *  bit clock lines. It will also acts as TDM master and drives the fsync
- *  signal.
- *
- *  \param tdm_i          The TDM callback interface to connect to
- *                        the application
- *  \param i2s_dout       An array of I2S data output ports
- *  \param num_i2s_out    The number of I2S output data ports
- *  \param i2s_din        An array of I2S data input ports
- *  \param num_i2s_in     The number of I2S input data ports
- *  \param i2s_bclk       The I2S bit clock output port
- *  \param i2s_lrclk      The I2S word clock output port
- *  \param tdm_fsync      The TDM frame sync output port
- *  \param tdm_dout       An array of TDM data output ports
- *  \param num_tdm_out    The number of TDM output data ports
- *  \param tdm_din        An array of TDM data input ports
- *  \param num_tdm_in     The number of TDM input data ports
- *  \param bclk           A clock that will get configured for use with
- *                        the I2S bit clock
- *  \param mclk           The clock connected to the master clock frequency.
- *                        Usually this should be configured to be driven by
- *                        an incoming master system clock. This clock is also
- *                        used as the TDM bit clock.
- */
-void i2s_tdm_master(client interface i2s_callback_if tdm_i,
-        out buffered port:32 i2s_dout[num_i2s_out],
-        static const size_t num_i2s_out,
-        in buffered port:32 i2s_din[num_i2s_in],
-        static const size_t num_i2s_in,
-        out buffered port:32 i2s_bclk,
-        out buffered port:32 i2s_lrclk,
-        out buffered port:32 tdm_fsync,
-        out buffered port:32 tdm_dout[num_tdm_out],
-        size_t num_tdm_out,
-        in buffered port:32 tdm_din[num_tdm_in],
-        size_t num_tdm_in,
-        clock bclk,
-        clock mclk);
 
 #include <i2s_master_impl.h>
 #include <i2s_frame_master_impl.h>
 #include <i2s_slave_impl.h>
 #include <i2s_frame_slave_impl.h>
 #include <tdm_master_impl.h>
-#include <i2s_tdm_master_impl.h>
 
 #endif // _i2s_h_
