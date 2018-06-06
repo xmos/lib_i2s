@@ -1,3 +1,4 @@
+# Copyright (c) 2016-2018, XMOS Ltd, All rights reserved
 import xmostest, os, subprocess, re, shutil
 
 sr_range = (96000, 192000)
