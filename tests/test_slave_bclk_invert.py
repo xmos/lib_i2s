@@ -1,5 +1,4 @@
 # Copyright (c) 2015-2018, XMOS Ltd, All rights reserved
-#!/usr/bin/env python
 import xmostest
 from i2s_slave_checker import I2SSlaveChecker
 from i2s_slave_checker import Clock
