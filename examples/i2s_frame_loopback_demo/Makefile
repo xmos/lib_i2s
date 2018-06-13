@@ -9,7 +9,7 @@ TARGET = XR-AUDIO-216-MC
 APP_NAME = i2s_frame_loopback_demo
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = lib_gpio lib_i2c lib_i2s lib_logging
+USED_MODULES = lib_gpio(>=1.1.0) lib_i2c(>=5.0.0) lib_i2s(>=3.0.0) lib_logging(>=2.1.0)
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:

@@ -446,31 +446,11 @@ and tasks can be be found
 in the  :ref:`XMOS Programming Guide<programming_guide>`.
 
 A template application task is shown below. The specific contents of
-each callback will depend on the application::
+each callback will depend on the application.
 
-  [[distributable]]
-  void my_application(server i2s_callback_if i2s) {
-  while (1) {
-    select {
-    case i2s.init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config):
-      i2s_config.mclk_to_bclk_ratio = 2;
-      i2c_config.mode = I2S_MODE_LEFT_JUSTIFIED;
-      ...
-      break;
-
-    case i2s.restart_check() -> i2s_restart_t restart:
-      ...
-      break;
-
-    case i2s.receive(size_t index, int32_t sample):
-      ...
-      break;
-
-    case i2s.send(size_t index) -> int32_t sample:
-      ...
-      break;
-    }
-  }
+.. literalinclude:: simple_i2s_master.xc
+   :start-on: [[distributable]]
+   :end-before: out buffered
 
 The send/receive callbacks pass a channel index parameter to the
 application. This channel maps to the data signals as shown in
@@ -488,26 +468,11 @@ The |I2S| frame-based master task (only supported on xCORE-200) is
 instantiated as a parallel task that run in a ``par`` statement. The application
 can connect via the ``i2s_frame_callback_if`` interface connection. For example,
 the following code instantiates an |I2S| frame-based master component and
-connects to it::
+connects to it.
 
-  out buffered port:32 p_dout[2] = {XS1_PORT_1D, XS1_PORT_1E};
-  in buffered port:32 p_din[2]  = {XS1_PORT_1I, XS1_PORT_1K};
-  port p_mclk  = XS1_PORT_1M;
-  out buffered port:32 p_bclk  = XS1_PORT_1A;
-  out buffered port:32 p_lrclk = XS1_PORT_1C;
-
-  clock bclk = XS1_CLKBLK_1;
-
-  int main(void) {
-    i2s_frame_callback_if i_i2s;
-    par {
-      i2s_frame_master(i_i2s, p_dout, 4, p_din, 4,
-               p_bclk, p_lrclk, p_mclk, bclk);
-      my_application(i_i2s);
-    }
-    return 0;
-  }
-
+.. literalinclude:: simple_i2s_frame_master.xc
+   :start-on: out buffered
+   :end-before: // end
 
 |I2S| master usage
 ..................
@@ -515,28 +480,11 @@ connects to it::
 The |I2S| master task is instantiated as a parallel task that run in a
 ``par`` statement. The application can connect via the
 ``i2s_callback_if``  interface connection. For example,
-the following code instantiates an |I2S| master component and connects to it::
+the following code instantiates an |I2S| master component and connects to it.
 
-  out buffered port:32 p_dout[2] = {XS1_PORT_1D, XS1_PORT_1E};
-  in buffered port:32 p_din[2]  = {XS1_PORT_1I, XS1_PORT_1K};
-  port p_mclk  = XS1_PORT_1M;
-  out buffered port:32 p_bclk  = XS1_PORT_1A;
-  out buffered port:32 p_lrclk = XS1_PORT_1C;
-
-  clock mclk = XS1_CLKBLK_1;
-  clock bclk = XS1_CLKBLK_2;
-
-  int main(void) {
-    i2s_callback_if i_i2s;
-    configure_clock_src(mclk, p_mclk);
-    start_clock(mclk);
-    par {
-      i2s_master(i_i2s, p_dout, 2, p_din, 2,
-               p_bclk, p_lrclk, bclk, mclk);
-      my_application(i_i2s);
-    }
-    return 0;
-  }
+.. literalinclude:: simple_i2s_master.xc
+   :start-on: out buffered
+   :end-before: // end
 
 |I2S| frame-based slave usage
 .............................
@@ -544,24 +492,11 @@ the following code instantiates an |I2S| master component and connects to it::
 The |I2S| frame slave task is instantiated as a parallel task that run in a
 ``par`` statement. The application can connect via the
 ``i2s_frame_callback_if``  interface connection. For example,
-the following code instantiates an |I2S| slave component and connects to it::
+the following code instantiates an |I2S| slave component and connects to it.
 
-  out buffered port:32 p_dout[2] = {XS1_PORT_1D, XS1_PORT_1E};
-  in buffered port:32 p_din[2]  = {XS1_PORT_1I, XS1_PORT_1K};
-  in port p_bclk  = XS1_PORT_1A;
-  in port p_lrclk = XS1_PORT_1C;
-
-  clock bclk = XS1_CLKBLK_1;
-
-  int main(void) {
-    par {
-      i2s_frame_slave(i2s_i, p_dout, 2, p_din, 2,
-                p_bclk, p_lrclk, bclk);
-      my_application(i_i2s);
-    }
-    return 0;
-  }
-
+.. literalinclude:: simple_i2s_frame_slave.xc
+   :start-on: out buffered
+   :end-before: // end
 
 |I2S| slave usage
 .................
@@ -569,23 +504,11 @@ the following code instantiates an |I2S| slave component and connects to it::
 The |I2S| slave task is instantiated as a parallel task that run in a
 ``par`` statement. The application can connect via the
 ``i2s_callback_if``  interface connection. For example,
-the following code instantiates an |I2S| slave component and connects to it::
+the following code instantiates an |I2S| slave component and connects to it.
 
-  out buffered port:32 p_dout[2] = {XS1_PORT_1D, XS1_PORT_1E};
-  in buffered port:32 p_din[2]  = {XS1_PORT_1I, XS1_PORT_1K};
-  in port p_bclk  = XS1_PORT_1A;
-  in port p_lrclk = XS1_PORT_1C;
-
-  clock bclk = XS1_CLKBLK_1;
-
-  int main(void) {
-    par {
-      i2s_slave(i2s_i, p_dout, 2, p_din, 2,
-                p_bclk, p_lrclk, bclk);
-      my_application(i_i2s);
-    }
-    return 0;
-  }
+.. literalinclude:: simple_i2s_slave.xc
+   :start-on: out buffered
+   :end-before: // end
 
 Slave has an additional config option to sample data and word clock on falling
 edge of bit clock, instead of rising edge. Data is then output on rising edge
@@ -598,26 +521,11 @@ TDM usage
 The TDM master task is instantiated as a parallel task that run in a
 ``par`` statement. The application can connect via the
 ``i2s_callback_if``  interface connection. For example,
-the following code instantiates an TDM master component and connects to it::
+the following code instantiates an TDM master component and connects to it.
 
-
-  out buffered port:32 p_dout[2] = {XS1_PORT_1D, XS1_PORT_1E};
-  in buffered port:32 p_din[2]  = {XS1_PORT_1I, XS1_PORT_1K};
-  in port p_bclk  = XS1_PORT_1A;
-  out buffered port:32 p_fsync = XS1_PORT_1C;
-
-  clock bclk = XS1_CLKBLK_1;
-
-  int main(void) {
-    i2s_callback_if i_i2s;
-    configure_clock_src(bclk, p_bclk);
-    par {
-      tdm_master(i2s_i, p_fsync, p_dout, 2, p_din, 2, bclk);
-      my_application(i_i2s);
-    }
-    return 0;
-  }
-
+.. literalinclude:: simple_tdm_master.xc
+   :start-on: out buffered
+   :end-before: // end
 
 .. _i2s_channel_map:
 
