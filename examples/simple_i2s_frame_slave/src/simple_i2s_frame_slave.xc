@@ -1,4 +1,8 @@
 // Copyright (c) 2018, XMOS Ltd, All rights reserved
+
+/* A simple application example used for code snippets in the library
+ * documentation.
+ */
 #include <platform.h>
 #include <xs1.h>
 #include "i2s.h"
@@ -18,7 +22,7 @@ void my_application(server i2s_frame_callback_if i_i2s) {
         // Complete setup
         break;
       case i_i2s.restart_check() -> i2s_restart_t restart:
-        // Inform I2S master whether the bus needs resetting
+        // Inform the I2S slave whether it should restart or exit
         break;
       case i_i2s.receive(size_t num_in, int32_t samples[num_in]):
         // Handle a received sample
