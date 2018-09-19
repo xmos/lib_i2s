@@ -12,7 +12,6 @@ on tile[0]: in port p_mclk = XS1_PORT_1F;
 on tile[0]: out buffered port:32 p_dout[4] = {XS1_PORT_1M, XS1_PORT_1N, XS1_PORT_1O, XS1_PORT_1P};
 on tile[0]: in buffered port:32 p_din[4] = {XS1_PORT_1I, XS1_PORT_1J, XS1_PORT_1K, XS1_PORT_1L};
 
-on tile[0]: clock mclk = XS1_CLKBLK_1;
 on tile[0]: clock bclk = XS1_CLKBLK_2;
 
 on tile[0]: port p_i2c = XS1_PORT_4A;
