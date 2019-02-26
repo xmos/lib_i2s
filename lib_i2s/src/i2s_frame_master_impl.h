@@ -18,7 +18,8 @@ static void i2s_frame_init_ports(
         unsigned mclk_bclk_ratio){
 
     set_clock_on(bclk);
-    configure_clock_src_divide(bclk, p_mclk, mclk_bclk_ratio >> 1);
+    //configure_clock_src_divide(bclk, p_mclk, mclk_bclk_ratio >> 1);
+    configure_clock_xcore(bclk, 80);
     configure_port_clock_output(p_bclk, bclk);
     configure_out_port(p_lrclk, bclk, 1);
     for (size_t i = 0; i < num_out; i++)
