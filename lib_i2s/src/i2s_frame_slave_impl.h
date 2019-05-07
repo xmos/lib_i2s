@@ -14,7 +14,7 @@ static void i2s_frame_slave_init_ports(
         clock bclk){
     set_clock_on(bclk);
     configure_clock_src(bclk, p_bclk);
-    configure_out_port(p_lrclk, bclk, 1);
+    configure_in_port(p_lrclk, bclk);
     for (size_t i = 0; i < num_out; i++)
         configure_out_port(p_dout[i], bclk, 0);
     for (size_t i = 0; i < num_in; i++)
