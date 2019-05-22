@@ -4,7 +4,7 @@ I2S library change log
 3.0.1
 -----
 
-  * CHANGE: Configure LR clock for input at initialisation.
+  * CHANGE: Configure LR clock of frame-based I2S slave for input at initialisation.
 
 3.0.0
 -----
