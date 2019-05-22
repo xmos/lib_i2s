@@ -1,6 +1,11 @@
 I2S library change log
 ======================
 
+3.0.1
+-----
+
+  * CHANGE: Configure LR clock for input at initialisation.
+
 3.0.0
 -----
 
