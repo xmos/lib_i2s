@@ -6,6 +6,11 @@
 #include "i2s.h"
 #include "xassert.h"
 
+#ifndef XCORE_BCLOCK_DIV
+    #warning "I2S xCore bit clock div not defined, setting to 80 (491.52 MHz / (2*80))"
+    #define XCORE_BCLOCK_DIV 80
+#endif
+
 static void i2s_frame_init_ports(
         out buffered port:32 (&?p_dout)[num_out],
         static const size_t num_out,
@@ -19,7 +24,7 @@ static void i2s_frame_init_ports(
 
     set_clock_on(bclk);
     //configure_clock_src_divide(bclk, p_mclk, mclk_bclk_ratio >> 1);
-    configure_clock_xcore(bclk, 80);
+    configure_clock_xcore(bclk, XCORE_BCLOCK_DIV);
     configure_port_clock_output(p_bclk, bclk);
     configure_out_port(p_lrclk, bclk, 1);
     for (size_t i = 0; i < num_out; i++)
