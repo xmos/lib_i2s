@@ -1,8 +1,0 @@
-def use_module(bld):
-    depends_on = ['lib_xassert(>=3.0.0)', 'lib_logging(>=2.1.0)']
-    bld.env.MODULE_XCC_FLAGS = bld.env.XCC_FLAGS + ['-O3', '-g']
-    bld.module(
-        source='src/i2s_dummy_impl.xc',
-        includes=['api'],
-        depends_on=depends_on,
-        version='2.4.0')
