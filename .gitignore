@@ -16,6 +16,7 @@
 *.log
 .*.swp
 test_results.csv
+**/.venv/**
 
 # waf build files
 .lock-waf_*
