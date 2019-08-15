@@ -4,7 +4,7 @@ getApproval()
 
 pipeline {
   agent {
-    label 'x86_64&&brew'
+    label 'x86_64&&brew&&macOS'
   }
   environment {
     REPO = 'lib_i2s'
