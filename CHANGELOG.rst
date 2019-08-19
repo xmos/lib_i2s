@@ -1,6 +1,12 @@
 I2S library change log
 ======================
 
+3.0.2
+-----
+
+  * CHANGE: Renamed example application directories to have standard "app"
+    prefix.
+
 3.0.1
 -----
 
