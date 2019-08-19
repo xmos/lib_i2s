@@ -11,6 +11,8 @@ I2S library change log
 
   * CHANGE: At initialisation, configure LR clock of frame-based I2S slave for
     input.
+  * CHANGE: Renamed example application directories to have standard "app"
+    prefix.
 
 3.0.0
 -----
