@@ -5,4 +5,4 @@ def use_module(bld):
         source='src/i2s_dummy_impl.xc',
         includes=['api'],
         depends_on=depends_on,
-        version='3.0.2')
+        version='2.4.0')
