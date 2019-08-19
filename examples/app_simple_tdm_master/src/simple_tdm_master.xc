@@ -1,4 +1,4 @@
-// Copyright (c) 2018, XMOS Ltd, All rights reserved
+// Copyright (c) 2018-2019, XMOS Ltd, All rights reserved
 
 /* A simple application example used for code snippets in the library
  * documentation.
@@ -22,7 +22,7 @@ void my_application(server i2s_callback_if i_i2s) {
         // Complete setup
         break;
       case i_i2s.restart_check() -> i2s_restart_t restart:
-        // Inform the I2S master whether it should restart or exit
+        // Inform the TDM master whether it should restart or exit
         break;
       case i_i2s.receive(size_t index, int32_t sample):
         // Handle a received sample
@@ -35,22 +35,18 @@ void my_application(server i2s_callback_if i_i2s) {
 }
 
 out buffered port:32 p_dout[2] = {XS1_PORT_1D, XS1_PORT_1E};
-in buffered port:32 p_din[2] = {XS1_PORT_1I, XS1_PORT_1J};
-port p_mclk = XS1_PORT_1M;
-out buffered port:32 p_bclk = XS1_PORT_1A;
-out buffered port:32 p_lrclk = XS1_PORT_1C;
+in buffered port:32 p_din[2] = {XS1_PORT_1I, XS1_PORT_1K};
+in port p_bclk = XS1_PORT_1A;
+out buffered port:32 p_fsync = XS1_PORT_1C;
 
 clock bclk = XS1_CLKBLK_1;
-clock mclk = XS1_CLKBLK_2;
 
-int main() {
-  interface i2s_callback_if i_i2s;
-
-  configure_clock_src(mclk, p_mclk);
-  start_clock(mclk);
+int main(void) {
+  i2s_callback_if i_i2s;
+  configure_clock_src(bclk, p_bclk);
 
   par {
-    i2s_master(i_i2s, p_dout, 2, p_din, 2, p_bclk, p_lrclk, bclk, mclk);
+    tdm_master(i_i2s, p_fsync, p_dout, 2, p_din, 2, bclk);
     my_application(i_i2s);
   }
   return 0;

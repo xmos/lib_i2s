@@ -4,7 +4,7 @@ getApproval()
 
 pipeline {
   agent {
-    label 'x86_64&&brew'
+    label 'x86_64&&brew&&macOS'
   }
   environment {
     REPO = 'lib_i2s'
@@ -22,11 +22,21 @@ pipeline {
     upstream(
       upstreamProjects:
         (env.JOB_NAME.contains('PR-') ?
+          "../lib_gpio/${env.CHANGE_TARGET}," +
+          "../lib_i2c/${env.CHANGE_TARGET}," +
           "../lib_logging/${env.CHANGE_TARGET}," +
-          "../lib_xassert/${env.CHANGE_TARGET}"
+          "../lib_xassert/${env.CHANGE_TARGET}," +
+          "../tools_released/${env.CHANGE_TARGET}," +
+          "../tools_xmostest/${env.CHANGE_TARGET}," +
+          "../xdoc_released/${env.CHANGE_TARGET}"
         :
+          "../lib_gpio/${env.BRANCH_NAME}," +
+          "../lib_i2c/${env.BRANCH_NAME}," +
           "../lib_logging/${env.BRANCH_NAME}," +
-          "../lib_xassert/${env.BRANCH_NAME}"),
+          "../lib_xassert/${env.BRANCH_NAME}," +
+          "../tools_released/${env.BRANCH_NAME}," +
+          "../tools_xmostest/${env.BRANCH_NAME}," +
+          "../xdoc_released/${env.BRANCH_NAME}"),
       threshold: hudson.model.Result.SUCCESS
     )
   }
@@ -44,11 +54,6 @@ pipeline {
         xcoreLibraryChecks("${REPO}")
       }
     }
-    stage('Tests') {
-      steps {
-        runXmostest("${REPO}", 'tests')
-      }
-    }
     stage('xCORE builds') {
       steps {
         dir("${REPO}") {
@@ -58,6 +63,11 @@ pipeline {
             runXdoc('doc')
           }
         }
+      }
+    }
+    stage('Tests') {
+      steps {
+        runXmostest("${REPO}", 'tests')
       }
     }
   }

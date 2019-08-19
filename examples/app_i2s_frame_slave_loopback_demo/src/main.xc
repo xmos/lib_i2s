@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018, XMOS Ltd, All rights reserved
+// Copyright (c) 2014-2019, XMOS Ltd, All rights reserved
 #include <platform.h>
 #include <xs1.h>
 #include "i2s.h"
