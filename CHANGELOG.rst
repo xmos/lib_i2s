@@ -13,6 +13,7 @@ I2S library change log
     input.
   * CHANGE: Renamed example application directories to have standard "app"
     prefix.
+  * ADDED: I2S_BCLOCK_FROM_XCORE and I2S_XCORE_BLOCK_DIV optional #ifdefs
 
 3.0.0
 -----
