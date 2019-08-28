@@ -1,100 +1,14 @@
-import xwaf.utils.configs as config_utils
-
-
-def options(ctx):
-    ctx.add_option('--config', action='store', default='')
-
+def options(opt):
+    opt.load('xwaf.xcommon')
 
 def configure(conf):
-    def make_config(name, flags):
-        conf.setenv(name)
-        conf.load('xwaf.compiler_xcc')
-        conf.env.XCC_FLAGS = flags
-
-    for key, value in CONFIGS.iteritems():
-        make_config(key, value)
-
+    conf.load('xwaf.xcommon')
 
 def build(bld):
-    if not config_utils.check_build_config(bld, CONFIGS):
-        return
+    bld.do_xcommon()
 
-    bld.env.PROJECT_ROOT = '../../..'
+def dist(ctx):
+    ctx.load('xwaf.xcommon')
 
-    depends_on = ['lib_i2s']
-
-    bld.env.TARGET_ARCH = 'SLICEKIT-A16'
-
-    prog = bld.program(depends_on=depends_on)
-
-
-CONFIGS = {
-    'slave_02': ['-O2', '-g', '-DSLAVE', '-DNUM_OUT=0', '-DNUM_IN=2'],
-    'slave_44': ['-O2', '-g', '-DSLAVE', '-DNUM_OUT=4', '-DNUM_IN=4'],
-    'slave_24': ['-O2', '-g', '-DSLAVE', '-DNUM_OUT=2', '-DNUM_IN=4'],
-    'master_10': ['-O2', '-g', '-DMASTER', '-DNUM_OUT=1', '-DNUM_IN=0'],
-    'master_42': ['-O2', '-g', '-DMASTER', '-DNUM_OUT=4', '-DNUM_IN=2'],
-    'slave_12': ['-O2', '-g', '-DSLAVE', '-DNUM_OUT=1', '-DNUM_IN=2'],
-    'master_44': ['-O2', '-g', '-DMASTER', '-DNUM_OUT=4', '-DNUM_IN=4'],
-    'slave_20': ['-O2', '-g', '-DSLAVE', '-DNUM_OUT=2', '-DNUM_IN=0'],
-    'master_12': ['-O2', '-g', '-DMASTER', '-DNUM_OUT=1', '-DNUM_IN=2'],
-    'slave_21': ['-O2', '-g', '-DSLAVE', '-DNUM_OUT=2', '-DNUM_IN=1'],
-    'slave_03': ['-O2', '-g', '-DSLAVE', '-DNUM_OUT=0', '-DNUM_IN=3'],
-    'master_20': ['-O2', '-g', '-DMASTER', '-DNUM_OUT=2', '-DNUM_IN=0'],
-    'master_02': ['-O2', '-g', '-DMASTER', '-DNUM_OUT=0', '-DNUM_IN=2'],
-    'slave_40': ['-O2', '-g', '-DSLAVE', '-DNUM_OUT=4', '-DNUM_IN=0'],
-    'slave_34': ['-O2', '-g', '-DSLAVE', '-DNUM_OUT=3', '-DNUM_IN=4'],
-    'master_21': ['-O2', '-g', '-DMASTER', '-DNUM_OUT=2', '-DNUM_IN=1'],
-    'master_03': ['-O2', '-g', '-DMASTER', '-DNUM_OUT=0', '-DNUM_IN=3'],
-    'slave_11': ['-O2', '-g', '-DSLAVE', '-DNUM_OUT=1', '-DNUM_IN=1'],
-    'slave_22': ['-O2', '-g', '-DSLAVE', '-DNUM_OUT=2', '-DNUM_IN=2'],
-    'slave_13': ['-O2', '-g', '-DSLAVE', '-DNUM_OUT=1', '-DNUM_IN=3'],
-    'slave_41': ['-O2', '-g', '-DSLAVE', '-DNUM_OUT=4', '-DNUM_IN=1'],
-    'master_40': ['-O2', '-g', '-DMASTER', '-DNUM_OUT=4', '-DNUM_IN=0'],
-    'master_34': ['-O2', '-g', '-DMASTER', '-DNUM_OUT=3', '-DNUM_IN=4'],
-    'master_22': ['-O2', '-g', '-DMASTER', '-DNUM_OUT=2', '-DNUM_IN=2'],
-    'master_13': ['-O2', '-g', '-DMASTER', '-DNUM_OUT=1', '-DNUM_IN=3'],
-    'master_41': ['-O2', '-g', '-DMASTER', '-DNUM_OUT=4', '-DNUM_IN=1'],
-    'master_11': ['-O2', '-g', '-DMASTER', '-DNUM_OUT=1', '-DNUM_IN=1'],
-    'slave_42': ['-O2', '-g', '-DSLAVE', '-DNUM_OUT=4', '-DNUM_IN=2'],
-    'slave_23': ['-O2', '-g', '-DSLAVE', '-DNUM_OUT=2', '-DNUM_IN=3'],
-    'slave_30': ['-O2', '-g', '-DSLAVE', '-DNUM_OUT=3', '-DNUM_IN=0'],
-    'slave_31': ['-O2', '-g', '-DSLAVE', '-DNUM_OUT=3', '-DNUM_IN=1'],
-    'slave_04': ['-O2', '-g', '-DSLAVE', '-DNUM_OUT=0', '-DNUM_IN=4'],
-    'master_23': ['-O2', '-g', '-DMASTER', '-DNUM_OUT=2', '-DNUM_IN=3'],
-    'master_14': ['-O2', '-g', '-DMASTER', '-DNUM_OUT=1', '-DNUM_IN=4'],
-    'master_30': ['-O2', '-g', '-DMASTER', '-DNUM_OUT=3', '-DNUM_IN=0'],
-    'slave_43': ['-O2', '-g', '-DSLAVE', '-DNUM_OUT=4', '-DNUM_IN=3'],
-    'master_31': ['-O2', '-g', '-DMASTER', '-DNUM_OUT=3', '-DNUM_IN=1'],
-    'master_04': ['-O2', '-g', '-DMASTER', '-DNUM_OUT=0', '-DNUM_IN=4'],
-    'slave_32': ['-O2', '-g', '-DSLAVE', '-DNUM_OUT=3', '-DNUM_IN=2'],
-    'slave_14': ['-O2', '-g', '-DSLAVE', '-DNUM_OUT=1', '-DNUM_IN=4'],
-    'master_43': ['-O2', '-g', '-DMASTER', '-DNUM_OUT=4', '-DNUM_IN=3'],
-    'master_32': ['-O2', '-g', '-DMASTER', '-DNUM_OUT=3', '-DNUM_IN=2'],
-    'tdm_108': [
-        '-O2', '-g', '-DTDM', '-DTDM_CHANS_PER_FRAME=8', '-DNUM_OUT=1',
-        '-DNUM_IN=0'
-    ],
-    'tdm_018': [
-        '-O2', '-g', '-DTDM', '-DTDM_CHANS_PER_FRAME=8', '-DNUM_OUT=0',
-        '-DNUM_IN=1'
-    ],
-    'tdm_118': [
-        '-O2', '-g', '-DTDM', '-DTDM_CHANS_PER_FRAME=8', '-DNUM_OUT=1',
-        '-DNUM_IN=1'
-    ],
-    'slave_00': ['-O2', '-g', '-DSLAVE', '-DNUM_OUT=0', '-DNUM_IN=0'],
-    'slave_33': ['-O2', '-g', '-DSLAVE', '-DNUM_OUT=3', '-DNUM_IN=3'],
-    'slave_01': ['-O2', '-g', '-DSLAVE', '-DNUM_OUT=0', '-DNUM_IN=1'],
-    'tdm_224': [
-        '-O2', '-g', '-DTDM', '-DTDM_CHANS_PER_FRAME=4', '-DNUM_OUT=2',
-        '-DNUM_IN=2'
-    ],
-    'master_33': ['-O2', '-g', '-DMASTER', '-DNUM_OUT=3', '-DNUM_IN=3'],
-    'slave_10': ['-O2', '-g', '-DSLAVE', '-DNUM_OUT=1', '-DNUM_IN=0'],
-    'master_00': ['-O2', '-g', '-DMASTER', '-DNUM_OUT=0', '-DNUM_IN=0'],
-    'master_24': ['-O2', '-g', '-DMASTER', '-DNUM_OUT=2', '-DNUM_IN=4'],
-    'master_01': ['-O2', '-g', '-DMASTER', '-DNUM_OUT=0', '-DNUM_IN=1'],
-}
-
-config_utils.register_configs(CONFIGS)
+def distcheck(ctx):
+    ctx.load('xwaf.xcommon')

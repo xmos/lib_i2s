@@ -1,84 +1,14 @@
-import xwaf.utils.configs as config_utils
-
-
-def options(ctx):
-    ctx.add_option('--config', action='store', default='')
-
+def options(opt):
+    opt.load('xwaf.xcommon')
 
 def configure(conf):
-    def make_config(name, flags):
-        conf.setenv(name)
-        conf.load('xwaf.compiler_xcc')
-        conf.env.XCC_FLAGS = flags
-
-    for key, value in CONFIGS.iteritems():
-        make_config(key, value)
-
+    conf.load('xwaf.xcommon')
 
 def build(bld):
-    if not config_utils.check_build_config(bld, CONFIGS):
-        return
+    bld.do_xcommon()
 
-    bld.env.PROJECT_ROOT = '../../..'
+def dist(ctx):
+    ctx.load('xwaf.xcommon')
 
-    depends_on = ['lib_i2s']
-
-    bld.env.TARGET_ARCH = 'SLICEKIT-L16'
-
-    prog = bld.program(depends_on=depends_on)
-
-
-CONFIGS = {
-    'nightly_40': ['-O3', '-g', '-DNUM_OUT=4', '-DNUM_IN=0'],
-    'smoke_14': ['-O3', '-g', '-DNUM_OUT=1', '-DNUM_IN=4', '-DSMOKE'],
-    'nightly_31': ['-O3', '-g', '-DNUM_OUT=3', '-DNUM_IN=1'],
-    'nightly_22': ['-O3', '-g', '-DNUM_OUT=2', '-DNUM_IN=2'],
-    'nightly_13': ['-O3', '-g', '-DNUM_OUT=1', '-DNUM_IN=3'],
-    'nightly_11': ['-O3', '-g', '-DNUM_OUT=1', '-DNUM_IN=1'],
-    'nightly_41': ['-O3', '-g', '-DNUM_OUT=4', '-DNUM_IN=1'],
-    'nightly_42': ['-O3', '-g', '-DNUM_OUT=4', '-DNUM_IN=2'],
-    'smoke_00': ['-O3', '-g', '-DNUM_OUT=0', '-DNUM_IN=0', '-DSMOKE'],
-    'smoke_33': ['-O3', '-g', '-DNUM_OUT=3', '-DNUM_IN=3', '-DSMOKE'],
-    'smoke_24': ['-O3', '-g', '-DNUM_OUT=2', '-DNUM_IN=4', '-DSMOKE'],
-    'nightly_23': ['-O3', '-g', '-DNUM_OUT=2', '-DNUM_IN=3'],
-    'smoke_01': ['-O3', '-g', '-DNUM_OUT=0', '-DNUM_IN=1', '-DSMOKE'],
-    'nightly_30': ['-O3', '-g', '-DNUM_OUT=3', '-DNUM_IN=0'],
-    'smoke_11': ['-O3', '-g', '-DNUM_OUT=1', '-DNUM_IN=1', '-DSMOKE'],
-    'smoke_44': ['-O3', '-g', '-DNUM_OUT=4', '-DNUM_IN=4', '-DSMOKE'],
-    'smoke_10': ['-O3', '-g', '-DNUM_OUT=1', '-DNUM_IN=0', '-DSMOKE'],
-    'smoke_30': ['-O3', '-g', '-DNUM_OUT=3', '-DNUM_IN=0', '-DSMOKE'],
-    'nightly_04': ['-O3', '-g', '-DNUM_OUT=0', '-DNUM_IN=4'],
-    'nightly_20': ['-O3', '-g', '-DNUM_OUT=2', '-DNUM_IN=0'],
-    'smoke_02': ['-O3', '-g', '-DNUM_OUT=0', '-DNUM_IN=2', '-DSMOKE'],
-    'nightly_43': ['-O3', '-g', '-DNUM_OUT=4', '-DNUM_IN=3'],
-    'nightly_32': ['-O3', '-g', '-DNUM_OUT=3', '-DNUM_IN=2'],
-    'nightly_14': ['-O3', '-g', '-DNUM_OUT=1', '-DNUM_IN=4'],
-    'smoke_12': ['-O3', '-g', '-DNUM_OUT=1', '-DNUM_IN=2', '-DSMOKE'],
-    'smoke_20': ['-O3', '-g', '-DNUM_OUT=2', '-DNUM_IN=0', '-DSMOKE'],
-    'smoke_43': ['-O3', '-g', '-DNUM_OUT=4', '-DNUM_IN=3', '-DSMOKE'],
-    'smoke_21': ['-O3', '-g', '-DNUM_OUT=2', '-DNUM_IN=1', '-DSMOKE'],
-    'smoke_03': ['-O3', '-g', '-DNUM_OUT=0', '-DNUM_IN=3', '-DSMOKE'],
-    'nightly_34': ['-O3', '-g', '-DNUM_OUT=3', '-DNUM_IN=4'],
-    'smoke_34': ['-O3', '-g', '-DNUM_OUT=3', '-DNUM_IN=4', '-DSMOKE'],
-    'smoke_32': ['-O3', '-g', '-DNUM_OUT=3', '-DNUM_IN=2', '-DSMOKE'],
-    'nightly_00': ['-O3', '-g', '-DNUM_OUT=0', '-DNUM_IN=0'],
-    'nightly_33': ['-O3', '-g', '-DNUM_OUT=3', '-DNUM_IN=3'],
-    'smoke_22': ['-O3', '-g', '-DNUM_OUT=2', '-DNUM_IN=2', '-DSMOKE'],
-    'smoke_13': ['-O3', '-g', '-DNUM_OUT=1', '-DNUM_IN=3', '-DSMOKE'],
-    'smoke_41': ['-O3', '-g', '-DNUM_OUT=4', '-DNUM_IN=1', '-DSMOKE'],
-    'nightly_01': ['-O3', '-g', '-DNUM_OUT=0', '-DNUM_IN=1'],
-    'nightly_10': ['-O3', '-g', '-DNUM_OUT=1', '-DNUM_IN=0'],
-    'smoke_42': ['-O3', '-g', '-DNUM_OUT=4', '-DNUM_IN=2', '-DSMOKE'],
-    'nightly_02': ['-O3', '-g', '-DNUM_OUT=0', '-DNUM_IN=2'],
-    'nightly_44': ['-O3', '-g', '-DNUM_OUT=4', '-DNUM_IN=4'],
-    'smoke_40': ['-O3', '-g', '-DNUM_OUT=4', '-DNUM_IN=0', '-DSMOKE'],
-    'nightly_24': ['-O3', '-g', '-DNUM_OUT=2', '-DNUM_IN=4'],
-    'smoke_23': ['-O3', '-g', '-DNUM_OUT=2', '-DNUM_IN=3', '-DSMOKE'],
-    'nightly_12': ['-O3', '-g', '-DNUM_OUT=1', '-DNUM_IN=2'],
-    'smoke_31': ['-O3', '-g', '-DNUM_OUT=3', '-DNUM_IN=1', '-DSMOKE'],
-    'smoke_04': ['-O3', '-g', '-DNUM_OUT=0', '-DNUM_IN=4', '-DSMOKE'],
-    'nightly_21': ['-O3', '-g', '-DNUM_OUT=2', '-DNUM_IN=1'],
-    'nightly_03': ['-O3', '-g', '-DNUM_OUT=0', '-DNUM_IN=3'],
-}
-
-config_utils.register_configs(CONFIGS)
+def distcheck(ctx):
+    ctx.load('xwaf.xcommon')
