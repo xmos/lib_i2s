@@ -10,7 +10,7 @@ TARGET = XR-AUDIO-216-MC
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
 # the project name
-APP_NAME = 
+APP_NAME =
 
 # The USED_MODULES variable lists other module used by the application.
 USED_MODULES = lib_logging lib_i2c lib_i2s
@@ -37,10 +37,6 @@ $(foreach sr,768000 384000 192000,\
     ) \
   ) \
 )
-
-# The VERBOSE variable, if set to 1, enables verbose output from the make system.
-VERBOSE = 0
-
 
 test: bin/i2s_loopback_demo.xe
 	xsim bin/i2s_loopback_demo.xe --plugin LoopbackPort.dll '-port tile[0] XS1_PORT_1G 1 0 -port tile[0] XS1_PORT_1A 1 0'
