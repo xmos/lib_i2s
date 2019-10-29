@@ -1,10 +1,20 @@
-// Copyright (c) 2016-2018, XMOS Ltd, All rights reserved
+// Copyright (c) 2016-2019, XMOS Ltd, All rights reserved
 #if defined(__XS2A__)
 
 #include <xs1.h>
 #include <xclib.h>
 #include "i2s.h"
 #include "xassert.h"
+
+#ifdef I2S_BCLOCK_FROM_XCORE
+    #ifndef I2S_XCORE_BCLOCK_DIV
+        #error "If clocking I2S bclock from xCore clock, I2S_XCORE_BCLOCK_DIV must also be defined"
+        // Suggested value for 2 Channels @ 48 KHz:
+        // Clock speed: 491.52 MHz
+        // Div: 80
+        // 491.52 / (2*80) = 3.072 MHz
+    #endif
+#endif
 
 static void i2s_frame_init_ports(
         out buffered port:32 (&?p_dout)[num_out],
@@ -18,7 +28,11 @@ static void i2s_frame_init_ports(
         unsigned mclk_bclk_ratio){
 
     set_clock_on(bclk);
+#ifdef I2S_BCLOCK_FROM_XCORE
+    configure_clock_xcore(bclk, I2S_XCORE_BCLOCK_DIV);
+#else
     configure_clock_src_divide(bclk, p_mclk, mclk_bclk_ratio >> 1);
+#endif
     configure_port_clock_output(p_bclk, bclk);
     configure_out_port(p_lrclk, bclk, 1);
     for (size_t i = 0; i < num_out; i++)

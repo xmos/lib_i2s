@@ -6,7 +6,7 @@ TARGET = XR-AUDIO-216-MC
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
 # the project name
-APP_NAME = 
+APP_NAME =
 
 # The USED_MODULES variable lists other module used by the application.
 USED_MODULES = lib_gpio(>=1.1.0) lib_i2c(>=5.0.0) lib_i2s(>=3.0.0)
@@ -17,10 +17,6 @@ USED_MODULES = lib_gpio(>=1.1.0) lib_i2c(>=5.0.0) lib_i2s(>=3.0.0)
 # If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
 # xcc for the final link (mapping) stage.
 XCC_FLAGS = -O3 -report -g
-
-# The VERBOSE variable, if set to 1, enables verbose output from the make system.
-VERBOSE = 0
-
 
 test: bin/i2s_loopback_demo.xe
 	xsim bin/i2s_loopback_demo.xe --plugin LoopbackPort.dll '-port tile[0] XS1_PORT_1D 1 0 -port tile[1] XS1_PORT_1E 1 0'
