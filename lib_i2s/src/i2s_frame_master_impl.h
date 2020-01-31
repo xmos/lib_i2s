@@ -41,6 +41,24 @@ static void i2s_frame_init_ports(
         configure_in_port(p_din[i], bclk);
 }
 
+static void i2s_frame_init_ports_internal_clock(
+        out buffered port:32 (&?p_dout)[num_out],
+        static const size_t num_out,
+        in buffered port:32 (&?p_din)[num_in],
+        static const size_t num_in,
+        out port p_bclk,
+        out buffered port:32 p_lrclk,
+        clock bclk
+        ){
+
+    configure_port_clock_output(p_bclk, bclk);
+    configure_out_port(p_lrclk, bclk, 1);
+    for (size_t i = 0; i < num_out; i++)
+        configure_out_port(p_dout[i], bclk, 0);
+    for (size_t i = 0; i < num_in; i++)
+        configure_in_port(p_din[i], bclk);
+}
+
 #pragma unsafe arrays
 static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
         out buffered port:32 (&?p_dout)[num_out],
@@ -50,7 +68,6 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
         out port p_bclk,
         clock bclk,
         out buffered port:32 p_lrclk,
-        unsigned ratio,
         i2s_mode_t mode){
 
     int32_t in_samps[16]; //Workaround: should be (num_in << 1) but compiler thinks that isn't const,
@@ -169,14 +186,12 @@ static void i2s_frame_master0(client i2s_frame_callback_if i2s_i,
                 clock bclk){
     while(1){
         i2s_config_t config;
-        unsigned mclk_bclk_ratio_log2;
         i2s_i.init(config, null);
 
         if (isnull(p_dout) && isnull(p_din)) {
             fail("Must provide non-null p_dout or p_din");
         }
 
-        mclk_bclk_ratio_log2 = clz(bitrev(config.mclk_bclk_ratio));
 
         //This ensures that the port time on all the ports is at 0
         i2s_frame_init_ports(p_dout, num_out, p_din, num_in, p_bclk, p_lrclk, bclk,
@@ -185,15 +200,47 @@ static void i2s_frame_master0(client i2s_frame_callback_if i2s_i,
         i2s_restart_t restart =
           i2s_frame_ratio_n(i2s_i, p_dout, num_out, p_din,
                       num_in, p_bclk, bclk, p_lrclk,
-                      mclk_bclk_ratio_log2, config.mode);
+                      config.mode);
 
         if (restart == I2S_SHUTDOWN)
           return;
     }
 }
 
-// This function is just to avoid unused static function warnings for i2s_frame_master0,
-// it should never be called.
+#define i2s_frame_master_internal_clock i2s_frame_master0_internal_clock
+
+static void i2s_frame_master0_internal_clock(client i2s_frame_callback_if i2s_i,
+                out buffered port:32 (&?p_dout)[num_out],
+                static const size_t num_out,
+                in buffered port:32 (&?p_din)[num_in],
+                static const size_t num_in,
+                out port p_bclk,
+                out buffered port:32 p_lrclk,
+                clock bclk){
+    while(1){
+        i2s_config_t config;
+        i2s_i.init(config, null);
+
+        if (isnull(p_dout) && isnull(p_din)) {
+            fail("Must provide non-null p_dout or p_din");
+        }
+
+
+        //This ensures that the port time on all the ports is at 0
+        i2s_frame_init_ports_internal_clock(p_dout, num_out, p_din, num_in, p_bclk, p_lrclk, bclk);
+
+        i2s_restart_t restart =
+          i2s_frame_ratio_n(i2s_i, p_dout, num_out, p_din,
+                      num_in, p_bclk, bclk, p_lrclk,
+                      config.mode);
+
+        if (restart == I2S_SHUTDOWN)
+          return;
+    }
+}
+
+// These functions is just to avoid unused static function warnings for i2s_frame_master0
+// and i2s_frame_master0_internal_clock. They should never be called.
 inline void i2s_frame_master1(client interface i2s_frame_callback_if i,
         out buffered port:32 i2s_dout[num_i2s_out],
         static const size_t num_i2s_out,
@@ -205,6 +252,18 @@ inline void i2s_frame_master1(client interface i2s_frame_callback_if i,
         clock clk_bclk) {
     i2s_frame_master0(i, i2s_dout, num_i2s_out, i2s_din, num_i2s_in,
                 i2s_bclk, i2s_lrclk, p_mclk, clk_bclk);
+}
+
+inline void i2s_frame_master1_internal_clock(client interface i2s_frame_callback_if i,
+        out buffered port:32 i2s_dout[num_i2s_out],
+        static const size_t num_i2s_out,
+        in buffered port:32 i2s_din[num_i2s_in],
+        static const size_t num_i2s_in,
+        out port i2s_bclk,
+        out buffered port:32 i2s_lrclk,
+        clock clk_bclk) {
+    i2s_frame_master0_internal_clock(i, i2s_dout, num_i2s_out, i2s_din, num_i2s_in,
+                i2s_bclk, i2s_lrclk, clk_bclk);
 }
 
 #endif // __XS2A__
