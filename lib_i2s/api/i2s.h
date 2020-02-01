@@ -247,7 +247,7 @@ void i2s_frame_master(client i2s_frame_callback_if i2s_i,
                 in port p_mclk,
                 clock bclk);
 
-void i2s_frame_master_internal_clock(client i2s_frame_callback_if i2s_i,
+void i2s_frame_master_external_clock(client i2s_frame_callback_if i2s_i,
                 out buffered port:32 (&?p_dout)[num_out],
                 static const size_t num_out,
                 in buffered port:32 (&?p_din)[num_in],
