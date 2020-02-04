@@ -269,7 +269,6 @@ void i2s_frame_master(client i2s_frame_callback_if i2s_i,
  *  \param num_in         The number of input data ports
  *  \param p_bclk         The bit clock output port
  *  \param p_lrclk        The word clock output port
- *  \param p_mclk         Input port which supplies the master clock
  *  \param bclk           A clock that is configured externally to be used as the bit clock
  *                        
  */
