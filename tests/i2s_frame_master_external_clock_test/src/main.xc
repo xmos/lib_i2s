@@ -21,6 +21,8 @@ in port  setup_resp_port = XS1_PORT_1M;
 
 #define MAX_CHANNELS 8
 
+#define MAX_NUM_RESTARTS (4)
+
 
 
 
@@ -162,7 +164,11 @@ void app(server interface i2s_frame_callback_if i2s_i){
                  if (current_mode == I2S_MODE_I2S) {
                      current_mode = I2S_MODE_LEFT_JUSTIFIED;
                  }
-                if(num_restarts > 2)
+                 else
+                 {
+                    current_mode = I2S_MODE_I2S;
+                 }
+                if(num_restarts >= MAX_NUM_RESTARTS)
                 {
                     _Exit(1);
                 }
