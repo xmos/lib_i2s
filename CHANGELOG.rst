@@ -1,6 +1,13 @@
 I2S library change log
 ======================
 
+4.1.0
+-----
+
+  * ADDED: Frame based I2S master that needs the bit clock to be set up
+    externally.
+  * REMOVED: I2S_BCLOCK_FROM_XCORE and I2S_XCORE_BLOCK_DIV optional #ifdefs
+
 4.0.0
 -----
 
