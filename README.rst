@@ -113,3 +113,4 @@ Related application notes
 The following application notes use this library:
 
   * AN00162 - Using the |I2S| library
+
