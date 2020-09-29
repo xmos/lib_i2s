@@ -1,7 +1,6 @@
 VERSION = 4.1.0
 
-DEPENDENT_MODULES = lib_xassert(>=4.0.0) \
-                    lib_logging(>=3.0.0)
+DEPENDENT_MODULES = 
 
 MODULE_XCC_FLAGS = $(XCC_FLAGS) \
                    -O2
