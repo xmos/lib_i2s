@@ -110,7 +110,8 @@ static int request_response(
         r = port_in(setup_resp_port);
     port_out(setup_strobe_port, 1);
     port_out(setup_strobe_port, 0);
-    r = port_in(setup_resp_port);
+    for (int i = 0; i < 10 && r; i++, r = port_in(setup_resp_port));
+
     return r;
 }
 
@@ -224,6 +225,8 @@ int main(){
     port_enable(setup_strobe_port);
     port_enable(setup_data_port);
     port_enable(setup_resp_port);
+    port_enable(p_mclk);
+    port_enable(p_bclk);
 
     PAR_JOBS (
         PJOB(i2s_master, (

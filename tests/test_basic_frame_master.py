@@ -33,7 +33,7 @@ def do_master_test(num_in, num_out, testlevel):
     xmostest.run_on_simulator(resources['xsim'], binary,
                               simthreads = [clk, checker],
                               simargs=[],
-                              # simargs=['--trace-to', 'sim.log', '--vcd-tracing', '-o ./i2s_frame_master_test/trace.vcd -tile tile[0] -ports-detailed -functions'],
+                              # simargs=['--trace-to', 'sim.log', '--vcd-tracing', '-o ./i2s_frame_master_test/trace_{tl}_{i}{o}.vcd -tile tile[0] -ports-detailed -functions'.format(i=num_in, o=num_out,tl=testlevel)],
                               suppress_multidrive_messages = True,
                               tester = tester)
 
