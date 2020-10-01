@@ -43,13 +43,13 @@ run at different sampling rates of 192 KHz to 22.1 KHz.
 #""")
 
 
-#    xmostest.register_group("lib_i2s",
-#                            "i2s_backpressure_tests",
-#                            "I2S backpressure tests",
-#    """
-#Tests that ensure that an acceptable level of backpressure can be asserted by
-#the user of the i2s frame based master.
-#""")
+    xmostest.register_group("lib_i2s",
+                            "i2s_backpressure_tests",
+                            "I2S backpressure tests",
+    """
+Tests that ensure that an acceptable level of backpressure can be asserted by
+the user of the i2s frame based master.
+""")
 
     xmostest.runtests()
 
