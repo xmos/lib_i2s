@@ -35,6 +35,8 @@
 #define MASTER_CLOCK_FREQUENCY 24576000
 #endif
 
+#define SETSR(c) asm volatile("setsr %0" : : "n"(c));
+
 /* Ports and clocks used by the application */
 port_t p_lrclk = XS1_PORT_1G;
 port_t p_bclk = XS1_PORT_1H;
@@ -45,30 +47,30 @@ port_t p_din [4] = {XS1_PORT_1I, XS1_PORT_1J, XS1_PORT_1K, XS1_PORT_1L};
 xclock_t mclk = XS1_CLKBLK_1;
 xclock_t bclk = XS1_CLKBLK_2;
 
-static int receive_delay = 0;
-static int send_delay = 0;
+static volatile int receive_delay = 0;
+static volatile int send_delay = 0;
 
 void i2s_init(void *app_data, i2s_config_t *i2s_config)
 {
-  i2s_config->mode = I2S_MODE_I2S;
-  i2s_config->mclk_bclk_ratio = (MASTER_CLOCK_FREQUENCY/SAMPLE_FREQUENCY)/64;
+    i2s_config->mode = I2S_MODE_I2S;
+    i2s_config->mclk_bclk_ratio = (MASTER_CLOCK_FREQUENCY/SAMPLE_FREQUENCY)/64;
 }
 
 void i2s_send(void *app_data, size_t n, int32_t *send_data)
 {
-  for (size_t c= 0; c<n; c++) {
-    send_data[c] = c;
-  }
-  if (send_delay) {
-    delay_ticks(send_delay);
-  }
+    for (size_t c = 0; c < n; c++) {
+        send_data[c] = c;
+    }
+    if (send_delay) {
+        delay_ticks(send_delay);
+    }
 }
 
 void i2s_receive(void *app_data, size_t n, int32_t *receive_data)
 {
-  if (receive_delay) {
-    delay_ticks(receive_delay);
-  }
+    if (receive_delay) {
+        delay_ticks(receive_delay);
+    }
 }
 
 i2s_restart_t i2s_restart_check(void *app_data)
@@ -76,7 +78,7 @@ i2s_restart_t i2s_restart_check(void *app_data)
     return I2S_NO_RESTART;
 }
 
-#define OVERHEAD_TICKS 160 // Some of the period needs to be allowed for the interface handling
+#define OVERHEAD_TICKS 150 // Some of the period needs to be allowed for the callbacks
 #define JITTER  1   //Allow for rounding so does not break when diff = period + 1
 #define N_CYCLES_AT_DELAY   1 //How many LR clock cycles to measure at each backpressure delay value
 #define DIFF_WRAP_16(new, old)  (new > old ? new - old : new + 0x10000 - old)
@@ -85,6 +87,9 @@ DECLARE_JOB(test_lr_period, (void));
 void test_lr_period() {
     const int ref_tick_per_sample = XS1_TIMER_HZ/SAMPLE_FREQUENCY;
     const int period = ref_tick_per_sample;
+
+    //set_core_fast_mode_on();
+    SETSR(XS1_SR_QUEUE_MASK | XS1_SR_FAST_MASK);
 
     port_enable(p_lr_test);
     int time;
@@ -133,9 +138,11 @@ void test_lr_period() {
     }
 }
 
-DECLARE_JOB(spin, (void));
+DECLARE_JOB(burn, (void));
 
-void spin(void) {
+void burn(void) {
+    //set_core_fast_mode_on();
+    SETSR(XS1_SR_QUEUE_MASK | XS1_SR_FAST_MASK);
     for(;;);
 }
 
@@ -175,14 +182,29 @@ int main() {
           p_mclk,
           bclk)),
 
-      PJOB(test_lr_period, ()),
+      PJOB(test_lr_period, ())
+#if BURN_THREADS > 0
+      ,
+#endif
 
-      PJOB(spin, ()),
-      PJOB(spin, ()),
-      PJOB(spin, ()),
-      PJOB(spin, ()),
-      PJOB(spin, ()),
-      PJOB(spin, ())
+#if BURN_THREADS > 5
+      PJOB(burn, ()),
+#endif
+#if BURN_THREADS > 4
+      PJOB(burn, ()),
+#endif
+#if BURN_THREADS > 3
+      PJOB(burn, ()),
+#endif
+#if BURN_THREADS > 2
+      PJOB(burn, ()),
+#endif
+#if BURN_THREADS > 1
+      PJOB(burn, ()),
+#endif
+#if BURN_THREADS > 0
+      PJOB(burn, ())
+#endif
   );
   return 0;
 }

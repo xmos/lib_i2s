@@ -67,7 +67,7 @@ void i2s_slave(
         i2s_config_t config;
         i2s_restart_t restart = I2S_NO_RESTART;
         i2s_cbg->init(i2s_cbg->app_data, &config);
-        
+
         //Get initial send data if output enabled
         if (num_out > 0) {
             i2s_cbg->send(i2s_cbg->app_data, num_out << 1, out_samps);
@@ -107,11 +107,11 @@ void i2s_slave(
         (void) port_in(p_lrclk);
         port_time = port_get_trigger_time(p_lrclk);
 
-        unsigned initial_out_port_time = port_time + offset + (I2S_CHANS_PER_FRAME*32);
-        unsigned initial_in_port_time  = port_time + offset + ((I2S_CHANS_PER_FRAME*32)+32) - 1;
+        unsigned initial_out_port_time = port_time + offset + (I2S_CHANS_PER_FRAME * 32);
+        unsigned initial_in_port_time  = port_time + offset + ((I2S_CHANS_PER_FRAME * 32) + 32) - 1;
 
         //Start outputting evens (0,2,4..) data at correct point relative to the clock
-        for (i=0, idx=0; i<num_out; i++, idx+=I2S_CHANS_PER_FRAME){
+        for (i = 0, idx = 0; i < num_out; i++, idx += I2S_CHANS_PER_FRAME) {
             port_set_trigger_time(p_dout[i], initial_out_port_time);
             port_out(p_dout[i], bitrev(out_samps[idx]));
         }
@@ -122,7 +122,7 @@ void i2s_slave(
         }
 
         //And pre-load the odds (1,3,5..) to follow immediately afterwards
-        for (i=0, idx=1; i<num_out; i++, idx+=I2S_CHANS_PER_FRAME){
+        for (i = 0, idx = 1; i < num_out; i++, idx += I2S_CHANS_PER_FRAME) {
             port_out(p_dout[i], bitrev(out_samps[idx]));
         }
 
@@ -130,23 +130,22 @@ void i2s_slave(
         while (!syncerror && (restart == I2S_NO_RESTART)) {
             restart = i2s_cbg->restart_check(i2s_cbg->app_data);
 
-
-            if (num_out > 0 && (restart == I2S_NO_RESTART)){
+            if (num_out > 0 && (restart == I2S_NO_RESTART)) {
                 i2s_cbg->send(i2s_cbg->app_data, num_out << 1, out_samps);
 
                 //Output i2s evens (0,2,4..)
 //#pragma unroll(I2S_MAX_DATALINES)
-                for (size_t i=0, idx=0; i<num_out; i++, idx+=I2S_CHANS_PER_FRAME){
+                for (size_t i = 0, idx = 0; i < num_out; i++, idx += I2S_CHANS_PER_FRAME) {
                     port_out(p_dout[i], bitrev(out_samps[idx]));
                 }
             }
-                
+
             //Read lrclk value
             lrval = port_in(p_lrclk);
 
             //Input i2s evens (0,2,4..)
 //#pragma unroll(I2S_MAX_DATALINES)
-            for (size_t i=0, idx=0; i<num_in; i++, idx+=I2S_CHANS_PER_FRAME){
+            for (size_t i = 0, idx = 0; i < num_in; i++, idx += I2S_CHANS_PER_FRAME) {
                 int32_t data;
                 data = port_in(p_din[i]);
                 in_samps[idx] = bitrev(data);
@@ -159,15 +158,15 @@ void i2s_slave(
 
             //Output i2s odds (1,3,5..)
 //#pragma unroll(I2S_MAX_DATALINES)
-            if (num_out && (restart == I2S_NO_RESTART)){
-                for (size_t i=0, idx=1; i<num_out; i++, idx+=I2S_CHANS_PER_FRAME){
+            if (num_out && (restart == I2S_NO_RESTART)) {
+                for (size_t i = 0, idx = 1; i < num_out; i++, idx += I2S_CHANS_PER_FRAME) {
                     port_out(p_dout[i], bitrev(out_samps[idx]));
                 }
             }
 
-        //Input i2s odds (1,3,5..)
+            //Input i2s odds (1,3,5..)
 //#pragma unroll(I2S_MAX_DATALINES)
-            for (size_t i=0, idx=1; i<num_in; i++, idx+=I2S_CHANS_PER_FRAME){
+            for (size_t i = 0, idx = 1; i < num_in; i++, idx += I2S_CHANS_PER_FRAME) {
                 int32_t data;
                 data = port_in(p_din[i]);
                 in_samps[idx] = bitrev(data);
@@ -177,6 +176,6 @@ void i2s_slave(
 
             if (num_in > 0)
                 i2s_cbg->receive(i2s_cbg->app_data, num_in << 1, in_samps);
-        }//main loop, runs until user restart or synch error
+        } //main loop, runs until user restart or synch error
     }
 }
