@@ -39,6 +39,7 @@ def do_frame_slave_test(num_in, num_out, testlevel):
 
 def runtest():
     do_frame_slave_test(4, 4, "smoke")
+    do_frame_slave_test(1, 1, "smoke")
     do_frame_slave_test(4, 0, "smoke")
     do_frame_slave_test(0, 4, "smoke")
     do_frame_slave_test(4, 4, "nightly")

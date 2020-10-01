@@ -1,55 +1,39 @@
-// Copyright (c) 2015-2016, XMOS Ltd, All rights reserved
+// Copyright (c) 2015-2018, XMOS Ltd, All rights reserved
 #include <xs1.h>
 #include <i2s.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <xcore/parallel.h>
 
-port_t p_mclk  = XS1_PORT_1A;
-port_t p_bclk = XS1_PORT_1B;
+port_t p_bclk  = XS1_PORT_1B;
 port_t p_lrclk = XS1_PORT_1C;
 
 port_t p_din [4] = {XS1_PORT_1D, XS1_PORT_1E, XS1_PORT_1F, XS1_PORT_1G};
 port_t p_dout[4] = {XS1_PORT_1H, XS1_PORT_1I, XS1_PORT_1J, XS1_PORT_1K};
 
-xclock_t bclk = XS1_CLKBLK_2;
+xclock_t bclk = XS1_CLKBLK_1;
 
-port_t setup_strobe_port = XS1_PORT_1L;
-port_t setup_data_port = XS1_PORT_16A;
-port_t  setup_resp_port = XS1_PORT_1M;
-
-#define MAX_RATIO 4
+/*out*/ port_t setup_strobe_port = XS1_PORT_1L;
+/*out*/ port_t setup_data_port   = XS1_PORT_16A;
+/*in*/  port_t setup_resp_port   = XS1_PORT_1M;
 
 #define MAX_CHANNELS 8
 
+#define I2S_LOOPBACK_LATENCY 1
+
 #if defined(SMOKE)
-#if NUM_OUT > 1 || NUM_IN > 1
-#define NUM_MCLKS 1
-static const unsigned mclock_freq[NUM_MCLKS] = {
-        12288000,
+#define NUM_BCLKS 1
+#define NUM_BCLKS_TO_CHECK 1
+static const unsigned bclk_freq_lut[NUM_BCLKS] = {
+  1228800
 };
 #else
-#define NUM_MCLKS 1
-static const unsigned mclock_freq[NUM_MCLKS] = {
-        24576000,
+#define NUM_BCLKS 10
+#define NUM_BCLKS_TO_CHECK 3
+static const unsigned bclk_freq_lut[NUM_BCLKS] = {
+  1228800, 614400, 384000, 192000, 44100,
+  22050, 96000, 176400, 88200, 48000, 24000, 352800
 };
-#endif
-#else
-#if NUM_OUT > 1 || NUM_IN > 1
-#define NUM_MCLKS 2
-static const unsigned mclock_freq[NUM_MCLKS] = {
-        12288000,
-        11289600,
-};
-#else
-#define NUM_MCLKS 4
-static const unsigned mclock_freq[NUM_MCLKS] = {
-        24576000,
-        22579200,
-        12288000,
-        11289600,
-};
-#endif
 #endif
 
 int32_t tx_data[MAX_CHANNELS][8] = {
@@ -92,13 +76,12 @@ static void send_data_to_tester(
     port_sync(setup_strobe_port);
 }
 
-static void broadcast(unsigned mclk_freq, unsigned mclk_bclk_ratio,
+static void broadcast(unsigned bclk_freq,
         unsigned num_in, unsigned num_out, int is_i2s_justified)
 {
     port_out(setup_strobe_port, 0);
-    send_data_to_tester(setup_strobe_port, setup_data_port, mclk_freq >> 16);
-    send_data_to_tester(setup_strobe_port, setup_data_port, mclk_freq);
-    send_data_to_tester(setup_strobe_port, setup_data_port, mclk_bclk_ratio);
+    send_data_to_tester(setup_strobe_port, setup_data_port, bclk_freq >> 16);
+    send_data_to_tester(setup_strobe_port, setup_data_port, bclk_freq);
     send_data_to_tester(setup_strobe_port, setup_data_port, num_in);
     send_data_to_tester(setup_strobe_port, setup_data_port, num_out);
     send_data_to_tester(setup_strobe_port, setup_data_port, is_i2s_justified);
@@ -120,26 +103,16 @@ static int request_response(
     return r;
 }
 
-static int error=0;
+static unsigned bclk_freq_index = 0;
 static unsigned frames_sent = 0;
 static unsigned rx_data_counter[MAX_CHANNELS] = {0};
 static unsigned tx_data_counter[MAX_CHANNELS] = {0};
+static int error=0;
 
+//set_core_fast_mode_on();
 static int first_time = 1;
-static unsigned mclock_freq_index=0;
-static unsigned ratio_log2 = 1;
+
 static i2s_mode_t current_mode = I2S_MODE_I2S;
-
-
-void i2s_send(void *app_data, size_t n, int32_t *send_data)
-{
-    for(size_t c=0; c<n; c++){
-        unsigned i = tx_data_counter[c];
-        send_data[c] = tx_data[c][i];
-        tx_data_counter[c] = i+1;
-    }
-}
-
 
 void i2s_receive(void *app_data, size_t n, int32_t *receive_data)
 {
@@ -147,6 +120,15 @@ void i2s_receive(void *app_data, size_t n, int32_t *receive_data)
         unsigned i = rx_data_counter[c];
         error |= (receive_data[c] != rx_data[c][i]);
         rx_data_counter[c] = i+1;
+    }
+}
+
+void i2s_send(void *app_data, size_t n, int32_t *send_data)
+{
+    for(size_t c=0; c<n; c++){
+        unsigned i = tx_data_counter[c];
+        send_data[c] = tx_data[c][i];
+        tx_data_counter[c] = i+1;
     }
 }
 
@@ -165,36 +147,30 @@ i2s_restart_t i2s_restart_check(void *app_data)
 
 void i2s_init(void *app_data, i2s_config_t *i2s_config)
 {
-    if (!first_time) {
-        unsigned x = request_response(setup_strobe_port, setup_resp_port);
-        error |= x;
-        if (error)
-            printf("Error: test fail\n");
+#if SLAVE_INVERT_BCLK
+    i2s_config->slave_bclk_polarity = I2S_SLAVE_SAMPLE_ON_BCLK_FALLING;
+#else
+    i2s_config->slave_bclk_polarity = I2S_SLAVE_SAMPLE_ON_BCLK_RISING;
+#endif
 
-        int s = 0;
-        while (!s) {
-            if (ratio_log2 == MAX_RATIO) {
-                ratio_log2 = 1;
-                if (mclock_freq_index == NUM_MCLKS - 1) {
-                    mclock_freq_index = 0;
-                    if (current_mode == I2S_MODE_I2S) {
-                        current_mode = I2S_MODE_LEFT_JUSTIFIED;
-                    } else {
-                        _Exit(1);
-                    }
-                } else {
-                    mclock_freq_index++;
-                }
+    if (!first_time) {
+        error |= request_response(setup_strobe_port, setup_resp_port);
+
+        if (error) {
+            printf("Error\n");
+        }
+
+        if (bclk_freq_index == NUM_BCLKS_TO_CHECK - 1) {
+            if (current_mode == I2S_MODE_I2S) {
+                current_mode = I2S_MODE_LEFT_JUSTIFIED;
+                bclk_freq_index = 0;
             } else {
-                ratio_log2++;
+                _Exit(1);
             }
-            if (mclock_freq[mclock_freq_index] / ((1 << ratio_log2) * 64) <= 48000) {
-                s = 1;
-            }
+        } else {
+            bclk_freq_index++;
         }
     }
-
-    i2s_config->mclk_bclk_ratio = (1 << ratio_log2);
 
     frames_sent = 0;
     error = 0;
@@ -206,12 +182,12 @@ void i2s_init(void *app_data, i2s_config_t *i2s_config)
         tx_data_counter[i] = 0;
         rx_data_counter[i] = 0;
     }
-    broadcast(mclock_freq[mclock_freq_index],
-              i2s_config->mclk_bclk_ratio,
-              NUM_IN, NUM_OUT,
-              i2s_config->mode == I2S_MODE_I2S);
-}
 
+    broadcast(bclk_freq_lut[bclk_freq_index],
+              NUM_IN,
+              NUM_OUT, i2s_config->mode == I2S_MODE_I2S);
+
+}
 
 DECLARE_JOB(spin, (void));
 
@@ -233,11 +209,10 @@ int main(){
     port_enable(setup_strobe_port);
     port_enable(setup_data_port);
     port_enable(setup_resp_port);
-    port_enable(p_mclk);
     port_enable(p_bclk);
 
     PAR_JOBS (
-        PJOB(i2s_master, (
+        PJOB(i2s_slave, (
             &i_i2s,
             p_dout,
             NUM_OUT,
@@ -245,7 +220,6 @@ int main(){
             NUM_IN,
             p_bclk,
             p_lrclk,
-            p_mclk,
             bclk)),
 
         PJOB(spin, ()),
@@ -259,5 +233,4 @@ int main(){
 
     return 0;
 }
-
 
