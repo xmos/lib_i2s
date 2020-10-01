@@ -18,7 +18,7 @@ static void i2s_setup_bclk(
     clock_set_divide(bclk, mclk_bclk_ratio >> 1);
 }
 
-static void i2s_frame_init_ports(
+static void i2s_init_ports(
         const /*out buffered*/port_t /*:32*/p_dout[],
         const size_t num_out,
         const /*in buffered*/port_t /*:32*/p_din[],
@@ -50,7 +50,7 @@ static void i2s_frame_init_ports(
     }
 }
 
-static i2s_restart_t i2s_frame_ratio_n(
+static i2s_restart_t i2s_ratio_n(
         const i2s_callback_group_t *const i2s_cbg,
         const port_t p_dout[],
         const size_t num_out,
@@ -66,8 +66,8 @@ static i2s_restart_t i2s_frame_ratio_n(
     int offset;
 
     /* two samples per data line, left and right */
-    int32_t in_samps[2 * I2S_MAX_DATALINES];
-    int32_t out_samps[2 * I2S_MAX_DATALINES];
+    int32_t in_samps[I2S_CHANS_PER_FRAME * I2S_MAX_DATALINES];
+    int32_t out_samps[I2S_CHANS_PER_FRAME * I2S_MAX_DATALINES];
 
     xassert(num_in <= I2S_MAX_DATALINES);
     xassert(num_out <= I2S_MAX_DATALINES);
@@ -94,7 +94,7 @@ static i2s_restart_t i2s_frame_ratio_n(
     }
 
 //#pragma unroll(I2S_MAX_DATALINES)
-    for (i = 0, idx = 0; i < num_out; i++, idx += 2) {
+    for (i = 0, idx = 0; i < num_out; i++, idx += I2S_CHANS_PER_FRAME) {
         port_set_trigger_time(p_dout[i], 1 + offset);
         port_out(p_dout[i], bitrev(out_samps[idx]));
     }
@@ -106,7 +106,7 @@ static i2s_restart_t i2s_frame_ratio_n(
 
     //And pre-load the odds (1,3,5..)
 //#pragma unroll(I2S_MAX_DATALINES)
-    for (i = 0, idx = 1; i < num_out; i++, idx += 2) {
+    for (i = 0, idx = 1; i < num_out; i++, idx += I2S_CHANS_PER_FRAME) {
         port_out(p_dout[i], bitrev(out_samps[idx]));
     }
 
@@ -128,14 +128,14 @@ static i2s_restart_t i2s_frame_ratio_n(
 
             //Output i2s evens (0,2,4..)
 //#pragma unroll(I2S_MAX_DATALINES)
-            for (i = 0, idx = 0; i < num_out; i++, idx += 2) {
+            for (i = 0, idx = 0; i < num_out; i++, idx += I2S_CHANS_PER_FRAME) {
                 port_out(p_dout[i], bitrev(out_samps[idx]));
             }
         }
 
         //Input i2s evens (0,2,4..)
 //#pragma unroll(I2S_MAX_DATALINES)
-        for (i = 0, idx = 0; i < num_in; i++, idx += 2) {
+        for (i = 0, idx = 0; i < num_in; i++, idx += I2S_CHANS_PER_FRAME) {
             int32_t data;
             data = port_in(p_din[i]);
             in_samps[idx] = bitrev(data);
@@ -147,7 +147,7 @@ static i2s_restart_t i2s_frame_ratio_n(
         if (restart == I2S_NO_RESTART) {
             //Output i2s odds (1,3,5..)
 //#pragma unroll(I2S_MAX_DATALINES)
-            for (i = 0, idx = 1; i < num_out; i++, idx += 2) {
+            for (i = 0, idx = 1; i < num_out; i++, idx += I2S_CHANS_PER_FRAME) {
                 port_out(p_dout[i], bitrev(out_samps[idx]));
             }
 
@@ -157,7 +157,7 @@ static i2s_restart_t i2s_frame_ratio_n(
 
         //Input i2s odds (1,3,5..)
 //#pragma unroll(I2S_MAX_DATALINES)
-        for (i = 0, idx = 1; i < num_in; i++, idx += 2) {
+        for (i = 0, idx = 1; i < num_in; i++, idx += I2S_CHANS_PER_FRAME) {
             int32_t data;
             data = port_in(p_din[i]);
             in_samps[idx] = bitrev(data);
@@ -202,13 +202,12 @@ void i2s_master(
         i2s_setup_bclk(bclk, p_mclk, config.mclk_bclk_ratio);
 
         //This ensures that the port time on all the ports is at 0
-        i2s_frame_init_ports(p_dout, num_out, p_din, num_in, p_bclk, p_lrclk, bclk);
+        i2s_init_ports(p_dout, num_out, p_din, num_in, p_bclk, p_lrclk, bclk);
 
-        i2s_restart_t restart =
-                i2s_frame_ratio_n(i2s_cbg, p_dout, num_out, p_din,
-                                  num_in,
-                                  p_bclk, bclk, p_lrclk,
-                                  config.mode);
+        i2s_restart_t restart = i2s_ratio_n(i2s_cbg, p_dout, num_out, p_din,
+                                             num_in,
+                                             p_bclk, bclk, p_lrclk,
+                                             config.mode);
 
         if (restart == I2S_SHUTDOWN) {
             return;
@@ -235,13 +234,12 @@ void i2s_master_external_clock(
         }
 
         //This ensures that the port time on all the ports is at 0
-        i2s_frame_init_ports(p_dout, num_out, p_din, num_in, p_bclk, p_lrclk, bclk);
+        i2s_init_ports(p_dout, num_out, p_din, num_in, p_bclk, p_lrclk, bclk);
 
-        i2s_restart_t restart =
-                i2s_frame_ratio_n(i2s_cbg, p_dout, num_out, p_din,
-                                  num_in,
-                                  p_bclk, bclk, p_lrclk,
-                                  config.mode);
+        i2s_restart_t restart = i2s_ratio_n(i2s_cbg, p_dout, num_out, p_din,
+                                            num_in,
+                                            p_bclk, bclk, p_lrclk,
+                                            config.mode);
 
         if (restart == I2S_SHUTDOWN) {
             return;
