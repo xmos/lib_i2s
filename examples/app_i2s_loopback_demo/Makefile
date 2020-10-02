@@ -1,15 +1,15 @@
 # The TARGET variable determines what target system the application is
 # compiled for. It either refers to an XN file in the source directories
 # or a valid argument for the --target option when compiling
-TARGET = XR-AUDIO-216-MC
+TARGET = XCORE-AI-EXPLORER
 
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
 # the project name
-APP_NAME = i2s_frame_loopback_demo
+APP_NAME = i2s_loopback_demo
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = lib_gpio(>=1.1.0) lib_i2c(>=5.0.0) lib_i2s(>=3.0.0) lib_logging(>=2.1.0)
+USED_MODULES = lib_i2s(>=3.0.0)
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:
