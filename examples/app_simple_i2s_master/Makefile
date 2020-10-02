@@ -1,7 +1,7 @@
 # The TARGET variable determines what target system the application is
 # compiled for. It either refers to an XN file in the source directories
 # or a valid argument for the --target option when compiling
-TARGET = XCORE-200-EXPLORER
+TARGET = XCORE-AI-EXPLORER
 
 # The USED_MODULES variable lists other module used by the application.
 USED_MODULES = lib_i2s(>=3.0.0)
