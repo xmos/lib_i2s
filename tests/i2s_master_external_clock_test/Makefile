@@ -5,12 +5,12 @@ else # USING_XWAF
 # The TARGET variable determines what target system the application is
 # compiled for. It either refers to an XN file in the source directories
 # or a valid argument for the --target option when compiling
-TARGET = SLICEKIT-L16
+TARGET = XCORE-AI-EXPLORER
 
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
 # the project name
-APP_NAME = tdm_master_cb_test
+APP_NAME = i2s_master_external_clock_test
 
 # The USED_MODULES variable lists other module used by the application.
 USED_MODULES = lib_i2s
@@ -20,7 +20,8 @@ USED_MODULES = lib_i2s
 # XCC_XC_FLAGS, XCC_C_FLAGS, XCC_ASM_FLAGS, XCC_CPP_FLAGS
 # If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
 # xcc for the final link (mapping) stage.
-COMMON_FLAGS = -O3 -g
+
+COMMON_FLAGS = -O3 -g -save-temps
 
 $(foreach out,0 1 2 3 4,\
  $(foreach in,0 1 2 3 4,\

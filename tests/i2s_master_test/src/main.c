@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2016, XMOS Ltd, All rights reserved
+// Copyright (c) 2015-2020, XMOS Ltd, All rights reserved
 #include <xs1.h>
 #include <i2s.h>
 #include <stdlib.h>
@@ -168,9 +168,10 @@ void i2s_init(void *app_data, i2s_config_t *i2s_config)
     if (!first_time) {
         unsigned x = request_response(setup_strobe_port, setup_resp_port);
         error |= x;
-        if (error)
+        if (error) {
             printf("Error: test fail\n");
-
+        }
+		
         int s = 0;
         while (!s) {
             if (ratio_log2 == MAX_RATIO) {
@@ -206,6 +207,7 @@ void i2s_init(void *app_data, i2s_config_t *i2s_config)
         tx_data_counter[i] = 0;
         rx_data_counter[i] = 0;
     }
+
     broadcast(mclock_freq[mclock_freq_index],
               i2s_config->mclk_bclk_ratio,
               NUM_IN, NUM_OUT,
