@@ -1,6 +1,11 @@
 I2S library change log
 ======================
 
+4.1.1
+-----
+
+  * CHANGED: Pin Python package versions
+
 4.1.0
 -----
 
