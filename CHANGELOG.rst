@@ -1,6 +1,12 @@
 I2S library change log
 ======================
 
+4.1.1
+-----
+
+  * CHANGED: Pin Python package versions
+  * REMOVED: not necessary cpanfile
+
 4.1.0
 -----
 
