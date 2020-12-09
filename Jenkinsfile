@@ -39,7 +39,7 @@ pipeline {
             steps {
               dir("${REPO}") {
                 xcoreAllAppsBuild('examples')
-                stash name: 'backpressure_test', includes: 'tests/backpressure_test/bin/XCORE_AI/backpressure_test_XCORE_AI.xe, '
+                stash name: 'backpressure_test', includes: 'lib_i2s/tests/backpressure_test/bin/XCORE_AI/backpressure_test_XCORE_AI.xe, '
                 xcoreAllAppNotesBuild('examples')
                 dir("${REPO}") {
                   runXdoc('doc')
