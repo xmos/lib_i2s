@@ -39,8 +39,6 @@ pipeline {
             steps {
               dir("${REPO}") {
                 xcoreAllAppsBuild('examples')
-                sh 'tree'
-                stash name: 'backpressure_test', includes: 'lib_i2s/tests/backpressure_test/bin/XCORE_AI/backpressure_test_XCORE_AI.xe, '
                 xcoreAllAppNotesBuild('examples')
                 dir("${REPO}") {
                   runXdoc('doc')
@@ -51,6 +49,8 @@ pipeline {
           stage('Tests') {
             steps {
               runXmostest("${REPO}", 'tests')
+              sh 'tree'
+              stash name: 'backpressure_test', includes: 'lib_i2s/tests/backpressure_test/bin/XCORE_AI/backpressure_test_XCORE_AI.xe, '
             }
           }
         }// stages
