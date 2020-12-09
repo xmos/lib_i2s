@@ -39,6 +39,7 @@ pipeline {
             steps {
               dir("${REPO}") {
                 xcoreAllAppsBuild('examples')
+                sh 'tree'
                 stash name: 'backpressure_test', includes: 'lib_i2s/tests/backpressure_test/bin/XCORE_AI/backpressure_test_XCORE_AI.xe, '
                 xcoreAllAppNotesBuild('examples')
                 dir("${REPO}") {
@@ -83,11 +84,12 @@ pipeline {
                 // sh 'xrun --io --id 0 bin/xcoreai/debug_printf_test.xe &> debug_printf_test.txt'
                 // sh 'cat debug_printf_test.txt && diff debug_printf_test.txt tests/test.expect'
 
-                //Just run these and error on incorrect binary etc. It will not run otherwise due to lack of loopback (intended for sim)
+                //Just run on HW and error on incorrect binary etc. It will not run otherwise due to lack of loopback (intended for sim)
+                //We run xsim afterwards for actual test (with loopback)
                 unstash 'backpressure_test'
-                sh 'xrun --id 0 tests/backpressure_test/bin/XCORE_AI/backpressure_test_XCORE_AI.xe'
-                sh 'xsim --xscope "-offline xscope.xmt" tests/backpressure_test/bin/XCORE_AI/backpressure_test_XCORE_AI.xe --plugin LoopbackPort.dll "-port tile[0] XS1_PORT_1G 1 0 -port tile[0] XS1_PORT_1A 1 0" > bp_test.txt'
-                sh 'cat bp_test.txt && diff bp_test.txt tests/backpressure_test.expect'
+                sh 'xrun --id 0 lib_i2s/tests/backpressure_test/bin/XCORE_AI/backpressure_test_XCORE_AI.xe'
+                sh 'xsim --xscope "-offline xscope.xmt" lib_i2s/tests/backpressure_test/bin/XCORE_AI/backpressure_test_XCORE_AI.xe --plugin LoopbackPort.dll "-port tile[0] XS1_PORT_1G 1 0 -port tile[0] XS1_PORT_1A 1 0" > bp_test.txt'
+                sh 'cat bp_test.txt && diff bp_test.txt lib_i2s/tests/backpressure_test.expect'
               }
             }
           }
