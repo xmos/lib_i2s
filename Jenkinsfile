@@ -40,6 +40,7 @@ pipeline {
               dir("${REPO}") {
                 xcoreAllAppsBuild('examples')
                 xcoreAllAppNotesBuild('examples')
+                stash name: 'AN00162', includes: 'lib_i2s/examples/AN00162_i2s_loopback_demo/bin/XCORE_AI/AN00162_i2s_loopback_demo_XCORE_AI.xe, '
                 dir("${REPO}") {
                   runXdoc('doc')
                 }
@@ -49,8 +50,11 @@ pipeline {
           stage('Tests') {
             steps {
               runXmostest("${REPO}", 'tests')
-              sh 'tree'
-              stash name: 'backpressure_test', includes: 'lib_i2s/tests/backpressure_test/bin/XCORE_AI/backpressure_test_XCORE_AI.xe, '
+              dir('lib_i2s/examples/app_debug_printf'){
+                runXmake(".", "", "CONFIG=XCORE_AI")
+                sh 'tree'
+                stash name: 'backpressure_test', includes: 'bin/XCORE_AI/backpressure_test_XCORE_AI.xe, '
+              }
             }
           }
         }// stages
@@ -79,16 +83,15 @@ pipeline {
           stage('xrun'){
             steps{
               toolsEnv(TOOLS_PATH) {  // load xmos tools
-                //Run this and diff against expected output. Note we have the lib files here available
-                // unstash 'debug_printf_test'
-                // sh 'xrun --io --id 0 bin/xcoreai/debug_printf_test.xe &> debug_printf_test.txt'
-                // sh 'cat debug_printf_test.txt && diff debug_printf_test.txt tests/test.expect'
+                //Just run on HW and error on incorrect binary etc. We need specific HW for it to run so just check it loads OK
+                unstash 'AN00162'
+                sh 'xrun --id 0 lib_i2s/examples/AN00162_i2s_loopback_demo/bin/XCORE_AI/AN00162_i2s_loopback_demo_XCORE_AI.xe'
 
                 //Just run on HW and error on incorrect binary etc. It will not run otherwise due to lack of loopback (intended for sim)
                 //We run xsim afterwards for actual test (with loopback)
                 unstash 'backpressure_test'
-                sh 'xrun --id 0 lib_i2s/tests/backpressure_test/bin/XCORE_AI/backpressure_test_XCORE_AI.xe'
-                sh 'xsim --xscope "-offline xscope.xmt" lib_i2s/tests/backpressure_test/bin/XCORE_AI/backpressure_test_XCORE_AI.xe --plugin LoopbackPort.dll "-port tile[0] XS1_PORT_1G 1 0 -port tile[0] XS1_PORT_1A 1 0" > bp_test.txt'
+                sh 'xrun --id 0 bin/XCORE_AI/backpressure_test_XCORE_AI.xe'
+                sh 'xsim --xscope "-offline xscope.xmt" bin/XCORE_AI/backpressure_test_XCORE_AI.xe --plugin LoopbackPort.dll "-port tile[0] XS1_PORT_1G 1 0 -port tile[0] XS1_PORT_1A 1 0" > bp_test.txt'
                 sh 'cat bp_test.txt && diff bp_test.txt lib_i2s/tests/backpressure_test.expect'
               }
             }
