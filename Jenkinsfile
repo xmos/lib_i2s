@@ -42,7 +42,7 @@ pipeline {
                 xcoreAllAppsBuild('examples')
                 xcoreAllAppNotesBuild('examples')
                 dir('examples/AN00162_i2s_loopback_demo'){
-                  runXmake(".", "", "XCORE_AI=1")
+                  runXmake(".", "", "XCOREAI=1")
                   sh 'tree'
                   stash name: 'AN00162', includes: 'bin/XCORE_AI/AN00162_i2s_loopback_demo_XCORE_AI.xe, '
                 }
