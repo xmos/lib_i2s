@@ -19,7 +19,8 @@ pipeline {
         }
         environment {
           REPO = 'lib_i2s'
-          VIEW = "${env.JOB_NAME.contains('PR-') ? REPO+'_'+env.CHANGE_TARGET : REPO+'_'+env.BRANCH_NAME}"
+          // VIEW = "${env.JOB_NAME.contains('PR-') ? REPO+'_'+env.CHANGE_TARGET : REPO+'_'+env.BRANCH_NAME}"
+          VIEW = "lib_i2s_feature_test_xs3"
         }
         options {
           skipDefaultCheckout()
