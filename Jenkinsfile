@@ -40,7 +40,11 @@ pipeline {
               dir("${REPO}") {
                 xcoreAllAppsBuild('examples')
                 xcoreAllAppNotesBuild('examples')
-                stash name: 'AN00162', includes: 'lib_i2s/examples/AN00162_i2s_loopback_demo/bin/XCORE_AI/AN00162_i2s_loopback_demo_XCORE_AI.xe, '
+                dir('lib_i2s/examples/AN00162_i2s_loopback_demo'){
+                  runXmake(".", "", "CONFIG=XCORE_AI")
+                  sh 'tree'
+                  stash name: 'AN00162', includes: 'bin/XCORE_AI/AN00162_i2s_loopback_demo_XCORE_AI.xe, '
+                }
                 dir("${REPO}") {
                   runXdoc('doc')
                 }
@@ -85,7 +89,7 @@ pipeline {
               toolsEnv(TOOLS_PATH) {  // load xmos tools
                 //Just run on HW and error on incorrect binary etc. We need specific HW for it to run so just check it loads OK
                 unstash 'AN00162'
-                sh 'xrun --id 0 lib_i2s/examples/AN00162_i2s_loopback_demo/bin/XCORE_AI/AN00162_i2s_loopback_demo_XCORE_AI.xe'
+                sh 'xrun --id 0 bin/XCORE_AI/AN00162_i2s_loopback_demo_XCORE_AI.xe'
 
                 //Just run on HW and error on incorrect binary etc. It will not run otherwise due to lack of loopback (intended for sim)
                 //We run xsim afterwards for actual test (with loopback)
