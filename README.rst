@@ -28,78 +28,12 @@ Features
 Resource Usage
 ..............
 
-.. resusage::
-
-  * - configuration: |I2S| Master (frame-based)
-    - globals:   out buffered port:32 p_dout[2] = {XS1_PORT_1D, XS1_PORT_1E};
-                 in buffered port:32 p_din[2]  = {XS1_PORT_1I, XS1_PORT_1K};
-                 port p_mclk  = XS1_PORT_1M;
-                 out port p_bclk  = XS1_PORT_1A;
-                 out buffered port:32 p_lrclk = XS1_PORT_1C;
-                 clock mclk = XS1_CLKBLK_1;
-                 clock bclk = XS1_CLKBLK_2;
-    - locals: interface i2s_frame_callback_if i;
-    - fn: i2s_frame_master(i, p_dout, 2, p_din, 2, p_bclk, p_lrclk, p_mclk, bclk);
-    - pins: 3 + data lines
-    - ports: 3 x (1-bit) + data lines
-    - cores: 1
-    - target: XCORE-200-EXPLORER
-  * - configuration: |I2S| Master
-    - globals:   out buffered port:32 p_dout[2] = {XS1_PORT_1D, XS1_PORT_1E};
-                 in buffered port:32 p_din[2]  = {XS1_PORT_1I, XS1_PORT_1K};
-                 port p_mclk  = XS1_PORT_1M;
-                 out buffered port:32 p_bclk  = XS1_PORT_1A;
-                 out buffered port:32 p_lrclk = XS1_PORT_1C;
-                 clock mclk = XS1_CLKBLK_1;
-                 clock bclk = XS1_CLKBLK_2;
-    - locals: interface i2s_callback_if i;
-    - fn: i2s_master(i, p_dout, 2, p_din, 2, p_bclk, p_lrclk, bclk, mclk);
-    - pins: 3 + data lines
-    - ports: 3 x (1-bit) + data lines
-    - cores: 1
-    - target: XCORE-200-EXPLORER
-  * - configuration: |I2S| Slave (frame-based)
-    - globals:   out buffered port:32 p_dout[2] = {XS1_PORT_1D, XS1_PORT_1E};
-                 in buffered port:32 p_din[2]  = {XS1_PORT_1I, XS1_PORT_1K};
-                 port p_mclk  = XS1_PORT_1M;
-                 in port p_bclk  = XS1_PORT_1A;
-                 in buffered port:32 p_lrclk = XS1_PORT_1C;
-                 clock bclk = XS1_CLKBLK_2;
-    - locals: interface i2s_frame_callback_if i;
-    - fn: i2s_frame_slave(i, p_dout, 2, p_din, 2, p_bclk, p_lrclk, bclk);
-    - pins: 2 + data lines
-    - ports: 2 x (1-bit) + data lines
-    - cores: 1
-    - target: XCORE-200-EXPLORER
-  * - configuration: |I2S| Slave
-    - globals:   out buffered port:32 p_dout[2] = {XS1_PORT_1D, XS1_PORT_1E};
-                 in buffered port:32 p_din[2]  = {XS1_PORT_1I, XS1_PORT_1K};
-                 port p_mclk  = XS1_PORT_1M;
-                 in port p_bclk  = XS1_PORT_1A;
-                 in buffered port:32 p_lrclk = XS1_PORT_1C;
-                 clock bclk = XS1_CLKBLK_2;
-    - locals: interface i2s_callback_if i;
-    - fn: i2s_slave(i, p_dout, 2, p_din, 2, p_bclk, p_lrclk, bclk);
-    - pins: 2 + data lines
-    - ports: 2 x (1-bit) + data lines
-    - cores: 1
-    - target: XCORE-200-EXPLORER
-  * - configuration: TDM Master
-    - globals:   out buffered port:32 p_dout[2] = {XS1_PORT_1D, XS1_PORT_1E};
-                 in buffered port:32 p_din[2]  = {XS1_PORT_1I, XS1_PORT_1K};
-                 out buffered port:32 p_fsync = XS1_PORT_1C;
-                 clock bclk = XS1_CLKBLK_2;
-    - locals: interface i2s_callback_if i;
-    - fn: tdm_master(i, p_fsync, p_dout, 2, p_din, 2, bclk);
-    - pins: 2 + data lines
-    - ports: 2 x (1-bit) + data lines
-    - cores: 1
-    - target: XCORE-200-EXPLORER
+The I2S and TDM modules use one logical core and between 1.6 and 2.1kB of memory. IO usage is 1 x 1b port for each signal.
 
 Software version and dependencies
 .................................
 
-.. libdeps::
+lib_i2s depends on lib_logging and lib_xasset.
 
 Notes on "frame-based" |I2S| implementations
 ............................................
