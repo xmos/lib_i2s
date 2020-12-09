@@ -33,7 +33,9 @@ The I2S and TDM modules use one logical core and between 1.6 and 2.1kB of memory
 Software version and dependencies
 .................................
 
-lib_i2s depends on lib_logging and lib_xasset.
+The CHANGELOG contains information about the current and previous versions.
+For a list of direct dependencies, look for DEPENDENT_MODULES in lib_i2s/module_build_info.
+
 
 Notes on "frame-based" |I2S| implementations
 ............................................
