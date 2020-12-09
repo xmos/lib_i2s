@@ -39,6 +39,7 @@ pipeline {
             steps {
               dir("${REPO}") {
                 xcoreAllAppsBuild('examples')
+                stash name: 'backpressure_test', includes: 'tests/backpressure_test/bin/XCORE_AI/backpressure_test_XCORE_AI.xe, '
                 xcoreAllAppNotesBuild('examples')
                 dir("${REPO}") {
                   runXdoc('doc')
@@ -78,15 +79,14 @@ pipeline {
             steps{
               toolsEnv(TOOLS_PATH) {  // load xmos tools
                 //Run this and diff against expected output. Note we have the lib files here available
-                unstash 'debug_printf_test'
-                sh 'xrun --io --id 0 bin/xcoreai/debug_printf_test.xe &> debug_printf_test.txt'
-                sh 'cat debug_printf_test.txt && diff debug_printf_test.txt tests/test.expect'
+                // unstash 'debug_printf_test'
+                // sh 'xrun --io --id 0 bin/xcoreai/debug_printf_test.xe &> debug_printf_test.txt'
+                // sh 'cat debug_printf_test.txt && diff debug_printf_test.txt tests/test.expect'
 
-                //Just run these and error on exception
-                unstash 'AN00239'
-                sh 'xrun --io --id 0 bin/xcoreai/AN00239.xe'
-                unstash 'app_debug_printf'
-                sh 'xrun --io --id 0 bin/xcoreai/app_debug_printf.xe'
+                //Just run these and error on incorrect binary etc. It will not run otherwise due to lack of loopback (intended for sim)
+                unstash 'backpressure_test'
+                sh 'xrun --id 0 tests/backpressure_test/bin/XCORE_AI/backpressure_test_XCORE_AI.xe'
+                sh 'xsim --xscope "-offline xscope.xmt" tests/backpressure_test/bin/XCORE_AI/backpressure_test_XCORE_AI.xe --plugin LoopbackPort.dll "-port tile[0] XS1_PORT_1G 1 0 -port tile[0] XS1_PORT_1A 1 0"'
               }
             }
           }
