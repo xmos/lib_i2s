@@ -41,7 +41,7 @@ pipeline {
               dir("${REPO}") {
                 xcoreAllAppsBuild('examples')
                 xcoreAllAppNotesBuild('examples')
-                dir('lib_i2s/examples/AN00162_i2s_loopback_demo'){
+                dir('examples/AN00162_i2s_loopback_demo'){
                   runXmake(".", "", "CONFIG=XCORE_AI")
                   sh 'tree'
                   stash name: 'AN00162', includes: 'bin/XCORE_AI/AN00162_i2s_loopback_demo_XCORE_AI.xe, '
