@@ -86,7 +86,8 @@ pipeline {
                 //Just run these and error on incorrect binary etc. It will not run otherwise due to lack of loopback (intended for sim)
                 unstash 'backpressure_test'
                 sh 'xrun --id 0 tests/backpressure_test/bin/XCORE_AI/backpressure_test_XCORE_AI.xe'
-                sh 'xsim --xscope "-offline xscope.xmt" tests/backpressure_test/bin/XCORE_AI/backpressure_test_XCORE_AI.xe --plugin LoopbackPort.dll "-port tile[0] XS1_PORT_1G 1 0 -port tile[0] XS1_PORT_1A 1 0"'
+                sh 'xsim --xscope "-offline xscope.xmt" tests/backpressure_test/bin/XCORE_AI/backpressure_test_XCORE_AI.xe --plugin LoopbackPort.dll "-port tile[0] XS1_PORT_1G 1 0 -port tile[0] XS1_PORT_1A 1 0" > bp_test.txt'
+                sh 'cat bp_test.txt && diff bp_test.txt tests/backpressure_test.expect'
               }
             }
           }
