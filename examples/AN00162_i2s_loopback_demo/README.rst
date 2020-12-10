@@ -4,10 +4,6 @@
 Using the I2S library
 =====================
 
-.. appnote:: AN00162
-
-.. version:: 1.1.0
-
 Summary
 -------
 
