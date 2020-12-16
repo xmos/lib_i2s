@@ -36,7 +36,6 @@ Software version and dependencies
 The CHANGELOG contains information about the current and previous versions.
 For a list of direct dependencies, look for DEPENDENT_MODULES in lib_i2s/module_build_info.
 
-
 Notes on "frame-based" |I2S| implementations
 ............................................
 
