@@ -43,7 +43,6 @@ pipeline {
                 xcoreAllAppNotesBuild('examples')
                 dir('examples/AN00162_i2s_loopback_demo'){
                   runXmake(".", "", "XCOREAI=1")
-                  sh 'tree'
                   stash name: 'AN00162', includes: 'bin/XCORE_AI/AN00162_i2s_loopback_demo.xe, '
                 }
                 dir("${REPO}") {
@@ -56,7 +55,6 @@ pipeline {
             steps {
               dir('lib_i2s/tests/backpressure_test'){
                 runXmake(".", "", "CONFIG=XCORE_AI")
-                sh 'tree'
                 stash name: 'backpressure_test', includes: 'bin/XCORE_AI/backpressure_test_XCORE_AI.xe, '
               }
               runXmostest("${REPO}", 'tests')
