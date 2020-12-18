@@ -37,7 +37,7 @@ and |I2C| drivers are all time-multiplexed with the loopback application.
 The Makefile
 ............
 
-To start using the |I2S|, you need to add ``lib_i2s`` to you Makefile::
+To start using the |I2S|, you need to add ``lib_i2s`` to your Makefile::
 
   USED_MODULES = .. lib_i2s ...
 
@@ -87,7 +87,7 @@ four 1-bit ports for input and four more for output:
    :end-on: in buffered port:32 p_din
 
 The xCORE also provides ``clock block`` hardware to efficiently generate
-clock singal that can either be driven out on a port or used
+clock signal that can either be driven out on a port or used
 to control a port. In this application two clocks blocks are used:
 
 .. literalinclude:: main.xc

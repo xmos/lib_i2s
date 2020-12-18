@@ -25,6 +25,11 @@ Features
  * Sample rate support up to 192kHz or 768kHz for "frame-based" versions.
  * Up to 32 channels in/32 channels out (depending on sample rate and protocol).
 
+Resource Usage
+..............
+
+The I2S and TDM modules use one logical core and between 1.6 and 2.1kB of memory. IO usage is 1 x 1b port for each signal.
+
 Software version and dependencies
 .................................
 
