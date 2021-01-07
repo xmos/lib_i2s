@@ -50,6 +50,29 @@ static void i2s_init_ports(
     }
 }
 
+static void i2s_deinit_ports(
+        const /*out buffered*/port_t /*:32*/p_dout[],
+        const size_t num_out,
+        const /*in buffered*/port_t /*:32*/p_din[],
+        const size_t num_in,
+        /*out*/port_t p_bclk,
+        /*out buffered*/port_t /*:32*/p_lrclk
+        )
+{
+    size_t i;
+
+    port_disable(p_bclk);
+    port_disable(p_lrclk);
+
+    for (i = 0; i < num_out; i++) {
+        port_disable(p_dout[i]);
+    }
+
+    for (i = 0; i < num_in; i++) {
+        port_disable(p_din[i]);
+    }
+}
+
 static i2s_restart_t i2s_ratio_n(
         const i2s_callback_group_t *const i2s_cbg,
         const port_t p_dout[],
@@ -210,6 +233,8 @@ void i2s_master(
                                              config.mode);
 
         if (restart == I2S_SHUTDOWN) {
+            i2s_deinit_ports(p_dout, num_out, p_din, num_in, p_bclk, p_lrclk);
+            clock_disable(bclk);
             return;
         }
     }
@@ -242,6 +267,7 @@ void i2s_master_external_clock(
                                             config.mode);
 
         if (restart == I2S_SHUTDOWN) {
+            i2s_deinit_ports(p_dout, num_out, p_din, num_in, p_bclk, p_lrclk);
             return;
         }
     }
