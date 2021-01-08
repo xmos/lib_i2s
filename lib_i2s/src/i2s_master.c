@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2020, XMOS Ltd, All rights reserved
+// Copyright (c) 2021, XMOS Ltd, All rights reserved
 
 #include <xclib.h>
 #include <xcore/port.h>
