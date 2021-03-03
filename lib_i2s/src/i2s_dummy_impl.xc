@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2018, XMOS Ltd, All rights reserved
+// Copyright (c) 2015-2021, XMOS Ltd, All rights reserved
 #include <i2s.h>
 
 #undef i2s_master
@@ -13,7 +13,7 @@ void i2s_master(client i2s_callback_if i2s_i,
                 const clock mclk)
 {}
 
-#if defined(__XS2A__)
+#if defined(__XS2A__) || defined(__XS3A__)
 
 #undef i2s_frame_master
 void i2s_frame_master(client i2s_frame_callback_if i2s_i,

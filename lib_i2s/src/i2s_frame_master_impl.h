@@ -1,5 +1,5 @@
-// Copyright (c) 2016-2020, XMOS Ltd, All rights reserved
-#if defined(__XS2A__)
+// Copyright (c) 2016-2021, XMOS Ltd, All rights reserved
+#if defined(__XS2A__) || defined(__XS3A__)
 
 #include <xs1.h>
 #include <xclib.h>

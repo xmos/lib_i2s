@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2020, XMOS Ltd, All rights reserved
+// Copyright (c) 2014-2021, XMOS Ltd, All rights reserved
 #ifndef _i2s_h_
 #define _i2s_h_
 #include <xs1.h>
@@ -209,7 +209,7 @@ void i2s_master(client i2s_callback_if i2s_i,
                 clock bclk,
                 const clock mclk);
 
-#if defined(__XS2A__) || defined(__DOXYGEN__)
+#if defined(__XS2A__) || defined(__XS3A__) || defined(__DOXYGEN__)
 
 /** I2S frame-based master component **for xCORE200 only**
  *
