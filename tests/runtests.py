@@ -1,5 +1,6 @@
 #!/usr/bin/env python2.7
 # Copyright (c) 2015-2018, XMOS Ltd, All rights reserved
+# This software is available under the terms provided in LICENSE.txt.
 import xmostest
 from i2s_master_checker import I2SMasterChecker
 

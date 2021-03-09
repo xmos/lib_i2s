@@ -1,4 +1,5 @@
 # Copyright (c) 2016-2018, XMOS Ltd, All rights reserved
+# This software is available under the terms provided in LICENSE.txt.
 import xmostest, os, subprocess, re, shutil
 
 sr_range = (96000, 192000)

@@ -1,4 +1,5 @@
 // Copyright (c) 2015-2016, XMOS Ltd, All rights reserved
+// This software is available under the terms provided in LICENSE.txt.
 #ifndef TDM_COMMON_H_
 #define TDM_COMMON_H_
 #include <xclib.h>
