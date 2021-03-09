@@ -1,6 +1,11 @@
 I2S library change log
 ======================
 
+4.2.0
+-----
+
+  * ADDED: Support for XS3 architecture
+
 4.1.1
 -----
 
