@@ -1,6 +1,11 @@
 I2S library change log
 ======================
 
+4.3.0
+-----
+
+  * CHANGED: Use XMOS Public Licence Version 1
+
 4.2.0
 -----
 
