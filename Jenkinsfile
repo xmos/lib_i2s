@@ -112,7 +112,7 @@ pipeline {
         label 'x86_64&&brew&&macOS'
       }
       when {
-        expression { return currentBuild.result == "SUCCESS" }
+        expression { return currentBuild.currentResult == "SUCCESS" }
       }
       steps {
         updateViewfiles()
