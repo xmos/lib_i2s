@@ -5,7 +5,12 @@ else # USING_XWAF
 # The TARGET variable determines what target system the application is
 # compiled for. It either refers to an XN file in the source directories
 # or a valid argument for the --target option when compiling
-TARGET = XR-AUDIO-216-MC
+
+ifeq ($(CONFIG),XCORE_AI)
+TARGET = XCORE-AI-EXPLORER
+else
+TARGET = XCORE-200-EXPLORER
+endif
 
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
@@ -13,7 +18,7 @@ TARGET = XR-AUDIO-216-MC
 APP_NAME =
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = lib_logging lib_i2c lib_i2s
+USED_MODULES = lib_logging lib_i2s
 
 SHARED_FLAGS = -O2 -report -g -DSIM=1 -DDEBUG_PRINT_ENABLE=1 -DGENERATE_MCLK
 
@@ -37,6 +42,8 @@ $(foreach sr,768000 384000 192000,\
     ) \
   ) \
 )
+
+XCC_FLAGS_XCORE_AI = $(SHARED_FLAGS) -DSAMPLE_FREQUENCY=768000 -DNUM_I2S_LINES=4 -DRECEIVE_DELAY_INCREMENT=5 -DSEND_DELAY_INCREMENT=5
 
 test: bin/i2s_loopback_demo.xe
 	xsim bin/i2s_loopback_demo.xe --plugin LoopbackPort.dll '-port tile[0] XS1_PORT_1G 1 0 -port tile[0] XS1_PORT_1A 1 0'
