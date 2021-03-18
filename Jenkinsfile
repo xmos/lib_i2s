@@ -1,4 +1,4 @@
-@Library('xmos_jenkins_shared_library@v0.15.1') _
+@Library('xmos_jenkins_shared_library@v0.16.2') _
 
 getApproval()
 
@@ -112,7 +112,7 @@ pipeline {
         label 'x86_64&&brew&&macOS'
       }
       when {
-        expression { return currentBuild.result == "SUCCESS" }
+        expression { return currentBuild.currentResult == "SUCCESS" }
       }
       steps {
         updateViewfiles()
