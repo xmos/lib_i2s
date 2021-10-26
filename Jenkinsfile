@@ -70,7 +70,7 @@ pipeline {
 
     stage('xcore.ai Verification'){
       agent {
-        label 'xcore.ai-explorer'
+        label 'xcore.ai'
       }
       environment {
         // '/XMOS/tools' from get_tools.py and rest from tools installers
