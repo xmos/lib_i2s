@@ -204,7 +204,7 @@ void setup_bclock()
     mclock_freq_index=0;
     ratio_log2 = 1;
     unsigned sample_frequency = 192000;
-    mclk_bclk_ratio = mclock_freq[mclock_freq_index] / (sample_frequency * 2 * DATA_BITS) // (1<<ratio_log2);
+    mclk_bclk_ratio = mclock_freq[mclock_freq_index] / (sample_frequency * 2 * DATA_BITS); // (1<<ratio_log2);
     current_mode = I2S_MODE_I2S;
 
     broadcast(mclock_freq[mclock_freq_index],
