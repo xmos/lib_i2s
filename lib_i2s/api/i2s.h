@@ -232,6 +232,7 @@ void i2s_master(client i2s_callback_if i2s_i,
  *  \param num_out        The number of output data ports
  *  \param p_din          An array of data input ports
  *  \param num_in         The number of input data ports
+ *  \param num_data_bits  The number of bits per data word
  *  \param p_bclk         The bit clock output port
  *  \param p_lrclk        The word clock output port
  *  \param p_mclk         Input port which supplies the master clock
@@ -243,6 +244,7 @@ void i2s_frame_master(client i2s_frame_callback_if i2s_i,
                 static const size_t num_out,
                 in buffered port:32 (&?p_din)[num_in],
                 static const size_t num_in,
+                static const size_t num_data_bits,
                 out port p_bclk,
                 out buffered port:32 p_lrclk,
                 in port p_mclk,
@@ -268,6 +270,7 @@ void i2s_frame_master(client i2s_frame_callback_if i2s_i,
  *  \param num_out        The number of output data ports
  *  \param p_din          An array of data input ports
  *  \param num_in         The number of input data ports
+ *  \param num_data_bits  The number of bits per data word
  *  \param p_bclk         The bit clock output port
  *  \param p_lrclk        The word clock output port
  *  \param bclk           A clock that is configured externally to be used as the bit clock
@@ -278,6 +281,7 @@ void i2s_frame_master_external_clock(client i2s_frame_callback_if i2s_i,
                 static const size_t num_out,
                 in buffered port:32 (&?p_din)[num_in],
                 static const size_t num_in,
+                static const size_t num_data_bits,
                 out port p_bclk,
                 out buffered port:32 p_lrclk,
                 clock bclk);
@@ -327,6 +331,7 @@ void i2s_slave(client i2s_callback_if i2s_i,
  *  \param num_out        The number of output data ports
  *  \param p_din          An array of data input ports
  *  \param num_in         The number of input data ports
+ *  \param num_data_bits  The number of bits per data word
  *  \param p_bclk         The bit clock input port
  *  \param p_lrclk        The word clock input port
  *  \param bclk           A clock that will get configured for use with
@@ -337,6 +342,7 @@ void i2s_frame_slave(client i2s_frame_callback_if i2s_i,
         static const size_t num_out,
         in buffered port:32 (&?p_din)[num_in],
         static const size_t num_in,
+        static const size_t num_data_bits,
         in port p_bclk,
         in buffered port:32 p_lrclk,
         clock bclk);
