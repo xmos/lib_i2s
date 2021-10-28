@@ -98,7 +98,7 @@ void i2s_loopback(server i2s_frame_callback_if i2s,
     select {
     case i2s.init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config):
       i2s_config.mode = I2S_MODE_I2S;
-      i2s_config.mclk_bclk_ratio = (MASTER_CLOCK_FREQUENCY/(SAMPLE_FREQUENCY*2*DATA_BITS);
+      i2s_config.mclk_bclk_ratio = (MASTER_CLOCK_FREQUENCY/(SAMPLE_FREQUENCY*2*DATA_BITS));
 
       // Set CODECs in reset
       dac_reset.output(0);
