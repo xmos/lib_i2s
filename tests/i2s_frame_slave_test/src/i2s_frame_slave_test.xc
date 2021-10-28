@@ -21,6 +21,8 @@ in port  setup_resp_port = XS1_PORT_1M;
 
 #define I2S_LOOPBACK_LATENCY 1
 
+#define DATA_BITS 32
+
 #if defined(SMOKE)
 #define NUM_BCLKS 1
 #define NUM_BCLKS_TO_CHECK 1
@@ -181,7 +183,7 @@ int main(){
 
     par {
       [[distribute]] app(i2s_i);
-      i2s_frame_slave(i2s_i, p_dout, NUM_OUT, p_din, NUM_IN,
+      i2s_frame_slave(i2s_i, p_dout, NUM_OUT, p_din, NUM_IN, DATA_BITS, 
                 p_bclk, p_lrclk, bclk);
       par(int i=0;i<7;i++){
         { set_core_fast_mode_on();

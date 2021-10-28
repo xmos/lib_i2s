@@ -29,6 +29,9 @@
 #ifndef GENERATE_MCLK
 #define GENERATE_MCLK 0
 #endif
+#ifndef DATA_BITS
+#define DATA_BITS 32
+#endif
 
 #if GENERATE_MCLK
 #define MASTER_CLOCK_FREQUENCY 25000000
@@ -61,7 +64,7 @@ void i2s_loopback(server i2s_frame_callback_if i2s)
     select {
     case i2s.init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config):
       i2s_config.mode = I2S_MODE_I2S;
-      i2s_config.mclk_bclk_ratio = (MASTER_CLOCK_FREQUENCY/SAMPLE_FREQUENCY)/64;
+      i2s_config.mclk_bclk_ratio = (MASTER_CLOCK_FREQUENCY/(SAMPLE_FREQUENCY*2*DATA_BITS));
       break;
 
     case i2s.receive(size_t num_chan_in, int32_t sample[num_chan_in]):
@@ -155,7 +158,7 @@ int main()
       set_port_mode_clock(p_mclk);
       start_clock(mclk);
 #endif
-      i2s_frame_master(i_i2s, p_dout, NUM_I2S_LINES, p_din, NUM_I2S_LINES, p_bclk, p_lrclk, p_mclk, bclk);
+      i2s_frame_master(i_i2s, p_dout, NUM_I2S_LINES, p_din, NUM_I2S_LINES, DATA_BITS, p_bclk, p_lrclk, p_mclk, bclk);
     }
 
     on tile[0]: [[distribute]] i2s_loopback(i_i2s);

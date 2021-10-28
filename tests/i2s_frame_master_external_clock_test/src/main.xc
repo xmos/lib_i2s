@@ -24,6 +24,9 @@ in port  setup_resp_port = XS1_PORT_1M;
 
 #define MAX_NUM_RESTARTS (4)
 
+#ifndef DATA_BITS
+#define DATA_BITS 32
+#endif
 
 
 
@@ -200,7 +203,8 @@ void setup_bclock()
 {
     mclock_freq_index=0;
     ratio_log2 = 1;
-    mclk_bclk_ratio = (1<<ratio_log2);
+    unsigned sample_frequency = 192000;
+    mclk_bclk_ratio = mclock_freq[mclock_freq_index] / (sample_frequency * 2 * DATA_BITS) // (1<<ratio_log2);
     current_mode = I2S_MODE_I2S;
 
     broadcast(mclock_freq[mclock_freq_index],
@@ -220,7 +224,7 @@ int main(){
         par {
             [[distribute]]
                 app(i2s_i);
-            i2s_frame_master_external_clock(i2s_i, p_dout, NUM_OUT, p_din, NUM_IN,
+            i2s_frame_master_external_clock(i2s_i, p_dout, NUM_OUT, p_din, NUM_IN, DATA_BITS,
                     p_bclk, p_lrclk, bclk);
             par(int i=0;i<7;i++)while(1);
         }
