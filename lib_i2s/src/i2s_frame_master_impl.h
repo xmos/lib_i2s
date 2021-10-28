@@ -40,6 +40,7 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
         static const size_t num_out,
         in buffered port:32 (&?p_din)[num_in],
         static const size_t num_in,
+        static const size_t num_data_bits,
         out port p_bclk,
         clock bclk,
         out buffered port:32 p_lrclk,
@@ -69,24 +70,25 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
 
 #pragma loop unroll
     for (size_t i=0, idx=0; i<num_out; i++, idx+=2){
-        p_dout[i] @ (1 + offset) <: bitrev(out_samps[idx]);
+        partout_timed(p_dout[i], num_data_bits, bitrev(out_samps[idx]), (1 + offset));
     }
 
-    p_lrclk @ 1 <: lr_mask;
+    partout_timed(p_lrclk, num_data_bits, lr_mask, 1);
 
     start_clock(bclk);
 
     //And pre-load the odds (1,3,5..)
 #pragma loop unroll
     for (size_t i=0, idx=1; i<num_out; i++, idx+=2){
-        p_dout[i] <: bitrev(out_samps[idx]);
+        partout(p_dout[i], num_data_bits, bitrev(out_samps[idx]));
     }
 
     lr_mask = ~lr_mask;
-    p_lrclk <: lr_mask;
+    partout(p_lrclk, num_data_bits, lr_mask);
 
     for (size_t i=0;i<num_in;i++) {
-        asm("setpt res[%0], %1"::"r"(p_din[i]), "r"(32 + offset));
+        asm("setpt res[%0], %1"::"r"(p_din[i]), "r"(num_data_bits + offset));
+        set_port_shift_count(p_din[i], num_data_bits);
     }
 
     while(1) {
@@ -99,7 +101,7 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
             //Output i2s evens (0,2,4..)
 #pragma loop unroll
             for (size_t i=0, idx=0; i<num_out; i++, idx+=2){
-                p_dout[i] <: bitrev(out_samps[idx]);
+                partout(p_dout[i], num_data_bits, bitrev(out_samps[idx]));
             }
         }
 
@@ -108,21 +110,22 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
         for (size_t i=0, idx=0; i<num_in; i++, idx+=2){
             int32_t data;
             asm volatile("in %0, res[%1]":"=r"(data):"r"(p_din[i]):"memory");
-            in_samps[idx] = bitrev(data);
+            set_port_shift_count(p_din[i], num_data_bits);
+            in_samps[idx] = bitrev(data) << (32 - num_data_bits);
         }
 
         lr_mask = ~lr_mask;
-        p_lrclk <: lr_mask;
+        partout(p_lrclk, num_data_bits, lr_mask);
 
         if (restart == I2S_NO_RESTART) {
             //Output i2s odds (1,3,5..)
 #pragma loop unroll
             for (size_t i=0, idx=1; i<num_out; i++, idx+=2){
-                p_dout[i] <: bitrev(out_samps[idx]);
+                partout(p_dout[i], num_data_bits, bitrev(out_samps[idx]));
             }
 
             lr_mask = ~lr_mask;
-            p_lrclk <: lr_mask;
+            partout(p_lrclk, num_data_bits, lr_mask);
         }
 
         //Input i2s odds (1,3,5..)
@@ -130,7 +133,8 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
         for (size_t i=0, idx=1; i<num_in; i++, idx+=2){
             int32_t data;
             asm volatile("in %0, res[%1]":"=r"(data):"r"(p_din[i]):"memory");
-            in_samps[idx] = bitrev(data);
+            set_port_shift_count(p_din[i], num_data_bits);
+            in_samps[idx] = bitrev(data) << (32 - num_data_bits);
         }
 
         if (num_in) i2s_i.receive(num_in << 1, in_samps);
@@ -155,6 +159,7 @@ static void i2s_frame_master0(client i2s_frame_callback_if i2s_i,
                 static const size_t num_out,
                 in buffered port:32 (&?p_din)[num_in],
                 static const size_t num_in,
+                static const size_t num_data_bits,
                 out port p_bclk,
                 out buffered port:32 p_lrclk,
                 in port p_mclk,
@@ -173,7 +178,7 @@ static void i2s_frame_master0(client i2s_frame_callback_if i2s_i,
 
         i2s_restart_t restart =
           i2s_frame_ratio_n(i2s_i, p_dout, num_out, p_din,
-                      num_in, p_bclk, bclk, p_lrclk,
+                      num_in, num_data_bits, p_bclk, bclk, p_lrclk,
                       config.mode);
 
         if (restart == I2S_SHUTDOWN)
@@ -188,6 +193,7 @@ static void i2s_frame_master0_external_clock(client i2s_frame_callback_if i2s_i,
                 static const size_t num_out,
                 in buffered port:32 (&?p_din)[num_in],
                 static const size_t num_in,
+                static const size_t num_data_bits,
                 out port p_bclk,
                 out buffered port:32 p_lrclk,
                 clock bclk){
@@ -205,7 +211,7 @@ static void i2s_frame_master0_external_clock(client i2s_frame_callback_if i2s_i,
 
         i2s_restart_t restart =
           i2s_frame_ratio_n(i2s_i, p_dout, num_out, p_din,
-                      num_in, p_bclk, bclk, p_lrclk,
+                      num_in, num_data_bits, p_bclk, bclk, p_lrclk,
                       config.mode);
 
         if (restart == I2S_SHUTDOWN)
@@ -220,6 +226,7 @@ inline void i2s_frame_master1(client interface i2s_frame_callback_if i,
         static const size_t num_i2s_out,
         in buffered port:32 i2s_din[num_i2s_in],
         static const size_t num_i2s_in,
+        static const size_t num_data_bits,
         out port i2s_bclk,
         out buffered port:32 i2s_lrclk,
         in port p_mclk,
@@ -233,6 +240,7 @@ inline void i2s_frame_master1_external_clock(client interface i2s_frame_callback
         static const size_t num_i2s_out,
         in buffered port:32 i2s_din[num_i2s_in],
         static const size_t num_i2s_in,
+        static const size_t num_data_bits,
         out port i2s_bclk,
         out buffered port:32 i2s_lrclk,
         clock clk_bclk) {
@@ -240,4 +248,4 @@ inline void i2s_frame_master1_external_clock(client interface i2s_frame_callback
                 i2s_bclk, i2s_lrclk, clk_bclk);
 }
 
-#endif // __XS2A__
+#endif // __XS2A__ || __XS3A__
