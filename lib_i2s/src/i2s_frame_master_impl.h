@@ -231,7 +231,7 @@ inline void i2s_frame_master1(client interface i2s_frame_callback_if i,
         out buffered port:32 i2s_lrclk,
         in port p_mclk,
         clock clk_bclk) {
-    i2s_frame_master0(i, i2s_dout, num_i2s_out, i2s_din, num_i2s_in,
+    i2s_frame_master0(i, i2s_dout, num_i2s_out, i2s_din, num_i2s_in, num_data_bits,
                 i2s_bclk, i2s_lrclk, p_mclk, clk_bclk);
 }
 
@@ -244,7 +244,7 @@ inline void i2s_frame_master1_external_clock(client interface i2s_frame_callback
         out port i2s_bclk,
         out buffered port:32 i2s_lrclk,
         clock clk_bclk) {
-    i2s_frame_master0_external_clock(i, i2s_dout, num_i2s_out, i2s_din, num_i2s_in,
+    i2s_frame_master0_external_clock(i, i2s_dout, num_i2s_out, i2s_din, num_i2s_in, num_data_bits,
                 i2s_bclk, i2s_lrclk, clk_bclk);
 }
 

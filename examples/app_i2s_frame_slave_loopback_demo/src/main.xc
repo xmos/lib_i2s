@@ -25,6 +25,9 @@
 #ifndef SIM_LOOPBACK_TEST
 #define SIM_LOOPBACK_TEST 0
 #endif
+#ifndef DATA_BITS
+#define DATA_BITS 32
+#endif
 
 
 /* Ports and clocks used by the application */
@@ -117,7 +120,7 @@ void reset_codecs(client i2c_master_if i2c)
 }
 
 void slave_mode_clk_setup_sim(const unsigned samFreq, const unsigned chans_per_frame){
-  const unsigned data_bits = 32;
+  const unsigned data_bits = DATA_BITS;
   const unsigned mclk_freq = MASTER_CLOCK_FREQUENCY;
   const unsigned mclk_freq_round_up = (mclk_freq / 1000000) + 1;
 
@@ -259,7 +262,7 @@ int main()
 
 
   par {
-    on tile[0]: i2s_frame_slave(i_i2s_slave, p_dout, NUM_I2S_LINES, p_din, NUM_I2S_LINES, p_bclk, p_lrclk, clk_bclk);
+    on tile[0]: i2s_frame_slave(i_i2s_slave, p_dout, NUM_I2S_LINES, p_din, NUM_I2S_LINES, DATA_BITS, p_bclk, p_lrclk, clk_bclk);
 
     on tile[0]: [[distribute]] i2c_master_single_port(i_i2c, 1, p_i2c, 100, 0, 1, 0);
     on tile[0]: [[distribute]] output_gpio(i_gpio, 4, p_gpio, gpio_pin_map);

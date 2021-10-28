@@ -20,6 +20,7 @@ on tile[0]: port p_gpio = XS1_PORT_8C;
 
 #define SAMPLE_FREQUENCY 48000
 #define MASTER_CLOCK_FREQUENCY 24576000
+#define DATA_BITS 32
 
 #define CS5368_ADDR           0x4C // I2C address of the CS5368 DAC
 #define CS5368_GCTL_MDE       0x01 // I2C mode control register number
@@ -97,7 +98,7 @@ void i2s_loopback(server i2s_frame_callback_if i2s,
     select {
     case i2s.init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config):
       i2s_config.mode = I2S_MODE_I2S;
-      i2s_config.mclk_bclk_ratio = (MASTER_CLOCK_FREQUENCY/SAMPLE_FREQUENCY)/64;
+      i2s_config.mclk_bclk_ratio = (MASTER_CLOCK_FREQUENCY/(SAMPLE_FREQUENCY*2*DATA_BITS);
 
       // Set CODECs in reset
       dac_reset.output(0);
@@ -146,7 +147,7 @@ int main()
   interface output_gpio_if i_gpio[4];
   par {
     /* System setup, I2S + Codec control over I2C */
-    on tile[0]: i2s_frame_master(i_i2s, p_dout, 4, p_din, 4, p_bclk, p_lrclk, p_mclk, bclk);
+    on tile[0]: i2s_frame_master(i_i2s, p_dout, 4, p_din, 4, DATA_BITS, p_bclk, p_lrclk, p_mclk, bclk);
     on tile[0]: [[distribute]] i2c_master_single_port(i_i2c, 1, p_i2c, 100, 0, 1, 0);
     on tile[0]: [[distribute]] output_gpio(i_gpio, 4, p_gpio, gpio_pin_map);
 

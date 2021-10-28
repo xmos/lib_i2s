@@ -11,6 +11,7 @@
 
 #define SAMPLE_FREQUENCY 192000
 #define MASTER_CLOCK_FREQUENCY 24576000
+#define DATA_BITS 32
 
 /* Ports and clocks used by the application */
 on tile[0]: out buffered port:32 p_lrclk = XS1_PORT_1G;
@@ -157,7 +158,7 @@ int main()
   interface output_gpio_if i_gpio[4];
 
   par {
-    on tile[0]: i2s_frame_master(i_i2s, p_dout, 4, p_din, 4, p_bclk, p_lrclk, p_mclk, bclk);
+    on tile[0]: i2s_frame_master(i_i2s, p_dout, 4, p_din, 4, DATA_BITS, p_bclk, p_lrclk, p_mclk, bclk);
 
     on tile[0]: [[distribute]] i2c_master_single_port(i_i2c, 1, p_i2c, 100, 0, 1, 0);
     on tile[0]: [[distribute]] output_gpio(i_gpio, 4, p_gpio, gpio_pin_map);
