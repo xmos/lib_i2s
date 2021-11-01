@@ -18,7 +18,6 @@ void my_application(server i2s_frame_callback_if i_i2s) {
   while (1) {
     select {
       case i_i2s.init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config):
-        i2s_config.mclk_bclk_ratio = (MASTER_CLOCK_FREQUENCY/SAMPLE_FREQUENCY)/64;
         i2s_config.mode = I2S_MODE_LEFT_JUSTIFIED;
         // Complete setup
         break;
