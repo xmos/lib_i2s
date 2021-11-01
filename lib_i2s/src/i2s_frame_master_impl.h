@@ -88,7 +88,6 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
 
     for (size_t i=0;i<num_in;i++) {
         asm("setpt res[%0], %1"::"r"(p_din[i]), "r"(num_data_bits + offset));
-        set_port_shift_count(p_din[i], num_data_bits);
     }
 
     while(1) {
@@ -109,8 +108,10 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
 #pragma loop unroll
         for (size_t i=0, idx=0; i<num_in; i++, idx+=2){
             int32_t data;
-            asm volatile("in %0, res[%1]":"=r"(data):"r"(p_din[i]):"memory");
-            set_port_shift_count(p_din[i], num_data_bits);
+            asm volatile("inpw %0, res[%1], %2"
+                        :"=r" (data)
+                        :"r"  (p_din[i]), "r" (num_data_bits)
+                        :"memory");
             in_samps[idx] = bitrev(data) << (32 - num_data_bits);
         }
 
@@ -132,8 +133,7 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
 #pragma loop unroll
         for (size_t i=0, idx=1; i<num_in; i++, idx+=2){
             int32_t data;
-            asm volatile("in %0, res[%1]":"=r"(data):"r"(p_din[i]):"memory");
-            set_port_shift_count(p_din[i], num_data_bits);
+            asm volatile("inpw %0, res[%1], %2":"=r"(data):"r"(p_din[i]), "r"(num_data_bits):"memory");
             in_samps[idx] = bitrev(data) << (32 - num_data_bits);
         }
 
