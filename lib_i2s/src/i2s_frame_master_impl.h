@@ -107,11 +107,11 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
         //Input i2s evens (0,2,4..)
 #pragma loop unroll
         for (size_t i=0, idx=0; i<num_in; i++, idx+=2){
-            int32_t data;
-            asm volatile("inpw %0, res[%1], %2"
-                        :"=r" (data)
-                        :"r"  (p_din[i]), "r" (num_data_bits)
-                        :"memory");
+            //asm volatile("inpw %0, res[%1], 32"
+            //            :"=r" (data)
+            //            :"r"  (p_din[i])
+            //            :"memory");
+            const int32_t data = partin(p_din[i], num_data_bits);
             in_samps[idx] = bitrev(data) << (32 - num_data_bits);
         }
 
@@ -132,8 +132,7 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
         //Input i2s odds (1,3,5..)
 #pragma loop unroll
         for (size_t i=0, idx=1; i<num_in; i++, idx+=2){
-            int32_t data;
-            asm volatile("inpw %0, res[%1], %2":"=r"(data):"r"(p_din[i]), "r"(num_data_bits):"memory");
+            const int32_t data = partin(p_din[i], num_data_bits);
             in_samps[idx] = bitrev(data) << (32 - num_data_bits);
         }
 
