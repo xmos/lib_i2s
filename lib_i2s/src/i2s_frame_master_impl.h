@@ -110,19 +110,10 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
         //Input i2s evens (0,2,4..)
 #pragma loop unroll
         for (size_t i=0, idx=0; i<num_in; i++, idx+=2){
-<<<<<<< HEAD
             int32_t data;
             asm volatile("in %0, res[%1]":"=r"(data):"r"(p_din[i]):"memory");
             set_port_shift_count(p_din[i], num_data_bits);
             in_samps[idx] = bitrev(data) & data_bit_mask;
-=======
-            //asm volatile("inpw %0, res[%1], 32"
-            //            :"=r" (data)
-            //            :"r"  (p_din[i])
-            //            :"memory");
-            const int32_t data = partin(p_din[i], num_data_bits);
-            in_samps[idx] = bitrev(data) << (32 - num_data_bits);
->>>>>>> 261e3b36fe144830832c4515cccfd5fb14799a77
         }
 
         lr_mask = ~lr_mask;
@@ -142,15 +133,10 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
         //Input i2s odds (1,3,5..)
 #pragma loop unroll
         for (size_t i=0, idx=1; i<num_in; i++, idx+=2){
-<<<<<<< HEAD
             int32_t data;
             asm volatile("in %0, res[%1]":"=r"(data):"r"(p_din[i]):"memory");
             set_port_shift_count(p_din[i], num_data_bits);
             in_samps[idx] = bitrev(data) & data_bit_mask;
-=======
-            const int32_t data = partin(p_din[i], num_data_bits);
-            in_samps[idx] = bitrev(data) << (32 - num_data_bits);
->>>>>>> 261e3b36fe144830832c4515cccfd5fb14799a77
         }
 
         if (num_in) i2s_i.receive(num_in << 1, in_samps);
