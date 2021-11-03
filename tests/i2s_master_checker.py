@@ -66,7 +66,7 @@ class I2SMasterChecker(xmostest.SimThread):
         self.wait_for_port_pins_change([setup_strobe_port])
         return xsi.sample_port_pins(setup_data_port)
 
-    def __init__(self,  bclk, lrclk, din, dout, setup_strobe_port, setup_data_port, setup_resp_port, c, check_extra_bclk=True):
+    def __init__(self,  bclk, lrclk, din, dout, setup_strobe_port, setup_data_port, setup_resp_port, c, check_extra_bclk=True, frame_based=False):
         self._din = din
         self._dout = dout
         self._bclk = bclk
@@ -76,6 +76,7 @@ class I2SMasterChecker(xmostest.SimThread):
         self._setup_resp_port = setup_resp_port
         self._clk = c
         self._check_extra_bclk = check_extra_bclk
+        self._frame_based = frame_based
 
     def run(self):
         xsi = self.xsi
@@ -100,8 +101,11 @@ class I2SMasterChecker(xmostest.SimThread):
                 xsi, self._setup_strobe_port, self._setup_data_port)
             is_i2s_justified = self.get_setup_data(
                 xsi, self._setup_strobe_port, self._setup_data_port)
-            data_bits = self.get_setup_data(
-                xsi, self._setup_strobe_port, self._setup_data_port)
+            if self._frame_based:
+                data_bits = self.get_setup_data(
+                    xsi, self._setup_strobe_port, self._setup_data_port)
+            else:
+                data_bits = 32
 
             mclk_frequency = (mclk_frequency_u << 16) + mclk_frequency_l
 

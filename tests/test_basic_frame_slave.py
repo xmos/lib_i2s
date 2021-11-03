@@ -26,7 +26,7 @@ def do_frame_slave_test(data_bits, num_in, num_out, testlevel):
     tester = xmostest.ComparisonTester(open('slave_test.expect'),
                                      'lib_i2s', 'i2s_frame_slave_sim_tests',
                                      'basic_test_%s'%testlevel,
-                                     {'num_in':num_in, 'num_out':num_out},
+                                     {'num_in':num_in, 'num_out':num_out, 'data_bits':data_bits},
                                        regexp=True,
                                        ignore=["CONFIG:.*"])
 

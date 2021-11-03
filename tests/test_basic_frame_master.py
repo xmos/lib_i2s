@@ -23,7 +23,8 @@ def do_master_test(data_bits, num_in, num_out, testlevel):
         "tile[0]:XS1_PORT_16A",
         "tile[0]:XS1_PORT_1M",
          clk,
-         False) # Don't check the bclk stops precisely as the hardware can't do that
+         False, # Don't check the bclk stops precisely as the hardware can't do that
+         True)  # We're running the frame-based master, so can have variable data widths
 
     tester = xmostest.ComparisonTester(open('master_test.expect'),
                                        'lib_i2s', 'i2s_frame_master_sim_tests',
