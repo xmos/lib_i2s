@@ -4,12 +4,15 @@
 #include <i2s.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <xclib.h>
+
+#define IS_POWER_OF_2(x) ((x) && !((x) & ((x) - 1)))
 
 in port p_mclk  = XS1_PORT_1A;
 out port p_bclk = XS1_PORT_1B;
 out buffered port:32 p_lrclk = XS1_PORT_1C;
 
-in buffered port:32 p_din [4] = {XS1_PORT_1D, XS1_PORT_1E, XS1_PORT_1F, XS1_PORT_1G};
+in buffered port:32   p_din[4]  = {XS1_PORT_1D, XS1_PORT_1E, XS1_PORT_1F, XS1_PORT_1G};
 out buffered port:32  p_dout[4] = {XS1_PORT_1H, XS1_PORT_1I, XS1_PORT_1J, XS1_PORT_1K};
 
 clock bclk = XS1_CLKBLK_2;
@@ -22,7 +25,9 @@ in port  setup_resp_port = XS1_PORT_1M;
 
 #define MAX_CHANNELS 8
 
+#ifndef DATA_BITS
 #define DATA_BITS 32
+#endif
 
 #if defined(SMOKE)
 #if NUM_OUT > 1 || NUM_IN > 1
@@ -87,7 +92,7 @@ static void send_data_to_tester(
 }
 
 static void broadcast(unsigned mclk_freq, unsigned mclk_bclk_ratio,
-        unsigned num_in, unsigned num_out, int is_i2s_justified){
+        unsigned num_in, unsigned num_out, int is_i2s_justified, unsigned data_bits){
     setup_strobe_port <: 0;
     send_data_to_tester(setup_strobe_port, setup_data_port, mclk_freq>>16);
     send_data_to_tester(setup_strobe_port, setup_data_port, mclk_freq);
@@ -95,6 +100,7 @@ static void broadcast(unsigned mclk_freq, unsigned mclk_bclk_ratio,
     send_data_to_tester(setup_strobe_port, setup_data_port, num_in);
     send_data_to_tester(setup_strobe_port, setup_data_port, num_out);
     send_data_to_tester(setup_strobe_port, setup_data_port, is_i2s_justified);
+    send_data_to_tester(setup_strobe_port, setup_data_port, data_bits);
  }
 
 static int request_response(
@@ -135,7 +141,13 @@ void app(server interface i2s_frame_callback_if i2s_i){
         case i2s_i.receive(size_t n, int32_t receive_data[n]):{
             for(size_t c=0; c<n; c++){
                 unsigned i = rx_data_counter[c];
-                error |= (receive_data[c] != rx_data[c][i]);
+                // We shift here to pick up the case where the value we are
+                // testing with e.g. 401 cannot be represented in the given bit
+                // depth e.g. 8 bit
+                if ((receive_data[c] << (32-DATA_BITS)) != (rx_data[c][i] << (32-DATA_BITS)))
+                {
+                    error |= 1;
+                }
                 rx_data_counter[c] = i+1;
             }
             break;
@@ -155,10 +167,10 @@ void app(server interface i2s_frame_callback_if i2s_i){
                  if(error)
                    printf("Error: test fail\n");
 
-                 int s = 0;
-                 while(!s){
-                     if (ratio_log2 == MAX_RATIO){
-                         ratio_log2 = 1;
+                int s = 0;
+                while(!s){
+                    if (ratio_log2 == MAX_RATIO){
+                        ratio_log2 = 1;
                         if(mclock_freq_index == NUM_MCLKS-1){
                             mclock_freq_index = 0;
                             if (current_mode == I2S_MODE_I2S) {
@@ -177,7 +189,20 @@ void app(server interface i2s_frame_callback_if i2s_i){
                 }
             }
 
-            i2s_config.mclk_bclk_ratio = (1<<ratio_log2);
+            // In this test, mclk_bclk_ratio is used to select sample frequency.
+            // clz(data_bits) gives 26 when data_bits = 32, 27 when data_bits = 16
+            // etc. etc.. In this manner, we can artificially increase the ratio
+            // as required by lower data bit values. 
+            // Non-powers of 2 behave badly. Fix this.
+            if (IS_POWER_OF_2(DATA_BITS))
+            {
+                unsigned base_ratio = 1 << (clz(DATA_BITS) - 26);
+                i2s_config.mclk_bclk_ratio = (base_ratio << ratio_log2);
+            }
+            else
+            {
+                i2s_config.mclk_bclk_ratio = (1 << ratio_log2);
+            }
 
             frames_sent = 0;
             error = 0;
@@ -191,7 +216,7 @@ void app(server interface i2s_frame_callback_if i2s_i){
             }
             broadcast(mclock_freq[mclock_freq_index],
                       i2s_config.mclk_bclk_ratio, NUM_IN, NUM_OUT,
-                      i2s_config.mode == I2S_MODE_I2S);
+                      i2s_config.mode == I2S_MODE_I2S, DATA_BITS);
 
             break;
         }
