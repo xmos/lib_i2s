@@ -2,6 +2,7 @@
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 #if defined(__XS2A__) || defined(__XS3A__)
 
+#include "limits.h"
 #include <xs1.h>
 #include <xclib.h>
 #include "i2s.h"
@@ -53,6 +54,8 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
     assert((num_in << 1) <= 16);
 
     unsigned lr_mask = 0;
+    unsigned data_bit_offset = 32 - num_data_bits;
+    unsigned data_bit_mask = UINT_MAX >> data_bit_offset; // e.g. 00011111 for 5b data
 
     for (size_t i=0;i<num_out;i++)
         clearbuf(p_dout[i]);
@@ -70,7 +73,7 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
 
 #pragma loop unroll
     for (size_t i=0, idx=0; i<num_out; i++, idx+=2){
-        partout_timed(p_dout[i], num_data_bits, bitrev(out_samps[idx]), (1 + offset));
+        partout_timed(p_dout[i], num_data_bits, bitrev(out_samps[idx] << data_bit_offset), (1 + offset));
     }
 
     partout_timed(p_lrclk, num_data_bits, lr_mask, 1);
@@ -80,7 +83,7 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
     //And pre-load the odds (1,3,5..)
 #pragma loop unroll
     for (size_t i=0, idx=1; i<num_out; i++, idx+=2){
-        partout(p_dout[i], num_data_bits, bitrev(out_samps[idx]));
+        partout(p_dout[i], num_data_bits, bitrev(out_samps[idx] << data_bit_offset));
     }
 
     lr_mask = ~lr_mask;
@@ -101,7 +104,7 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
             //Output i2s evens (0,2,4..)
 #pragma loop unroll
             for (size_t i=0, idx=0; i<num_out; i++, idx+=2){
-                partout(p_dout[i], num_data_bits, bitrev(out_samps[idx]));
+                partout(p_dout[i], num_data_bits, bitrev(out_samps[idx] << data_bit_offset));
             }
         }
 
@@ -111,7 +114,7 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
             int32_t data;
             asm volatile("in %0, res[%1]":"=r"(data):"r"(p_din[i]):"memory");
             set_port_shift_count(p_din[i], num_data_bits);
-            in_samps[idx] = bitrev(data) << (32 - num_data_bits);
+            in_samps[idx] = bitrev(data) & data_bit_mask;
         }
 
         lr_mask = ~lr_mask;
@@ -121,7 +124,7 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
             //Output i2s odds (1,3,5..)
 #pragma loop unroll
             for (size_t i=0, idx=1; i<num_out; i++, idx+=2){
-                partout(p_dout[i], num_data_bits, bitrev(out_samps[idx]));
+                partout(p_dout[i], num_data_bits, bitrev(out_samps[idx] << data_bit_offset));
             }
 
             lr_mask = ~lr_mask;
@@ -134,7 +137,7 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
             int32_t data;
             asm volatile("in %0, res[%1]":"=r"(data):"r"(p_din[i]):"memory");
             set_port_shift_count(p_din[i], num_data_bits);
-            in_samps[idx] = bitrev(data) << (32 - num_data_bits);
+            in_samps[idx] = bitrev(data) & data_bit_mask;
         }
 
         if (num_in) i2s_i.receive(num_in << 1, in_samps);
