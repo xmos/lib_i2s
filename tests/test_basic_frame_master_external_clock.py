@@ -5,11 +5,11 @@ from i2s_master_checker import I2SMasterChecker
 from i2s_master_checker import Clock
 import os
 
-def do_master_test(num_in, num_out, testlevel):
+def do_master_test(data_bits, num_in, num_out, testlevel):
 
     resources = xmostest.request_resource("xsim")
 
-    binary = 'i2s_frame_master_external_clock_test/bin/{tl}_{i}{o}/i2s_frame_master_external_clock_test_{tl}_{i}{o}.xe'.format(i=num_in, o=num_out,tl=testlevel)
+    binary = 'i2s_frame_master_external_clock_test/bin/{tl}_{db}{i}{o}/i2s_frame_master_external_clock_test_{tl}_{db}{i}{o}.xe'.format(db=data_bits,i=num_in, o=num_out,tl=testlevel)
 
     clk = Clock("tile[0]:XS1_PORT_1A")
 
@@ -27,7 +27,7 @@ def do_master_test(num_in, num_out, testlevel):
 
     tester = xmostest.ComparisonTester(open('master_test.expect'),
                                        'lib_i2s', 'i2s_frame_master_sim_tests',
-                                       'basic_test_%s'%testlevel, {'num_in':num_in, 'num_out':num_out},ignore=["CONFIG:.*"])
+                                       'basic_test_%s'%testlevel, {'data_bits':data_bits, 'num_in':num_in, 'num_out':num_out},ignore=["CONFIG:.*"])
 
     tester.set_min_testlevel(testlevel)
 
@@ -39,9 +39,10 @@ def do_master_test(num_in, num_out, testlevel):
                               tester = tester)
 
 def runtest():
-   do_master_test(4, 4, "smoke")
-   do_master_test(1, 1, "smoke")
-   do_master_test(4, 0, "smoke")
-   do_master_test(0, 4, "smoke")
-   do_master_test(4, 4, "nightly")
+    for db in (8, 16, 24, 32):
+        do_master_test(db, 4, 4, "smoke")
+        do_master_test(db, 1, 1, "smoke")
+        do_master_test(db, 4, 0, "smoke")
+        do_master_test(db, 0, 4, "smoke")
+        do_master_test(db, 4, 4, "nightly")
 

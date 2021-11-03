@@ -5,11 +5,11 @@ from i2s_slave_checker import I2SSlaveChecker
 from i2s_slave_checker import Clock
 import os
 
-def do_frame_slave_test(num_in, num_out, testlevel):
+def do_frame_slave_test(data_bits, num_in, num_out, testlevel):
 
     resources = xmostest.request_resource("xsim")
 
-    binary = 'i2s_frame_slave_test/bin/{tl}_{i}{o}/i2s_frame_slave_test_{tl}_{i}{o}.xe'.format(i=num_in, o=num_out, tl=testlevel)
+    binary = 'i2s_frame_slave_test/bin/{tl}_{db}{i}{o}/i2s_frame_slave_test_{tl}_{db}{i}{o}.xe'.format(db=data_bits,i=num_in, o=num_out, tl=testlevel)
 
     clk = Clock("tile[0]:XS1_PORT_1A")
 
@@ -39,7 +39,8 @@ def do_frame_slave_test(num_in, num_out, testlevel):
                               tester = tester)
 
 def runtest():
-    do_frame_slave_test(4, 4, "smoke")
-    do_frame_slave_test(4, 0, "smoke")
-    do_frame_slave_test(0, 4, "smoke")
-    do_frame_slave_test(4, 4, "nightly")
+    for db in (8, 16, 24, 32):
+        do_frame_slave_test(db, 4, 4, "smoke")
+        do_frame_slave_test(db, 4, 0, "smoke")
+        do_frame_slave_test(db, 0, 4, "smoke")
+        do_frame_slave_test(db, 4, 4, "nightly")

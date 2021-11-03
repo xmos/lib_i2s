@@ -5,11 +5,11 @@ from i2s_slave_checker import I2SSlaveChecker
 from i2s_slave_checker import Clock
 import os
 
-def do_slave_test(num_in, num_out, testlevel):
+def do_slave_test(data_bits, num_in, num_out, testlevel):
 
     resources = xmostest.request_resource("xsim")
 
-    binary = 'i2s_slave_test/bin/{tl}_{i}{o}_inv/i2s_slave_test_{tl}_{i}{o}_inv.xe'.format(i=num_in, o=num_out, tl=testlevel)
+    binary = 'i2s_slave_test/bin/{tl}_{db}{i}{o}_inv/i2s_slave_test_{tl}_{db}{i}{o}_inv.xe'.format(db=data_bits,i=num_in, o=num_out, tl=testlevel)
 
     clk = Clock("tile[0]:XS1_PORT_1A")
 
@@ -27,7 +27,7 @@ def do_slave_test(num_in, num_out, testlevel):
     tester = xmostest.ComparisonTester(open('bclk_invert.expect'),
                                      'lib_i2s', 'i2s_slave_sim_tests',
                                      'slave_bclk_invert_%s'%testlevel,
-                                     {'num_in':num_in, 'num_out':num_out},
+                                     {'num_in':num_in, 'num_out':num_out, 'data_bits':data_bits},
                                        regexp=True,
                                        ignore=["CONFIG:.*"])
 
@@ -40,5 +40,6 @@ def do_slave_test(num_in, num_out, testlevel):
                               tester = tester)
 
 def runtest():
-    do_slave_test(2, 2, "smoke")
-    do_slave_test(2, 2, "nightly")
+    for db in (8, 16, 24, 32):
+        do_slave_test(2, 2, "smoke")
+        do_slave_test(2, 2, "nightly")

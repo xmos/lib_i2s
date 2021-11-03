@@ -23,15 +23,17 @@ USED_MODULES = lib_i2s
 
 COMMON_FLAGS = -O3 -g -save-temps
 
-$(foreach out,0 1 2 3 4,\
- $(foreach in,0 1 2 3 4,\
-   $(eval \
-    XCC_FLAGS_smoke_$(out)$(in) = $(COMMON_FLAGS) -DNUM_OUT=$(out) -DNUM_IN=$(in) -DSMOKE\
-    ) \
-   $(eval \
-    XCC_FLAGS_nightly_$(out)$(in) = $(COMMON_FLAGS) -DNUM_OUT=$(out) -DNUM_IN=$(in)\
-    ) \
- ) \
+$(foreach db,32 16 8,\
+  $(foreach out,0 1 2 3 4,\
+    $(foreach in,0 1 2 3 4,\
+      $(eval \
+        XCC_FLAGS_smoke_$(db)$(out)$(in) = $(COMMON_FLAGS) -DDATA_BITS=$(db) -DNUM_OUT=$(out) -DNUM_IN=$(in) -DSMOKE\
+      ) \
+      $(eval \
+        XCC_FLAGS_nightly_$(db)$(out)$(in) = $(COMMON_FLAGS) -DDATA_BITS=$(db) -DNUM_OUT=$(out) -DNUM_IN=$(in)\
+      )\
+    )\
+  )\
 )
 
 # The XCORE_ARM_PROJECT variable, if set to 1, configures this
