@@ -91,6 +91,7 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
 
     for (size_t i=0;i<num_in;i++) {
         asm("setpt res[%0], %1"::"r"(p_din[i]), "r"(num_data_bits + offset));
+        set_port_shift_count(p_din[i], num_data_bits);
     }
 
     while(1) {
