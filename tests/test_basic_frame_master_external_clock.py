@@ -9,7 +9,9 @@ def do_master_test(data_bits, num_in, num_out, testlevel):
 
     resources = xmostest.request_resource("xsim")
 
-    binary = 'i2s_frame_master_external_clock_test/bin/{tl}_{db}{i}{o}/i2s_frame_master_external_clock_test_{tl}_{db}{i}{o}.xe'.format(db=data_bits,i=num_in, o=num_out,tl=testlevel)
+    id_string ="{tl}_{db}{i}{o}".format(db=data_bits,i=num_in, o=num_out,tl=testlevel)
+
+    binary = 'i2s_frame_master_external_clock_test/bin/{id}/i2s_frame_master_external_clock_test_{id}.xe'.format(id=id_string)
 
     clk = Clock("tile[0]:XS1_PORT_1A")
 
@@ -35,12 +37,13 @@ def do_master_test(data_bits, num_in, num_out, testlevel):
     xmostest.run_on_simulator(resources['xsim'], binary,
                               simthreads = [clk, checker],
                               simargs=[],
-                              # simargs=['--trace-to', 'sim.log', '--vcd-tracing', '-o ./i2s_frame_master_test/trace.vcd -tile tile[0] -ports-detailed -functions'],
+                              #simargs=['--trace-to', './i2s_frame_master_external_clock_test/logs/sim_{id}.log'.format(id=id_string), 
+                              #         '--vcd-tracing', '-o ./i2s_frame_master_external_clock_test/traces/trace_{id}.vcd -tile tile[0] -ports-detailed -functions -cycles -clock-blocks -cores -instructions'.format(id=id_string)],
                               suppress_multidrive_messages = True,
                               tester = tester)
 
 def runtest():
-    for db in (8, 16, 24, 32):
+    for db in (24, 25, 26):
         do_master_test(db, 4, 4, "smoke")
         do_master_test(db, 1, 1, "smoke")
         do_master_test(db, 4, 0, "smoke")
