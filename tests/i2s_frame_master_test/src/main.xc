@@ -161,6 +161,7 @@ void set_mclk_and_ratio(unsigned sample_frequency)
         // This always gives better performance than the use of a 100MHz,
         // but may not be divisible in certain combinations - max clk divisor
         // is 255. In these instances, try other sensible lower clk speeds. 
+        // Unfortunately, the simulator doesn't seem to be able to go above 250.
 
         unsigned test_mclk_freqs[6] = {250000000, 100000000, 24576000, 
                                             1228800, 6144000, 3072000};
@@ -174,7 +175,7 @@ void set_mclk_and_ratio(unsigned sample_frequency)
 
             if (test_clk_idx > 5)
             {
-                printf("Unsupported sample rate and data bit combination!");
+                printf("Unsupported sample rate and data bit depth combination!");
                 _Exit(1);
             }
         } while (test_divisor > 255);

@@ -23,7 +23,7 @@ USED_MODULES = lib_i2s
 
 COMMON_FLAGS = -O2 -g -save-temps
 
-$(foreach db,8 16 24 32,\
+$(foreach db,32 16 8,\
   $(foreach out,0 1 2 3 4,\
     $(foreach in,0 1 2 3 4,\
       $(eval \

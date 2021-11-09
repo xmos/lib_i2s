@@ -4,6 +4,10 @@
 #include <xclib.h>
 #include "i2s.h"
 #include <print.h>
+#include "limits.h"
+#include "xassert.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 static void i2s_frame_slave_init_ports(
         out buffered port:32 (&?p_dout)[num_out],
@@ -22,7 +26,6 @@ static void i2s_frame_slave_init_ports(
         configure_in_port(p_din[i], bclk);
     start_clock(bclk);
 }
-
 
 #define i2s_frame_slave i2s_frame_slave0
 
@@ -44,16 +47,23 @@ static void i2s_frame_slave0(client i2s_frame_callback_if i2s_i,
     // Since #pragma unsafe arrays is used need to ensure array won't overflow.
     assert((num_in << 1) <= 16);
 
+    const unsigned data_bit_offset = 32 - num_data_bits;
+    const unsigned data_bit_mask = UINT_MAX >> data_bit_offset; // e.g. 00011111 for 5b data
+    
+    i2s_frame_slave_init_ports(p_dout, num_out, p_din, num_in, p_bclk, p_lrclk, bclk);
 
-    while(1){
-        i2s_frame_slave_init_ports(p_dout, num_out, p_din, num_in, p_bclk, p_lrclk, bclk);
 
+    while(1)
+    {
         i2s_config_t config;
         i2s_restart_t restart = I2S_NO_RESTART;
         i2s_i.init(config, null);
         
         //Get initial send data if output enabled
-        if (num_out) i2s_i.send(num_out << 1, out_samps);
+        if (num_out) 
+        {
+            i2s_i.send(num_out << 1, out_samps);
+        }
 
         unsigned mode = config.mode;
 
@@ -62,8 +72,8 @@ static void i2s_frame_slave0(client i2s_frame_callback_if i2s_i,
         else
             set_port_no_inv(p_bclk);
 
-        const unsigned expected_low  = (mode == I2S_MODE_I2S ? 0x80000000 : 0x00000000);
-        const unsigned expected_high = (mode == I2S_MODE_I2S ? 0x7fffffff : 0xffffffff);
+        const unsigned expected_low  = (mode == I2S_MODE_I2S ? 0x80000000 : 0x00000000) & !data_bit_mask;
+        const unsigned expected_high = (mode == I2S_MODE_I2S ? 0x7fffffff : 0xffffffff) & !data_bit_mask;
 
         unsigned syncerror = 0;
         unsigned lrval;
@@ -75,7 +85,8 @@ static void i2s_frame_slave0(client i2s_frame_callback_if i2s_i,
         clearbuf(p_lrclk);
 
         unsigned offset = 0;
-        if (mode==I2S_MODE_I2S) {
+        if (mode==I2S_MODE_I2S) 
+        {
             offset = 1;
         }
 
@@ -86,84 +97,204 @@ static void i2s_frame_slave0(client i2s_frame_callback_if i2s_i,
         unsigned initial_out_port_time = port_time + offset + (I2S_CHANS_PER_FRAME*num_data_bits);
         unsigned initial_in_port_time  = port_time + offset + ((I2S_CHANS_PER_FRAME*num_data_bits)+num_data_bits) - 1;
 
-        //Start outputting evens (0,2,4..) data at correct point relative to the clock
-        for (size_t i=0, idx=0; i<num_out; i++, idx+=2){
-            partout_timed(p_dout[i], num_data_bits, bitrev(out_samps[idx]), initial_out_port_time);
+        if (num_data_bits == 32)
+        {
+            // Start outputting evens (0,2,4..) data at correct point relative to the clock
+#pragma loop unroll
+            for (size_t i = 0, idx = 0; i < num_out; i++, idx += 2)
+            {
+                p_dout[i] @ initial_out_port_time <: bitrev(out_samps[idx]);
+            }
+
+            // XC doesn't have syntax for setting a timed input without waiting for the input 
+            asm volatile("setpt res[%0], %1"
+                        :
+                        :"r"(p_lrclk),"r"(initial_in_port_time));
+            for (size_t i = 0; i < num_in; i++) 
+            {
+                asm volatile("setpt res[%0], %1"
+                            :
+                            :"r"(p_din[i]),"r"(initial_in_port_time));
+            }
+
+            //And pre-load the odds (1,3,5..) to follow immediately afterwards
+            for (size_t i = 0, idx = 1; i < num_out; i++, idx += 2)
+            {
+                p_dout[i] <: bitrev(out_samps[idx]);
+            }
+        }
+        else
+        {
+            // Start outputting evens (0,2,4..) data at correct point relative to the clock
+#pragma loop unroll
+            for (size_t i = 0, idx = 0; i < num_out; i++, idx += 2)
+            {
+                partout_timed(p_dout[i], num_data_bits, bitrev(out_samps[idx] << data_bit_offset), initial_out_port_time);
+            }
+
+            // XC doesn't have syntax for setting a timed input without waiting for the input 
+            asm volatile("setpt res[%0], %1"
+                        :
+                        :"r"(p_lrclk),"r"(initial_in_port_time));
+            set_port_shift_count(p_lrclk, num_data_bits);
+
+            for (size_t i = 0; i < num_in; i++) 
+            {
+                asm volatile("setpt res[%0], %1"
+                            :
+                            :"r"(p_din[i]),"r"(initial_in_port_time));
+                set_port_shift_count(p_din[i], num_data_bits);
+            }
+
+            //And pre-load the odds (1,3,5..) to follow immediately afterwards
+            for (size_t i = 0, idx = 1; i < num_out; i++, idx += 2)
+            {
+                partout(p_dout[i], num_data_bits, bitrev(out_samps[idx] << data_bit_offset));
+            }
         }
 
-        // XC doesn't have syntax for setting a timed input without waiting for the input 
-        asm("setpt res[%0], %1"::"r"(p_lrclk),"r"(initial_in_port_time));
-        set_port_shift_count(p_lrclk, num_data_bits);
-
-        for (size_t i=0;i<num_in;i++) {
-            asm("setpt res[%0], %1"::"r"(p_din[i]),"r"(initial_in_port_time));
-            set_port_shift_count(p_din[i], num_data_bits);
-        }
-
-        //And pre-load the odds (1,3,5..) to follow immediately afterwards
-        for (size_t i=0, idx=1; i<num_out; i++, idx+=2){
-            partout(p_dout[i], num_data_bits, bitrev(out_samps[idx]));
-        }
 
         //Main loop
-        while (!syncerror && (restart == I2S_NO_RESTART)) {
+        while (!syncerror && (restart == I2S_NO_RESTART)) 
+        {
             restart = i2s_i.restart_check();
 
-
-            if (num_out && (restart == I2S_NO_RESTART)){
+            if (num_out && (restart == I2S_NO_RESTART))
+            {
                 i2s_i.send(num_out << 1, out_samps);
 
-                //Output i2s evens (0,2,4..)
+                // Output i2s evens (0,2,4..)
+                if (num_data_bits == 32)
+                {
 #pragma loop unroll
-                for (size_t i=0, idx=0; i<num_out; i++, idx+=2){
-                    partout(p_dout[i], num_data_bits, bitrev(out_samps[idx]));
+                    for (size_t i = 0, idx = 0; i < num_out; i++, idx += 2)
+                    {
+                        p_dout[i] <: bitrev(out_samps[idx]);
+                    }
+                }
+                else
+                {
+#pragma loop unroll
+                    for (size_t i = 0, idx = 0; i < num_out; i++, idx += 2)
+                    {
+                        partout(p_dout[i], num_data_bits, bitrev(out_samps[idx] << data_bit_offset));
+                    }
                 }
             }
                 
-            //Read lrclk value
-
-            asm volatile("in %0, res[%1]":"=r"(lrval):"r"(p_lrclk):"memory");
-            set_port_shift_count(p_lrclk, num_data_bits);
-
-            //Input i2s evens (0,2,4..)
-#pragma loop unroll
-            for (size_t i=0, idx=0; i<num_in; i++, idx+=2){
-                int32_t data;
-                asm volatile("in %0, res[%1]":"=r"(data):"r"(p_din[i]):"memory");
-                set_port_shift_count(p_din[i], num_data_bits);
-                in_samps[idx] = bitrev(data) << (32 - num_data_bits);
+            // Read lrclk value
+            if (num_data_bits == 32)
+            {
+                p_lrclk :> lrval;
+            }
+            else
+            {
+                asm volatile("in %0, res[%1]"
+                            :"=r"(lrval)
+                            :"r"(p_lrclk)
+                            :"memory");
+                set_port_shift_count(p_lrclk, num_data_bits);
             }
 
-            // TODO: work out method for detecting a syncerror
-            // syncerror += (lrval != expected_low);
-
-            //Read lrclk value
-            asm volatile("in %0, res[%1]":"=r"(lrval):"r"(p_lrclk):"memory");
-            set_port_shift_count(p_lrclk, num_data_bits);
-
-            //Output i2s odds (1,3,5..)
+            // Input i2s evens (0,2,4..)
+            if (num_data_bits == 32)
+            {
 #pragma loop unroll
-            if (num_out && (restart == I2S_NO_RESTART)){
-                for (size_t i=0, idx=1; i<num_out; i++, idx+=2){
-                    partout(p_dout[i], num_data_bits, bitrev(out_samps[idx]));
+                for (size_t i = 0, idx = 0; i < num_in; i++, idx += 2)
+                {
+                    int32_t data;
+                    asm volatile("in %0, res[%1]"
+                                :"=r"(data)
+                                :"r"(p_din[i])
+                                :"memory");
+                    in_samps[idx] = bitrev(data);
+                }
+            }
+            else
+            {
+#pragma loop unroll
+                for (size_t i=0, idx=0; i<num_in; i++, idx+=2)
+                {
+                    int32_t data;
+                    asm volatile("in %0, res[%1]"
+                                :"=r"(data)
+                                :"r"(p_din[i])
+                                :"memory");
+                    set_port_shift_count(p_din[i], num_data_bits);
+                    in_samps[idx] = bitrev(data) & data_bit_mask;
                 }
             }
 
-        //Input i2s odds (1,3,5..)
+                
+            syncerror += ((lrval & !data_bit_mask) != expected_low);
+            
+            
+            if (num_data_bits == 32)
+            {
+                // Read lrclk value
+                p_lrclk :> lrval;
+
+                // Output i2s odds (1,3,5..)
 #pragma loop unroll
-            for (size_t i=0, idx=1; i<num_in; i++, idx+=2){
-                int32_t data;
-                asm volatile("in %0, res[%1]":"=r"(data):"r"(p_din[i]):"memory");
-                set_port_shift_count(p_din[i], num_data_bits);
-                in_samps[idx] = bitrev(data) << (32 - num_data_bits);
+                if (num_out && (restart == I2S_NO_RESTART))
+                {
+                    for (size_t i = 0, idx = 1; i < num_out; i++, idx += 2)
+                    {
+                        p_dout[i] <: bitrev(out_samps[idx]);
+                    }
+                }
+
+                // Input i2s odds (1,3,5..)
+#pragma loop unroll
+                for (size_t i = 0, idx = 1; i < num_in; i++, idx += 2)
+                {
+                    int32_t data;
+                    asm volatile("in %0, res[%1]"
+                                :"=r"(data)
+                                :"r"(p_din[i])
+                                :"memory");
+                    in_samps[idx] = bitrev(data);
+                }
+            }
+            else
+            {
+                // Read lrclk value
+                asm volatile("in %0, res[%1]"
+                            :"=r"(lrval)
+                            :"r"(p_lrclk)
+                            :"memory");
+                set_port_shift_count(p_lrclk, num_data_bits);
+
+                // Output i2s odds (1,3,5..)
+#pragma loop unroll
+                if (num_out && (restart == I2S_NO_RESTART))
+                {
+                    for (size_t i = 0, idx = 1; i < num_out; i++, idx += 2)
+                    {
+                        partout(p_dout[i], num_data_bits, bitrev(out_samps[idx] << data_bit_offset));
+                    }
+                }
+
+                // Input i2s odds (1,3,5..)
+#pragma loop unroll
+                for (size_t i = 0, idx = 1; i < num_in; i++, idx += 2)
+                {
+                    int32_t data;
+                    asm volatile("in %0, res[%1]"
+                                :"=r"(data)
+                                :"r"(p_din[i])
+                                :"memory");
+                    set_port_shift_count(p_din[i], num_data_bits);
+                    in_samps[idx] = bitrev(data) & data_bit_mask;
+                }
             }
 
-            // TODO: work out method for detecting a syncerror
-            // syncerror += (lrval != expected_high);
+            syncerror += ((lrval & !data_bit_mask) != expected_high);
 
             if (num_in)
                 i2s_i.receive(num_in << 1, in_samps);
-        }//main loop, runs until user restart or synch error
+
+        }// main loop, runs until user restart or synch error
     }// while(1)
 }
 

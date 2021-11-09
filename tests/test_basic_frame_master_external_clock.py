@@ -43,7 +43,7 @@ def do_master_test(data_bits, num_in, num_out, testlevel):
                               tester = tester)
 
 def runtest():
-    for db in (24, 25, 26):
+    for db in (8, 16, 32):
         do_master_test(db, 4, 4, "smoke")
         do_master_test(db, 1, 1, "smoke")
         do_master_test(db, 4, 0, "smoke")

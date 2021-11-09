@@ -89,7 +89,12 @@ void i2s_loopback(server i2s_frame_callback_if i2s)
   }
 }
 
-#define OVERHEAD_TICKS 222 // Some of the period needs to be allowed for the interface handling
+#if DATA_BITS == 32
+#define OVERHEAD_TICKS 160 // Some of the period needs to be allowed for the interface handling
+#else
+#define OVERHEAD_TICKS 222
+#endif
+
 #define JITTER  1   //Allow for rounding so does not break when diff = period + 1
 #define N_CYCLES_AT_DELAY   1 //How many LR clock cycles to measure at each backpressure delay value
 #define DIFF_WRAP_16(new, old)  (new > old ? new - old : new + 0x10000 - old)

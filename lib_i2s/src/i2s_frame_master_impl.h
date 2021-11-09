@@ -27,12 +27,20 @@ static void i2s_frame_init_ports(
         clock bclk
         ){
 
+    for (size_t i = 0; i < num_out; i++)
+    {
+        configure_out_port(p_dout[i], bclk, 0);
+        clearbuf(p_dout[i]);
+    }
+    for (size_t i = 0; i < num_in; i++)
+    {
+        configure_in_port(p_din[i], bclk);
+        clearbuf(p_din[i]);
+    }
+
     configure_port_clock_output(p_bclk, bclk);
     configure_out_port(p_lrclk, bclk, 1);
-    for (size_t i = 0; i < num_out; i++)
-        configure_out_port(p_dout[i], bclk, 0);
-    for (size_t i = 0; i < num_in; i++)
-        configure_in_port(p_din[i], bclk);
+    clearbuf(p_lrclk);
 }
 
 #pragma unsafe arrays
@@ -46,104 +54,220 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
         clock bclk,
         out buffered port:32 p_lrclk,
         i2s_mode_t mode){
-
-    int32_t in_samps[16]; //Workaround: should be (num_in << 1) but compiler thinks that isn't const,
-    int32_t out_samps[16];//so setting to 16 which should be big enough for most cases
+    
+    const int offset = (mode == I2S_MODE_I2S) ? 1 : 0;
+    int32_t in_samps[16];  // Workaround: should be (num_in << 1) but compiler thinks that isn't const,
+    int32_t out_samps[16]; // so setting to 16 which should be big enough for most cases
 
     // Since #pragma unsafe arrays is used need to ensure array won't overflow.
     assert((num_in << 1) <= 16);
 
     unsigned lr_mask = 0;
-    unsigned data_bit_offset = 32 - num_data_bits;
-    unsigned data_bit_mask = UINT_MAX >> data_bit_offset; // e.g. 00011111 for 5b data
-
-    for (size_t i=0;i<num_out;i++)
-        clearbuf(p_dout[i]);
-    for (size_t i=0;i<num_in;i++)
-        clearbuf(p_din[i]);
-    clearbuf(p_lrclk);
-
-    if (num_out) i2s_i.send(num_out << 1, out_samps);
-
-    //Start outputting evens (0,2,4..) data at correct point relative to the clock
-    int offset = 0;
-    if (mode==I2S_MODE_I2S) {
-        offset = 1;
+    unsigned data_bit_mask;
+    unsigned data_bit_offset;
+    if (num_data_bits != 32)
+    {
+        data_bit_offset = 32 - num_data_bits;
+        data_bit_mask = UINT_MAX >> data_bit_offset; // e.g. 00011111 for 5b data
     }
 
+    if (num_out) 
+    {
+        i2s_i.send(num_out << 1, out_samps);
+    }
+
+    // Start outputting evens (0,2,4..) data at correct point relative to the clock
+    if (num_data_bits == 32)
+    {
 #pragma loop unroll
-    for (size_t i=0, idx=0; i<num_out; i++, idx+=2){
-        partout_timed(p_dout[i], num_data_bits, bitrev(out_samps[idx] << data_bit_offset), (1 + offset));
+        for (size_t i=0, idx=0; i<num_out; i++, idx+=2)
+        {
+            p_dout[i] @ (1 + offset) <: bitrev(out_samps[idx]);
+        }
+        p_lrclk @ 1 <: lr_mask;
     }
-
-    partout_timed(p_lrclk, num_data_bits, lr_mask, 1);
+    else
+    {
+#pragma loop unroll
+        for (size_t i=0, idx=0; i<num_out; i++, idx+=2)
+        {
+            partout_timed(p_dout[i], num_data_bits, bitrev(out_samps[idx] << data_bit_offset), (1 + offset));
+        }
+        partout_timed(p_lrclk, num_data_bits, lr_mask, 1);
+    }
 
     start_clock(bclk);
 
-    //And pre-load the odds (1,3,5..)
+    // Pre-load the odds (1,3,5..) and setup timing on the input ports
+    if (num_data_bits == 32)
+    {
 #pragma loop unroll
-    for (size_t i=0, idx=1; i<num_out; i++, idx+=2){
-        partout(p_dout[i], num_data_bits, bitrev(out_samps[idx] << data_bit_offset));
-    }
-
-    lr_mask = ~lr_mask;
-    partout(p_lrclk, num_data_bits, lr_mask);
-
-    for (size_t i=0;i<num_in;i++) {
-        asm("setpt res[%0], %1"::"r"(p_din[i]), "r"(num_data_bits + offset));
-        set_port_shift_count(p_din[i], num_data_bits);
-    }
-
-    while(1) {
-        // Check for restart
-        i2s_restart_t restart = i2s_i.restart_check();
-
-        if (restart == I2S_NO_RESTART) {
-            if (num_out) i2s_i.send(num_out << 1, out_samps);
-
-            //Output i2s evens (0,2,4..)
-#pragma loop unroll
-            for (size_t i=0, idx=0; i<num_out; i++, idx+=2){
-                partout(p_dout[i], num_data_bits, bitrev(out_samps[idx] << data_bit_offset));
-            }
+        for (size_t i = 0, idx = 1; i < num_out; i++, idx += 2)
+        {
+            p_dout[i] <: bitrev(out_samps[idx]);
         }
 
-        //Input i2s evens (0,2,4..)
+        lr_mask = ~lr_mask;
+        p_lrclk <: lr_mask;
+
+        for (size_t i = 0; i < num_in; i++) 
+        {
+            asm volatile("setpt res[%0], %1"
+                        :
+                        :"r"(p_din[i]), "r"(32 + offset));
+        }
+    }
+    else
+    {
 #pragma loop unroll
-        for (size_t i=0, idx=0; i<num_in; i++, idx+=2){
-            int32_t data;
-            asm volatile("in %0, res[%1]":"=r"(data):"r"(p_din[i]):"memory");
-            set_port_shift_count(p_din[i], num_data_bits);
-            in_samps[idx] = bitrev(data) & data_bit_mask;
+        for (size_t i = 0, idx = 1; i < num_out; i++, idx += 2)
+        {
+            partout(p_dout[i], num_data_bits, bitrev(out_samps[idx] << data_bit_offset));
         }
 
         lr_mask = ~lr_mask;
         partout(p_lrclk, num_data_bits, lr_mask);
 
-        if (restart == I2S_NO_RESTART) {
-            //Output i2s odds (1,3,5..)
+        for (size_t i = 0; i < num_in; i++) 
+        {
+            asm volatile("setpt res[%0], %1"
+                        :
+                        :"r"(p_din[i]), "r"(num_data_bits + offset));
+            set_port_shift_count(p_din[i], num_data_bits);
+        }
+    }
+
+    while (1) 
+    {
+        // Check for restart
+        i2s_restart_t restart = i2s_i.restart_check();
+
+        if (restart == I2S_NO_RESTART) 
+        {
+            if (num_out) 
+            {
+                i2s_i.send(num_out << 1, out_samps);
+            }
+            // Output i2s evens (0,2,4..)
+            if (num_data_bits == 32)
+            {
 #pragma loop unroll
-            for (size_t i=0, idx=1; i<num_out; i++, idx+=2){
-                partout(p_dout[i], num_data_bits, bitrev(out_samps[idx] << data_bit_offset));
+                for (size_t i = 0, idx = 0; i < num_out; i++, idx += 2)
+                {
+                    p_dout[i] <: bitrev(out_samps[idx]);
+                }
+            }
+            else
+            {
+#pragma loop unroll
+                for (size_t i = 0, idx = 0; i < num_out; i++, idx += 2)
+                {
+                    partout(p_dout[i], num_data_bits, bitrev(out_samps[idx] << data_bit_offset));
+                }
+            }
+        }
+
+        // Input i2s evens (0,2,4..)
+        if (num_data_bits == 32)
+        {
+#pragma loop unroll
+            for (size_t i = 0, idx = 0; i < num_in; i++, idx += 2)
+            {
+                int32_t data;
+                asm volatile("in %0, res[%1]"
+                            :"=r"(data)
+                            :"r"(p_din[i])
+                            :"memory");
+                in_samps[idx] = bitrev(data);
+            }
+
+            lr_mask = ~lr_mask;
+            p_lrclk <: lr_mask;
+        }
+        else
+        {
+#pragma loop unroll
+            for (size_t i = 0, idx = 0; i < num_in; i++, idx += 2)
+            {
+                int32_t data;
+                asm volatile("in %0, res[%1]"
+                            :"=r"(data)
+                            :"r"(p_din[i])
+                            :"memory");
+                set_port_shift_count(p_din[i], num_data_bits);
+                in_samps[idx] = bitrev(data) & data_bit_mask;
             }
 
             lr_mask = ~lr_mask;
             partout(p_lrclk, num_data_bits, lr_mask);
         }
 
-        //Input i2s odds (1,3,5..)
+        if (restart == I2S_NO_RESTART) 
+        {
+            // Output i2s odds (1,3,5..)
+            if (num_data_bits == 32)
+            {
 #pragma loop unroll
-        for (size_t i=0, idx=1; i<num_in; i++, idx+=2){
-            int32_t data;
-            asm volatile("in %0, res[%1]":"=r"(data):"r"(p_din[i]):"memory");
-            set_port_shift_count(p_din[i], num_data_bits);
-            in_samps[idx] = bitrev(data) & data_bit_mask;
+                for (size_t i = 0, idx = 1; i < num_out; i++, idx += 2)
+                {
+                    p_dout[i] <: bitrev(out_samps[idx]);
+                }
+
+                lr_mask = ~lr_mask;
+                p_lrclk <: lr_mask;
+            }
+            else
+            {
+#pragma loop unroll
+                for (size_t i = 0, idx = 1; i < num_out; i++, idx += 2)
+                {
+                    partout(p_dout[i], num_data_bits, bitrev(out_samps[idx] << data_bit_offset));
+                }
+
+                lr_mask = ~lr_mask;
+                partout(p_lrclk, num_data_bits, lr_mask);
+            }
         }
 
-        if (num_in) i2s_i.receive(num_in << 1, in_samps);
+        // Input i2s odds (1,3,5..)
+        if (num_data_bits == 32)
+        {
+#pragma loop unroll
+            for (size_t i = 0, idx = 1; i < num_in; i++, idx += 2)
+            {
+                int32_t data;
+                asm volatile("in %0, res[%1]"
+                            :"=r"(data)
+                            :"r"(p_din[i])
+                            :"memory");
+                in_samps[idx] = bitrev(data);
+            }
+        }
+        else
+        {
+#pragma loop unroll
+            for (size_t i = 0, idx = 1; i < num_in; i++, idx += 2)
+            {
+                int32_t data;
+                asm volatile("in %0, res[%1]"
+                            :"=r"(data)
+                            :"r"(p_din[i])
+                            :"memory");
+                set_port_shift_count(p_din[i], num_data_bits);
+                in_samps[idx] = bitrev(data) & data_bit_mask;
+            }
+        }
 
-        if (restart != I2S_NO_RESTART) {
-            if (!num_in) {
+
+        if (num_in) 
+        {
+            i2s_i.receive(num_in << 1, in_samps);
+        }
+
+        if (restart != I2S_NO_RESTART) 
+        {
+            if (!num_in) 
+            {
                 // Prevent the clock from being stopped before the last word
                 // has been sent if there are no RX ports.
                 sync(p_dout[0]);

@@ -115,7 +115,6 @@ class I2SMasterChecker(xmostest.SimThread):
             bclk_frequency = mclk_frequency / mclk_bclk_ratio
             data_bit_mask = int("1"*data_bits, base=2)
 
-            time = xsi.get_time()
             max_num_in_or_outs = 4
             num_test_frames = 4
             error = False

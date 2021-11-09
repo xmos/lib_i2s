@@ -23,10 +23,10 @@ def do_test(sample_rate, num_channels, data_bits, receive_increment, send_increm
     tester.set_min_testlevel(testlevel)
 
     xmostest.run_on_simulator(resources['xsim'], binary,
-                              #simargs=['--xscope', '-offline xscope.xmt'],
-                              simargs=['--xscope', '-offline xscope.xmt', 
-                                       '--trace-to', './backpressure_test/logs/sim_{id}.log'.format(id=id_string), 
-                                       '--vcd-tracing', '-o ./backpressure_test/traces/trace_{id}.vcd -tile tile[0] -ports-detailed -functions -cycles -clock-blocks -cores -instructions'.format(id=id_string)],
+                              simargs=['--xscope', '-offline xscope.xmt'],
+                              #simargs=['--xscope', '-offline xscope.xmt', 
+                              #         '--trace-to', './backpressure_test/logs/sim_{id}.log'.format(id=id_string), 
+                              #         '--vcd-tracing', '-o ./backpressure_test/traces/trace_{id}.vcd -tile tile[0] -ports-detailed -functions -cycles -clock-blocks -cores -instructions'.format(id=id_string)],
                               loopback=[{'from': 'tile[0]:XS1_PORT_1G',
                                          'to': 'tile[0]:XS1_PORT_1A'}],
                               suppress_multidrive_messages=True,
@@ -34,7 +34,7 @@ def do_test(sample_rate, num_channels, data_bits, receive_increment, send_increm
 
 def runtest():
   for sample_rate in [768000, 384000, 192000]:
-    for data_bits in [8, 16, 24, 32]:
+    for data_bits in [8, 16, 32]:
       for num_channels in [1, 2, 3, 4]:
         do_test(sample_rate, num_channels, data_bits, 5,  5, "smoke" if (num_channels == 4) else "nightly")
         do_test(sample_rate, num_channels, data_bits, 0, 10, "smoke" if (num_channels == 4) else "nightly")
