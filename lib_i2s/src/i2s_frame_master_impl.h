@@ -171,8 +171,7 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
                 int32_t data;
                 asm volatile("in %0, res[%1]"
                             :"=r"(data)
-                            :"r"(p_din[i])
-                            :"memory");
+                            :"r"(p_din[i]));
                 in_samps[idx] = bitrev(data);
             }
 
@@ -187,8 +186,7 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
                 int32_t data;
                 asm volatile("in %0, res[%1]"
                             :"=r"(data)
-                            :"r"(p_din[i])
-                            :"memory");
+                            :"r"(p_din[i]));
                 set_port_shift_count(p_din[i], num_data_bits);
                 in_samps[idx] = bitrev(data) & data_bit_mask;
             }
@@ -233,8 +231,7 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
                 int32_t data;
                 asm volatile("in %0, res[%1]"
                             :"=r"(data)
-                            :"r"(p_din[i])
-                            :"memory");
+                            :"r"(p_din[i]));
                 in_samps[idx] = bitrev(data);
             }
         }

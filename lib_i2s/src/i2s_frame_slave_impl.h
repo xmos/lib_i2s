@@ -191,8 +191,7 @@ static void i2s_frame_slave0(client i2s_frame_callback_if i2s_i,
             {
                 asm volatile("in %0, res[%1]"
                             :"=r"(lrval)
-                            :"r"(p_lrclk)
-                            :"memory");
+                            :"r"(p_lrclk));
                 set_port_shift_count(p_lrclk, num_data_bits);
             }
 
@@ -205,8 +204,7 @@ static void i2s_frame_slave0(client i2s_frame_callback_if i2s_i,
                     int32_t data;
                     asm volatile("in %0, res[%1]"
                                 :"=r"(data)
-                                :"r"(p_din[i])
-                                :"memory");
+                                :"r"(p_din[i]));
                     in_samps[idx] = bitrev(data);
                 }
             }
@@ -218,8 +216,7 @@ static void i2s_frame_slave0(client i2s_frame_callback_if i2s_i,
                     int32_t data;
                     asm volatile("in %0, res[%1]"
                                 :"=r"(data)
-                                :"r"(p_din[i])
-                                :"memory");
+                                :"r"(p_din[i]));
                     set_port_shift_count(p_din[i], num_data_bits);
                     in_samps[idx] = bitrev(data) & data_bit_mask;
                 }
@@ -251,8 +248,7 @@ static void i2s_frame_slave0(client i2s_frame_callback_if i2s_i,
                     int32_t data;
                     asm volatile("in %0, res[%1]"
                                 :"=r"(data)
-                                :"r"(p_din[i])
-                                :"memory");
+                                :"r"(p_din[i]));
                     in_samps[idx] = bitrev(data);
                 }
             }
@@ -261,8 +257,7 @@ static void i2s_frame_slave0(client i2s_frame_callback_if i2s_i,
                 // Read lrclk value
                 asm volatile("in %0, res[%1]"
                             :"=r"(lrval)
-                            :"r"(p_lrclk)
-                            :"memory");
+                            :"r"(p_lrclk));
                 set_port_shift_count(p_lrclk, num_data_bits);
 
                 // Output i2s odds (1,3,5..)
@@ -282,8 +277,7 @@ static void i2s_frame_slave0(client i2s_frame_callback_if i2s_i,
                     int32_t data;
                     asm volatile("in %0, res[%1]"
                                 :"=r"(data)
-                                :"r"(p_din[i])
-                                :"memory");
+                                :"r"(p_din[i]));
                     set_port_shift_count(p_din[i], num_data_bits);
                     in_samps[idx] = bitrev(data) & data_bit_mask;
                 }
