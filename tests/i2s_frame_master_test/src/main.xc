@@ -263,13 +263,14 @@ void app(server interface i2s_frame_callback_if i2s_i)
                     {
                         mclk_index += 1;
                     }
+                    
+                    set_mclk_and_ratio(current_sample_frequency);
 
-                    if (current_sample_frequency > MAX_SAMPLE_RATE)
+                    if (current_sample_frequency > MAX_SAMPLE_RATE ||
+                        mclk_bclk_ratio == 1)
                     {
                         _Exit(1);
                     }
-                    
-                    set_mclk_and_ratio(current_sample_frequency);
                 }
 
                 frames_sent = 0;

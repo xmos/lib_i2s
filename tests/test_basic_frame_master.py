@@ -36,17 +36,17 @@ def do_master_test(data_bits, num_in, num_out, testlevel):
 
     xmostest.run_on_simulator(resources['xsim'], binary,
                               simthreads = [clk, checker],
-                              #simargs=[],
-                              simargs=['--trace-to', './i2s_frame_master_test/logs/sim_{id}.log'.format(id=id_string), 
-                                       '--vcd-tracing', '-o ./i2s_frame_master_test/traces/trace_{id}.vcd -tile tile[0] -ports-detailed -functions -cycles -clock-blocks -cores -instructions'.format(id=id_string)],
+                              simargs=[],
+                              #simargs=['--trace-to', './i2s_frame_master_test/logs/sim_{id}.log'.format(id=id_string), 
+                              #         '--vcd-tracing', '-o ./i2s_frame_master_test/traces/trace_{id}.vcd -tile tile[0] -ports-detailed -functions -cycles -clock-blocks -cores -instructions'.format(id=id_string)],
                               suppress_multidrive_messages = True,
                               tester = tester)
 
 def runtest():
     for db in (32, 24, 16, 8):
-        do_master_test(db, 4, 0, "smoke")
-        do_master_test(db, 0, 4, "smoke")
         do_master_test(db, 4, 4, "smoke")
         do_master_test(db, 1, 1, "smoke")
+        do_master_test(db, 4, 0, "smoke")
+        do_master_test(db, 0, 4, "smoke")
         do_master_test(db, 4, 4, "nightly")
 
