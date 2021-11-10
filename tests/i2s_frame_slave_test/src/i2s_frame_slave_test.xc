@@ -17,23 +17,23 @@ out port setup_strobe_port = XS1_PORT_1L;
 out port setup_data_port = XS1_PORT_16A;
 in port  setup_resp_port = XS1_PORT_1M;
 
-#define MAX_CHANNELS 8
+#define MAX_CHANNELS (8)
 
-#define I2S_LOOPBACK_LATENCY 1
+#define I2S_LOOPBACK_LATENCY (1)
 
 #ifndef DATA_BITS
-#define DATA_BITS 32
+#define DATA_BITS (32)
 #endif
 
 #if defined(SMOKE)
-#define NUM_BCLKS 1
-#define NUM_BCLKS_TO_CHECK 1
+#define NUM_BCLKS (1)
+#define NUM_BCLKS_TO_CHECK (1)
 static const unsigned bclk_freq_lut[NUM_BCLKS] = {
   1228800
 };
 #else
-#define NUM_BCLKS 10
-#define NUM_BCLKS_TO_CHECK 3
+#define NUM_BCLKS (10)
+#define NUM_BCLKS_TO_CHECK (3)
 static const unsigned bclk_freq_lut[NUM_BCLKS] = {
   1228800, 614400, 384000, 192000, 44100,
   22050, 96000, 176400, 88200, 48000, 24000, 352800

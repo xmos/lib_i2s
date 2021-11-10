@@ -10,23 +10,22 @@
 #include <debug_print.h>
 #include <string.h>
 
-#define TEST_LENGTH     8 //Number of I2S frames to check
+#define TEST_LENGTH     (8) // Number of I2S frames to check
 
 #ifndef NUM_I2S_LINES
-#define NUM_I2S_LINES   4
+#define NUM_I2S_LINES   (4)
 #endif
 #ifndef SAMPLE_FREQUENCY
-#define SAMPLE_FREQUENCY 192000
+#define SAMPLE_FREQUENCY (192000)
 #endif
 #ifndef MASTER_CLOCK_FREQUENCY
-#define MASTER_CLOCK_FREQUENCY 24576000
-//#define MASTER_CLOCK_FREQUENCY 49152000
+#define MASTER_CLOCK_FREQUENCY (24576000)
 #endif
 #ifndef SIM_LOOPBACK_TEST
-#define SIM_LOOPBACK_TEST 0
+#define SIM_LOOPBACK_TEST (0)
 #endif
 #ifndef DATA_BITS
-#define DATA_BITS 32
+#define DATA_BITS (32)
 #endif
 
 
@@ -47,13 +46,13 @@ enum gpio_shared_audio_pins {
   GPIO_MCLK_FSEL = 7,   // Select frequency on Phaselink clock. 0 = 24.576MHz for 48k, 1 = 22.5792MHz for 44.1k.
 };
 
-#define CS5368_ADDR           0x4C // I2C address of the CS5368 DAC
-#define CS5368_GCTL_MDE       0x01 // I2C mode control register number
-#define CS5368_PWR_DN         0x06
+#define CS5368_ADDR           (0x4C) // I2C address of the CS5368 DAC
+#define CS5368_GCTL_MDE       (0x01) // I2C mode control register number
+#define CS5368_PWR_DN         (0x06)
 
-#define CS4384_ADDR           0x18 // I2C address of the CS4384 ADC
-#define CS4384_MODE_CTRL      0x02 // I2C mode control register number
-#define CS4384_PCM_CTRL       0x03 // I2C PCM control register number
+#define CS4384_ADDR           (0x18) // I2C address of the CS4384 ADC
+#define CS4384_MODE_CTRL      (0x02) // I2C mode control register number
+#define CS4384_PCM_CTRL       (0x03) // I2C PCM control register number
 
 //Simulator master I2S waveform gen
 on tile[0]: out port p_mclk_gen       = XS1_PORT_1A; 

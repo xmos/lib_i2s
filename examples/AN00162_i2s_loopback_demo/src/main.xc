@@ -18,17 +18,17 @@ on tile[0]: clock bclk = XS1_CLKBLK_2;
 on tile[0]: port p_i2c = XS1_PORT_4A;
 on tile[0]: port p_gpio = XS1_PORT_8C;
 
-#define SAMPLE_FREQUENCY 48000
-#define MASTER_CLOCK_FREQUENCY 24576000
-#define DATA_BITS 32
+#define SAMPLE_FREQUENCY (48000)
+#define MASTER_CLOCK_FREQUENCY (24576000)
+#define DATA_BITS (32)
 
-#define CS5368_ADDR           0x4C // I2C address of the CS5368 DAC
-#define CS5368_GCTL_MDE       0x01 // I2C mode control register number
-#define CS5368_PWR_DN         0x06
+#define CS5368_ADDR           (0x4C) // I2C address of the CS5368 DAC
+#define CS5368_GCTL_MDE       (0x01) // I2C mode control register number
+#define CS5368_PWR_DN         (0x06)
 
-#define CS4384_ADDR           0x18 // I2C address of the CS4384 ADC
-#define CS4384_MODE_CTRL      0x02 // I2C mode control register number
-#define CS4384_PCM_CTRL       0x03 // I2C PCM control register number
+#define CS4384_ADDR           (0x18) // I2C address of the CS4384 ADC
+#define CS4384_MODE_CTRL      (0x02) // I2C mode control register number
+#define CS4384_PCM_CTRL       (0x03) // I2C PCM control register number
 
 enum gpio_shared_audio_pins {
   GPIO_DAC_RST_N = 1,

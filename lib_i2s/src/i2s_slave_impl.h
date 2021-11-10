@@ -4,7 +4,7 @@
 #include <xclib.h>
 #include "i2s.h"
 
-#define I2S_CHANS_PER_FRAME 2
+#define I2S_CHANS_PER_FRAME (2)
 
 static void i2s_slave_init_ports(
         out buffered port:32 (&?p_dout)[num_out],

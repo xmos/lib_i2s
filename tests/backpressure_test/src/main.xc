@@ -8,35 +8,34 @@
 #include "debug_print.h"
 
 #ifndef NUM_I2S_LINES
-#define NUM_I2S_LINES   2
+#define NUM_I2S_LINES   (2)
 #endif
 #ifndef BURN_THREADS
-#define BURN_THREADS    6
+#define BURN_THREADS    (6)
 #endif
 #ifndef SAMPLE_FREQUENCY
-#define SAMPLE_FREQUENCY 768000
+#define SAMPLE_FREQUENCY (768000)
 #endif
 #ifndef TEST_LEN
-#define TEST_LEN 1000
+#define TEST_LEN (1000)
 #endif
 #ifndef RECEIVE_DELAY_INCREMENT
-#define RECEIVE_DELAY_INCREMENT 5
+#define RECEIVE_DELAY_INCREMENT (5)
 #endif
 #ifndef SEND_DELAY_INCREMENT
-#define SEND_DELAY_INCREMENT 5
+#define SEND_DELAY_INCREMENT (5)
 #endif
-
 #ifndef GENERATE_MCLK
-#define GENERATE_MCLK 0
+#define GENERATE_MCLK (0)
 #endif
 #ifndef DATA_BITS
-#define DATA_BITS 32
+#define DATA_BITS (32)
 #endif
 
 #if GENERATE_MCLK
-#define MASTER_CLOCK_FREQUENCY 25000000
+#define MASTER_CLOCK_FREQUENCY (25000000)
 #else
-#define MASTER_CLOCK_FREQUENCY 24576000
+#define MASTER_CLOCK_FREQUENCY (24576000)
 #endif
 
 /* Ports and clocks used by the application */
@@ -90,14 +89,14 @@ void i2s_loopback(server i2s_frame_callback_if i2s)
 }
 
 #if DATA_BITS == 32
-#define OVERHEAD_TICKS 160 // Some of the period needs to be allowed for the interface handling
+#define OVERHEAD_TICKS (160) // Some of the period needs to be allowed for the interface handling
 #else
-#define OVERHEAD_TICKS 222
+#define OVERHEAD_TICKS (222)
 #endif
 
-#define JITTER  1   //Allow for rounding so does not break when diff = period + 1
-#define N_CYCLES_AT_DELAY   1 //How many LR clock cycles to measure at each backpressure delay value
-#define DIFF_WRAP_16(new, old)  (new > old ? new - old : new + 0x10000 - old)
+#define JITTER (1)   //Allow for rounding so does not break when diff = period + 1
+#define N_CYCLES_AT_DELAY (1) //How many LR clock cycles to measure at each backpressure delay value
+#define DIFF_WRAP_16(new, old) ((new) > (old) ? (new) - (old) : (new) + 0x10000 - (old))
 on tile[0]: port p_lr_test = XS1_PORT_1A;
 void test_lr_period(void){
     unsafe {

@@ -21,47 +21,44 @@ out port setup_strobe_port = XS1_PORT_1L;
 out port setup_data_port = XS1_PORT_16A;
 in port  setup_resp_port = XS1_PORT_1M;
 
-#define MAX_RATIO 4
-#define MAX_CHANNELS 8
-#define MAX_SAMPLE_RATE 192000
+#define MAX_RATIO (4)
+#define MAX_CHANNELS (8)
+#define MAX_SAMPLE_RATE (192000)
 
 #ifndef DATA_BITS
-#define DATA_BITS 32
+#define DATA_BITS (32)
 #endif
-
 #ifndef BASE_SAMPLE_RATE
-#define BASE_SAMPLE_RATE 6000
+#define BASE_SAMPLE_RATE (6000)
 #endif
-
 #ifndef NUM_OUT
-#define NUM_OUT 4
+#define NUM_OUT (4)
 #endif
-
 #ifndef NUM_IN
-#define NUM_IN 4
+#define NUM_IN (4)
 #endif
 
 #if defined(SMOKE)
 #if NUM_OUT > 1 || NUM_IN > 1
-#define NUM_MCLKS 1
+#define NUM_MCLKS (1)
 static const unsigned mclk_freq[NUM_MCLKS] = {
         12288000,
 };
 #else
-#define NUM_MCLKS 1
+#define NUM_MCLKS (1)
 static const unsigned mclk_freq[NUM_MCLKS] = {
         24576000,
 };
 #endif
 #else
 #if NUM_OUT > 1 || NUM_IN > 1
-#define NUM_MCLKS 2
+#define NUM_MCLKS (2)
 static const unsigned mclk_freq[NUM_MCLKS] = {
         12288000,
         11289600,
 };
 #else
-#define NUM_MCLKS 4
+#define NUM_MCLKS (4)
 static const unsigned mclk_freq[NUM_MCLKS] = {
         24576000,
         22579200,
