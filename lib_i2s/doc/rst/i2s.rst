@@ -40,12 +40,15 @@ in :ref:`i2s_signal_params`.
        - The fixed ratio between the master clock and the bit clock.
      * - *MODE*
        - The mode - either |I2S| or left justified.
+     * - *NUM_DATA_BITS*
+       - The number of bits in a data word; this is usually 32, but can be 
+         adjusted for legacy applications.
 
-The *MCLK_BCLK_RATIO* should be such that 64 bits can be output by the
-bit clock at the data rate of the |I2S| signal. For example, a
+The *MCLK_BCLK_RATIO* should be such that twice the number of data bits can be 
+output by the bit clock at the data rate of the |I2S| signal. For example, a
 24.576MHz master clock with a ratio of 8 gives a bit clock at
 3.072MHz. This bit clock can output 64 bits at a frequency of 48kHz -
-which is the underlying rate of the data.
+which with a data word bit length of 32 is the underlying rate of the data.
 
 The master signals data transfer should occur by a transition on the
 *LRCLK* wire. There are two supported modes for |I2S|. In *I2S mode*
@@ -77,8 +80,7 @@ data line. When the *LRCLK* is low, the *left* channel is
 transmitted. When the *LRCLK* is high, the *right* channel is
 transmitted.
 
-All data is transmitted most significant bit first. The xCORE |I2S|
-library assumes 32 bits of data between *LRCLK* transitions. How the
+All data is transmitted most significant bit first. How the
 data is aligned is expected to be done in software by the
 application. For example, some audio CODECs have a *Right Justified*
 mode; to attain this mode the library should be set to
@@ -91,9 +93,9 @@ Connecting |I2S| signals to the xCORE device
 
 
 The |I2S| wires need to be connected to the xCORE device as shown in
-:ref:`i2s_master_xcore_connect` and :ref:`i2s_slave_xcore_connect`. The signals can be connected to any
-one bit ports on the device provide they do not overlap any other used
-ports and are all on the same tile.
+:ref:`i2s_master_xcore_connect` and :ref:`i2s_slave_xcore_connect`. The signals 
+can be connected to any one bit ports on the device provide they do not overlap 
+any other used ports and are all on the same tile.
 
 .. _i2s_master_xcore_connect:
 
