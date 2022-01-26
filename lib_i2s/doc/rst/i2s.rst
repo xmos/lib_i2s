@@ -42,7 +42,7 @@ in :ref:`i2s_signal_params`.
        - The mode - either |I2S| or left justified.
      * - *NUM_DATA_BITS*
        - The number of bits in a data word; this is usually 32, but can be 
-         adjusted for legacy applications.
+         adjusted to any value below 32 if required.
 
 The *MCLK_BCLK_RATIO* should be such that twice the number of data bits can be 
 output by the bit clock at the data rate of the |I2S| signal. For example, a
