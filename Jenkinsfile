@@ -1,4 +1,4 @@
-@Library('xmos_jenkins_shared_library@v0.16.2') _
+@Library('xmos_jenkins_shared_library@v0.17.0') _
 
 getApproval()
 
@@ -8,7 +8,7 @@ pipeline {
   parameters {
     string(
       name: 'TOOLS_VERSION',
-      defaultValue: '15.0.2',
+      defaultValue: '15.1.0',
       description: 'The tools version to build with (check /projects/tools/ReleasesTools/)'
       )
   }
@@ -72,20 +72,15 @@ pipeline {
       agent {
         label 'xcore.ai'
       }
-      environment {
-        // '/XMOS/tools' from get_tools.py and rest from tools installers
-        TOOLS_PATH = "/XMOS/tools/${params.TOOLS_VERSION}/XMOS/xTIMEcomposer/${params.TOOLS_VERSION}"
-      }
       stages{
         stage('Install Dependencies') {
           steps {
-            sh '/XMOS/get_tools.py ' + params.TOOLS_VERSION
             installDependencies()
           }
         }
         stage('xrun'){
           steps{
-            toolsEnv(TOOLS_PATH) {  // load xmos tools
+            withTools(params.TOOLS_VERSION) {  // load xmos tools
               //Just run on HW and error on incorrect binary etc. We need specific HW for it to run so just check it loads OK
               unstash 'AN00162'
               sh 'xrun --id 0 bin/XCORE_AI/AN00162_i2s_loopback_demo.xe'
