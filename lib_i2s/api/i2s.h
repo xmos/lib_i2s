@@ -250,6 +250,44 @@ void i2s_frame_master(client i2s_frame_callback_if i2s_i,
                 in port p_mclk,
                 clock bclk);
 
+/** I2S frame-based master component with 4-bit ports **for xCORE200 only**
+ *
+ *  This task performs I2S on the provided 4-bit ports. It will perform callbacks over
+ *  the i2s_frame_callback_if interface to get/receive frames of data from the
+ *  application using this component.
+ *
+ *  The component performs I2S master so will drive the word clock and
+ *  bit clock lines.
+ *
+ *  This is a more efficient version of i2s master which reduces callback
+ *  frequency and allows useful processing to be done in distributable i2s handler tasks.
+ *  It also uses xCORE200 specific features to remove the need for software
+ *  BCLK generation which decreases processor overhead.
+ *
+ *  This component can only operate with a 32-bit data word length.
+ *
+ *  \param i2s_i          The I2S frame callback interface to connect to
+ *                        the application
+ *  \param p_dout         An array of data output ports
+ *  \param num_out        The number of output data ports
+ *  \param p_din          An array of data input ports
+ *  \param num_in         The number of input data ports
+ *  \param p_bclk         The bit clock output port
+ *  \param p_lrclk        The word clock output port
+ *  \param p_mclk         Input port which supplies the master clock
+ *  \param bclk           A clock that will get configured for use with
+ *                        the bit clock
+ */
+void i2s_frame_master_4b(client i2s_frame_callback_if i2s_i,
+                out buffered port:32 ?p_dout,
+                static const size_t num_out,
+                in buffered port:32 ?p_din,
+                static const size_t num_in,
+                out port p_bclk,
+                out buffered port:32 p_lrclk,
+                in port p_mclk,
+                clock bclk);
+
 /** I2S frame-based master component **for xCORE200 only**
  *
  *  This task performs I2S on the provided pins. It will perform callbacks over
@@ -282,6 +320,43 @@ void i2s_frame_master_external_clock(client i2s_frame_callback_if i2s_i,
                 in buffered port:32 (&?p_din)[num_in],
                 static const size_t num_in,
                 static const size_t num_data_bits,
+                out port p_bclk,
+                out buffered port:32 p_lrclk,
+                clock bclk);
+
+/** I2S frame-based master component with 4-bit ports **for xCORE200 only**
+ *
+ *  This task performs I2S on the provided 4-bit ports. It will perform callbacks over
+ *  the i2s_frame_callback_if interface to get/receive frames of data from the
+ *  application using this component.
+ *
+ *  The component performs I2S master so will drive the word clock and
+ *  bit clock lines.
+ *
+ *  This is a more efficient version of i2s master which reduces callback
+ *  frequency and allows useful processing to be done in distributable i2s handler tasks.
+ *  It also uses xCORE200 specific features to remove the need for software
+ *  BCLK generation which decreases processor overhead.
+ *
+ *  This component can only operate with a 32-bit data word length.
+ *
+ *  \param i2s_i          The I2S frame callback interface to connect to
+ *                        the application
+ *  \param p_dout         An array of data output ports
+ *  \param num_out        The number of output data ports
+ *  \param p_din          An array of data input ports
+ *  \param num_in         The number of input data ports
+ *  \param p_bclk         The bit clock output port
+ *  \param p_lrclk        The word clock output port
+ *  \param p_mclk         Input port which supplies the master clock
+ *  \param bclk           A clock that will get configured for use with
+ *                        the bit clock
+ */
+void i2s_frame_master_external_clock_4b(client i2s_frame_callback_if i2s_i,
+                out buffered port:32 (&?p_dout)[num_out],
+                static const size_t num_out,
+                in buffered port:32 (&?p_din)[num_in],
+                static const size_t num_in,
                 out port p_bclk,
                 out buffered port:32 p_lrclk,
                 clock bclk);
@@ -377,6 +452,7 @@ void tdm_master(client interface i2s_callback_if tdm_i,
 
 #include <i2s_master_impl.h>
 #include <i2s_frame_master_impl.h>
+#include <i2s_frame_master_4b_impl.h>
 #include <i2s_slave_impl.h>
 #include <i2s_frame_slave_impl.h>
 #include <tdm_master_impl.h>
