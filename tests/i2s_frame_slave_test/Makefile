@@ -1,6 +1,6 @@
 ifeq ($(USING_XWAF),1)
 all:
-	xwaf configure build --config $(CONFIG)
+    xwaf configure build --config $(CONFIG)
 else # USING_XWAF
 # The TARGET variable determines what target system the application is
 # compiled for. It either refers to an XN file in the source directories
