@@ -182,9 +182,9 @@ static void i2s_frame_master0_4b(
 
 static void i2s_frame_master0_external_clock_4b(
                 client i2s_frame_callback_if i2s_i,
-                out buffered port:32 (&?p_dout)[num_out],
+                out buffered port:32 ?p_dout,
                 static const size_t num_out,
-                in buffered port:32 (&?p_din)[num_in],
+                in buffered port:32 ?p_din,
                 static const size_t num_in,
                 out port p_bclk,
                 out buffered port:32 p_lrclk,
@@ -234,9 +234,9 @@ inline void i2s_frame_master1_4b(client interface i2s_frame_callback_if i,
 }
 
 inline void i2s_frame_master1_external_clock_4b(client interface i2s_frame_callback_if i,
-        out buffered port:32 i2s_dout[num_i2s_out],
+        out buffered port:32 i2s_dout,
         static const size_t num_i2s_out,
-        in buffered port:32 i2s_din[num_i2s_in],
+        in buffered port:32 i2s_din,
         static const size_t num_i2s_in,
         out port i2s_bclk,
         out buffered port:32 i2s_lrclk,
