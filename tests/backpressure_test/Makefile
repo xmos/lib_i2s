@@ -1,6 +1,6 @@
 ifeq ($(USING_XWAF),1)
 all:
-    xwaf configure build --config $(CONFIG)
+	xwaf configure build --config $(CONFIG)
 else # USING_XWAF
 # The TARGET variable determines what target system the application is
 # compiled for. It either refers to an XN file in the source directories
@@ -48,7 +48,7 @@ $(foreach db,8 16 24 32, \
 XCC_FLAGS_XCORE_AI = $(SHARED_FLAGS) -DSAMPLE_FREQUENCY=768000 -DNUM_I2S_LINES=1 -DRECEIVE_DELAY_INCREMENT=5 -DSEND_DELAY_INCREMENT=5
 
 test: bin/i2s_loopback_demo.xe
-    xsim bin/i2s_loopback_demo.xe --plugin LoopbackPort.dll '-port tile[0] XS1_PORT_1G 1 0 -port tile[0] XS1_PORT_1A 1 0'
+	xsim bin/i2s_loopback_demo.xe --plugin LoopbackPort.dll '-port tile[0] XS1_PORT_1G 1 0 -port tile[0] XS1_PORT_1A 1 0'
 
 XMOS_MAKE_PATH ?= ../..
 -include $(XMOS_MAKE_PATH)/xcommon/module_xcommon/build/Makefile.common
