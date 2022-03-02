@@ -23,9 +23,8 @@ def do_test(sample_rate, num_channels, data_bits, receive_increment, send_increm
     tester.set_min_testlevel(testlevel)
 
     xmostest.run_on_simulator(resources['xsim'], binary,
-                              simargs=['--xscope', '-offline xscope.xmt'],
-                              #simargs=['--xscope', '-offline xscope.xmt', 
-                              #         '--trace-to', './backpressure_test/logs/sim_{id}.log'.format(id=id_string), 
+                              simargs=[],
+                              #simargs=['--trace-to', './backpressure_test/logs/sim_{id}.log'.format(id=id_string), 
                               #         '--vcd-tracing', '-o ./backpressure_test/traces/trace_{id}.vcd -tile tile[0] -ports-detailed -functions -cycles -clock-blocks -cores -instructions'.format(id=id_string)],
                               loopback=[{'from': 'tile[0]:XS1_PORT_1G',
                                          'to': 'tile[0]:XS1_PORT_1A'}],
