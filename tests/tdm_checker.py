@@ -108,35 +108,35 @@ class TDMMasterChecker(xmostest.SimThread):
                     for i in range(bit_count, bits_per_word):
                         xsi.drive_port_pins(self._sclk, 0)
     
-                for p in range(0, num_outs):
-                    xsi.drive_port_pins(self._dout[p], tx_word[p]>>31)
-                    tx_word[p] = tx_word[p]<<1
+                        for p in range(0, num_outs):
+                            xsi.drive_port_pins(self._dout[p], tx_word[p]>>31)
+                            tx_word[p] = tx_word[p]<<1
     
-                self.wait_until(time)
-                time = time + clock_half_period
-                xsi.drive_port_pins(self._sclk, 1)
+                        self.wait_until(time)
+                        time = time + clock_half_period
+                        xsi.drive_port_pins(self._sclk, 1)
     
-                for p in range(0, num_ins):
-                    val = xsi.sample_port_pins(self._din[p])
-                    rx_word[p] = (rx_word[p]<<1) + val
-                self.wait_until(time)
-                time = time + clock_half_period
-    
-              
-                for p in range(0, num_outs):
-                    if num_ins > 0:
-                        if rx_counter != rx_word[p]:
-                            print "rx error %08x %08x"%(rx_counter, rx_word[p])
-                            error = True
-                    rx_counter+=1
-            
-                bit_count = 0
-                for p in range(0, num_outs):
-                    tx_word[p] = tx_counter
-                    tx_counter += 1
-                for p in range(0, num_ins):
-                    rx_word[p] = 0
+                        for p in range(0, num_ins):
+                            val = xsi.sample_port_pins(self._din[p])
+                            rx_word[p] = (rx_word[p]<<1) + val
+                        self.wait_until(time)
+                        time = time + clock_half_period
+        
+                    for p in range(0, num_outs):
+                        if num_ins > 0:
+                            if rx_counter != rx_word[p]:
+                                print "rx error %08x %08x"%(rx_counter, rx_word[p])
+                                error = True
+                        rx_counter+=1
+                
+                    bit_count = 0
+                    for p in range(0, num_outs):
+                        tx_word[p] = tx_counter
+                        tx_counter += 1
+                    for p in range(0, num_ins):
+                        rx_word[p] = 0
                 frame_count += 1
+                
             for x in range(0, self._extra_clocks):
                 self.wait_until(time)
                 time = time + clock_half_period
