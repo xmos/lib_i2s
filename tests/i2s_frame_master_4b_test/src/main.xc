@@ -312,7 +312,7 @@ int main()
             par {
                 [[distribute]]
                 app(i2s_i);
-                i2s_frame_master_4b(i2s_i, p_dout, NUM_OUT, p_din, NUM_IN, DATA_BITS,
+                i2s_frame_master_4b(i2s_i, p_dout, NUM_OUT, p_din, NUM_IN,
                         p_bclk, p_lrclk, p_mclk, bclk);
                 par(int i=0;i<7;i++)while(1);
             }

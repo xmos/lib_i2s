@@ -14,10 +14,8 @@ def do_master_test(data_bits, num_in, num_out, testlevel):
         db=data_bits, i=num_in, o=num_out, tl=testlevel
     )
 
-    binary = (
-        "i2s_frame_master_4b_test/bin/{id}/i2s_frame_master_4b_test_{id}.xe".format(
-            id=id_string
-        )
+    binary = "i2s_frame_master_external_clock_4b_test/bin/{id}/i2s_frame_master_external_clock_4b_test_{id}.xe".format(
+        id=id_string
     )
 
     clk = Clock("tile[0]:XS1_PORT_1A")
@@ -61,14 +59,8 @@ def do_master_test(data_bits, num_in, num_out, testlevel):
         binary,
         simthreads=[clk, checker],
         simargs=[],
-        # simargs=[
-        #     "--trace-to",
-        #     "./i2s_frame_master_4b_test/logs/sim_{id}.log".format(id=id_string),
-        #     "--vcd-tracing",
-        #     "-o ./i2s_frame_master_4b_test/traces/trace_{id}.vcd -tile tile[0] -ports-detailed -functions -cycles -clock-blocks -cores -instructions".format(
-        #         id=id_string
-        #     ),
-        # ],
+        # simargs=['--trace-to', './i2s_frame_master_external_clock_test/logs/sim_{id}.log'.format(id=id_string),
+        #         '--vcd-tracing', '-o ./i2s_frame_master_external_clock_test/traces/trace_{id}.vcd -tile tile[0] -ports-detailed -functions -cycles -clock-blocks -cores -instructions'.format(id=id_string)],
         suppress_multidrive_messages=True,
         tester=tester,
     )
