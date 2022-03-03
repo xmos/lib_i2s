@@ -40,12 +40,15 @@ in :ref:`i2s_signal_params`.
        - The fixed ratio between the master clock and the bit clock.
      * - *MODE*
        - The mode - either |I2S| or left justified.
+     * - *NUM_DATA_BITS*
+       - The number of bits in a data word; this is usually 32, but can be 
+         adjusted to any value below 32 if required.
 
-The *MCLK_BCLK_RATIO* should be such that 64 bits can be output by the
-bit clock at the data rate of the |I2S| signal. For example, a
+The *MCLK_BCLK_RATIO* should be such that twice the number of data bits can be 
+output by the bit clock at the data rate of the |I2S| signal. For example, a
 24.576MHz master clock with a ratio of 8 gives a bit clock at
 3.072MHz. This bit clock can output 64 bits at a frequency of 48kHz -
-which is the underlying rate of the data.
+which with a data word bit length of 32 is the underlying rate of the data.
 
 The master signals data transfer should occur by a transition on the
 *LRCLK* wire. There are two supported modes for |I2S|. In *I2S mode*
@@ -77,8 +80,7 @@ data line. When the *LRCLK* is low, the *left* channel is
 transmitted. When the *LRCLK* is high, the *right* channel is
 transmitted.
 
-All data is transmitted most significant bit first. The xCORE |I2S|
-library assumes 32 bits of data between *LRCLK* transitions. How the
+All data is transmitted most significant bit first. How the
 data is aligned is expected to be done in software by the
 application. For example, some audio CODECs have a *Right Justified*
 mode; to attain this mode the library should be set to
@@ -91,9 +93,9 @@ Connecting |I2S| signals to the xCORE device
 
 
 The |I2S| wires need to be connected to the xCORE device as shown in
-:ref:`i2s_master_xcore_connect` and :ref:`i2s_slave_xcore_connect`. The signals can be connected to any
-one bit ports on the device provide they do not overlap any other used
-ports and are all on the same tile.
+:ref:`i2s_master_xcore_connect` and :ref:`i2s_slave_xcore_connect`. The signals 
+can be connected to any one bit ports on the device provide they do not overlap 
+any other used ports and are all on the same tile.
 
 .. _i2s_master_xcore_connect:
 
@@ -121,110 +123,126 @@ The speed and number of data wires that can be driven by the |I2S|
 library running as |I2S| master
 depends on the speed of the logical core that runs the code
 and the amount of processing that occurs in the user callbacks for
-handling the data from the library. :ref:`i2s_master_62_5_speeds` and
-:ref:`i2s_master_83_3_speeds` show configurations that are known to
-work for small amounts of callback processing. Other speeds will be
-achievable depending on the amount of processing in the application
-and the logical core speed.
+handling the data from the library. :ref:`i2s_master_62_5_speeds` shows 
+configurations that are known to work for small amounts of callback processing. 
+Other speeds will be achievable depending on the amount of processing in the 
+application and the logical core speed.
 
 .. _i2s_master_62_5_speeds:
 
 .. list-table:: Known working |I2S| master configurations on a 62.5MHz core
-     :class: vertical-borders horizontal-borders
-     :header-rows: 1
-     :widths: 20 20 20 25 25
+    :class: vertical-borders horizontal-borders
+    :header-rows: 1
+    :widths: 15 15 15 25 30
 
-     * - **MCLK FREQ**
-       - **MCLK/BCLK RATIO**
-       - **SAMPLE FREQ**
-       - **NUM IN (num channels)**
-       - **NUM OUT (num channels)**
-     * - 24.576MHz
-       - 2
-       - 192000
-       - 1 (2)
-       - 1 (2)
-     * - 24.576MHz
-       - 4
-       - 96000
-       - 2 (4)
-       - 2 (4)
-     * - 24.576MHz
-       - 8
-       - 48000
-       - 4 (8)
-       - 4 (8)
-     * - 12.288MHz
-       - 2
-       - 96000
-       - 2 (4)
-       - 2 (4)
-     * - 12.288MHz
-       - 4
-       - 48000
-       - 4 (8)
-       - 4 (8)
-
-.. _i2s_master_83_3_speeds:
-
-.. list-table:: Known working |I2S| master configurations on a 83.3MHz core
-     :class: vertical-borders horizontal-borders
-     :header-rows: 1
-     :widths: 20 20 20 25 25
-
-     * - **MCLK FREQ**
-       - **MCLK/BCLK RATIO**
-       - **SAMPLE FREQ**
-       - **NUM IN (num channels)**
-       - **NUM OUT (num channels)**
-     * - 24.576MHz
-       - 2
-       - 192000
-       - 2 (4)
-       - 2 (4)
-     * - 24.576MHz
-       - 4
-       - 96000
-       - 4 (8)
-       - 4 (8)
-     * - 12.288MHz
-       - 2
-       - 96000
-       - 4 (8)
-       - 4 (8)
+    * - **MCLK FREQ**
+      - **MCLK/BCLK RATIO**
+      - **SAMPLE FREQ**
+      - **MAX NUM IN (max num channels)**
+      - **MAX NUM OUT (max num channels)**
+    * - 12.288 MHz
+      - 16
+      - 12000 Hz
+      - 4 (8)
+      - 4 (8)
+    * - 12.288 MHz
+      - 8
+      - 24000 Hz
+      - 4 (8)
+      - 4 (8)
+    * - 12.288 MHz
+      - 4
+      - 48000 Hz
+      - 4 (8)
+      - 4 (8)
+    * - 12.288 MHz
+      - 2
+      - 96000 Hz
+      - 4 (8)
+      - 4 (8)
+    * - 24.576 MHz
+      - 16
+      - 24000 Hz
+      - 1 (2)
+      - 1 (2)
+    * - 24.576 MHz
+      - 8
+      - 48000 Hz
+      - 1 (2)
+      - 1 (2)
+    * - 24.576 MHz
+      - 2
+      - 192000 Hz
+      - 1 (2)
+      - 1 (2)
 
 On the xCORE-200 the frame-based |I2S| master can be used. This uses hardware
 clock dividers only available in the the xCORE-200 and a more efficient callback
-interface to achieve much higher throughputs. :ref:`i2s_frame_master_62_5_speeds`
-shows the known working configurations:
+interface to achieve much higher throughputs. This also permits the use of 
+non-32bit data word lengths. :ref:`i2s_frame_master_62_5_speeds` shows the known
+working configurations:
 
 .. _i2s_frame_master_62_5_speeds:
 
 .. list-table:: Known working |I2S| frame-based master configurations on a 62.5MHz core
      :class: vertical-borders horizontal-borders
      :header-rows: 1
-     :widths: 20 20 20 25 25
+     :widths: 15 28 7 27 10 13
 
      * - **MCLK FREQ**
        - **MCLK/BCLK RATIO**
+       - **DATA WORD**
        - **SAMPLE FREQ**
-       - **NUM IN (num channels)**
-       - **NUM OUT (num channels)**
-     * - 49.152MHz
-       - 1
-       - 768000
+       - **MAX IN (chans)**
+       - **MAX OUT (chans)**
+     * - 12.288 MHz
+       - 32, 16, 8, 4, 2
+       - 32 bit
+       - 6000 Hz - 96000 Hz
        - 4 (8)
        - 4 (8)
-     * - 24.576MHz
-       - 2
-       - 192000
+     * - 24.576 MHz
+       - 64, 32, 16, 8, 4, 2
+       - 32 bit
+       - 6000 Hz - 192000 Hz
+       - 1 (2)
+       - 1 (2)
+     * - 100 MHz
+       - 344
+       - 24 bit
+       - 6056 Hz
        - 4 (8)
        - 4 (8)
-     * - 24.576MHz
-       - 24
-       - 16000
+     * - 250 MHz
+       - 432, 216, 108, 52, 24
+       - 24 bit
+       - 12056 Hz - 217013 Hz
+       - 4 (2)
+       - 4 (2)
+     * - 12.288 MHz
+       - 64, 32, 16, 8, 4, 2
+       - 16 bit
+       - 6000 Hz - 192000 Hz
        - 4 (8)
        - 4 (8)
+     * - 24.576 MHz
+       - 128, 64, 32, 16, 8, 4
+       - 16 bit
+       - 6000 Hz - 192000 Hz
+       - 1 (2)
+       - 1 (2)
+     * - 12.288 MHz
+       - 128, 64, 32, 16, 8, 4
+       - 8 bit
+       - 6000 Hz - 192000 Hz
+       - 4 (8)
+       - 4 (8)
+     * - 24.576 MHz
+       - 256, 128, 64, 32, 16, 8
+       - 8 bit
+       - 6000 Hz - 192000 Hz
+       - 1 (2)
+       - 1 (2)
 
 
 |I2S| slave speeds and performance
@@ -267,22 +285,26 @@ The table :ref:`i2s_frame_slave_62_5_speeds` shows the known working configurati
 .. list-table:: Known working |I2S| frame-based master configurations on a 62.5MHz core
      :class: vertical-borders horizontal-borders
      :header-rows: 1
-     :widths: 20 20 20 20
+     :widths: 20 20 20 20 20
 
      * - **BCLK FREQ**
+       - **DATA WORD**
        - **SAMPLE FREQ**
        - **NUM IN (num channels)**
        - **NUM OUT (num channels)**
-     * - 24.576MHz
-       - 384000
-       - 4 (8)
-       - 4 (8)
      * - 12.288MHz
+       - 32 bit
        - 192000
        - 4 (8)
        - 4 (8)
-     * - 3.072MHz
-       - 16000
+     * - 12.288MHz
+       - 16 bit
+       - 192000
+       - 4 (8)
+       - 4 (8)
+     * - 12.288MHz
+       - 8 bit
+       - 192000
        - 4 (8)
        - 4 (8)
 
