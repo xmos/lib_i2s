@@ -12,7 +12,6 @@
 
 #define SAMPLE_FREQUENCY (192000)
 #define MASTER_CLOCK_FREQUENCY (24576000)
-#define DATA_BITS (32)
 
 [[distributable]]
 void my_application(server i2s_frame_callback_if i_i2s) {
@@ -36,8 +35,8 @@ void my_application(server i2s_frame_callback_if i_i2s) {
   }
 }
 
-out buffered port:32 p_dout = XS1_PORT_4B;
-in buffered port:32 p_din = XS1_PORT_4A;
+out buffered port:32 p_dout = XS1_PORT_4F;
+in buffered port:32 p_din = XS1_PORT_4E;
 out port p_bclk = XS1_PORT_1M;
 out buffered port:32 p_lrclk = XS1_PORT_1A;
 in port p_mclk = XS1_PORT_1B;
@@ -48,7 +47,7 @@ int main(void) {
   i2s_frame_callback_if i_i2s;
 
   par {
-    i2s_frame_master_4b(i_i2s, p_dout, 4, p_din, 4, DATA_BITS, p_bclk, p_lrclk, p_mclk, bclk);
+    i2s_frame_master_4b(i_i2s, p_dout, 4, p_din, 4, p_bclk, p_lrclk, p_mclk, bclk);
     my_application(i_i2s);
   }
   return 0;
