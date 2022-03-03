@@ -12,6 +12,7 @@
 
 #define SAMPLE_FREQUENCY (192000)
 #define MASTER_CLOCK_FREQUENCY (24576000)
+#define DATA_BITS (32)
 
 [[distributable]]
 void my_application(server i2s_frame_callback_if i_i2s) {
