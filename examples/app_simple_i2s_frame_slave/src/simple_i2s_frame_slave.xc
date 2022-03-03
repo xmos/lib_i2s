@@ -10,8 +10,9 @@
 #include <print.h>
 #include <stdlib.h>
 
-#define SAMPLE_FREQUENCY 192000
-#define MASTER_CLOCK_FREQUENCY 24576000
+#define SAMPLE_FREQUENCY (192000)
+#define MASTER_CLOCK_FREQUENCY (24576000)
+#define DATA_BITS (32)
 
 [[distributable]]
 void my_application(server i2s_frame_callback_if i_i2s) {
@@ -45,7 +46,7 @@ int main(void) {
   interface i2s_frame_callback_if i_i2s;
 
   par {
-    i2s_frame_slave(i_i2s, p_dout, 2, p_din, 2, p_bclk, p_lrclk, bclk);
+    i2s_frame_slave(i_i2s, p_dout, 2, p_din, 2, DATA_BITS, p_bclk, p_lrclk, bclk);
     my_application(i_i2s);
   }
   return 0;

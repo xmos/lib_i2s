@@ -22,13 +22,14 @@ void i2s_frame_master(client i2s_frame_callback_if i2s_i,
                 static const size_t num_out,
                 in buffered port:32 (&?p_din)[num_in],
                 static const size_t num_in,
+                static const size_t num_data_bits,
                 out port p_bclk,
                 out buffered port:32 p_lrclk,
                 in port p_mclk,
                 clock bclk)
 {}
 
-#endif // __XS2A__
+#endif // __XS2A__ || __XS3A__
 
 #undef i2s_slave
 void i2s_slave(client i2s_callback_if i2s_i,
@@ -48,6 +49,7 @@ void i2s_frame_slave(client i2s_frame_callback_if i2s_i,
         static const size_t num_out,
         in buffered port:32 (&?p_din)[num_in],
         static const size_t num_in,
+        static const size_t num_data_bits,
         in port p_bclk,
         in buffered port:32 p_lrclk,
         clock bclk)
