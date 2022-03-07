@@ -1,7 +1,7 @@
 I2S library change log
 ======================
 
-UNRELEASED
+5.0.0
 -----
 
   * ADDED: Support for I2S data lengths less than 32 bit.
