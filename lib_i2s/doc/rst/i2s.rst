@@ -42,7 +42,8 @@ in :ref:`i2s_signal_params`.
        - The mode - either |I2S| or left justified.
      * - *NUM_DATA_BITS*
        - The number of bits in a data word; this is usually 32, but can be 
-         adjusted to any value below 32 if required.
+         adjusted to any value below 32 if required when using one bit ports for
+         I/O.
 
 The *MCLK_BCLK_RATIO* should be such that twice the number of data bits can be 
 output by the bit clock at the data rate of the |I2S| signal. For example, a
@@ -94,8 +95,10 @@ Connecting |I2S| signals to the xCORE device
 
 The |I2S| wires need to be connected to the xCORE device as shown in
 :ref:`i2s_master_xcore_connect` and :ref:`i2s_slave_xcore_connect`. The signals 
-can be connected to any one bit ports on the device provide they do not overlap 
-any other used ports and are all on the same tile.
+can be connected to any one bit ports on the device provided that they do 
+not overlap any other used ports and are all on the same tile.
+In addition, four bit ports may also be used to connect to up to four signals of
+input or output with the same constraints as above.
 
 .. _i2s_master_xcore_connect:
 
@@ -176,15 +179,15 @@ application and the logical core speed.
       - 1 (2)
       - 1 (2)
 
-On the xCORE-200 the frame-based |I2S| master can be used. This uses hardware
-clock dividers only available in the the xCORE-200 and a more efficient callback
+On the xCORE-200 and xcore.ai the frame-based |I2S| master can be used. This uses hardware
+clock dividers only available in the the xCORE-200 and xcore.ai and a more efficient callback
 interface to achieve much higher throughputs. This also permits the use of 
 non-32bit data word lengths. :ref:`i2s_frame_master_62_5_speeds` shows the known
 working configurations:
 
 .. _i2s_frame_master_62_5_speeds:
 
-.. list-table:: Known working |I2S| frame-based master configurations on a 62.5MHz core
+.. list-table:: Known working |I2S| frame-based master configurations on a 62.5MHz core using one bit ports for I/O
      :class: vertical-borders horizontal-borders
      :header-rows: 1
      :widths: 15 28 7 27 10 13
@@ -245,6 +248,31 @@ working configurations:
        - 1 (2)
 
 
+.. list-table:: Known working |I2S| frame-based master configurations on a 62.5MHz core using four bit ports for I/O
+     :class: vertical-borders horizontal-borders
+     :header-rows: 1
+     :widths: 15 28 7 27 10 13
+
+     * - **MCLK FREQ**
+       - **MCLK/BCLK RATIO**
+       - **DATA WORD**
+       - **SAMPLE FREQ**
+       - **MAX IN (chans)**
+       - **MAX OUT (chans)**
+     * - 12.288 MHz
+       - 32, 16, 8, 4, 2
+       - 32 bit
+       - 6000 Hz - 96000 Hz
+       - 4 (8)
+       - 4 (8)
+     * - 24.576 MHz
+       - 64, 32, 16, 8, 4, 2
+       - 32 bit
+       - 6000 Hz - 192000 Hz
+       - 1 (2)
+       - 1 (2)
+
+
 |I2S| slave speeds and performance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -282,7 +310,7 @@ The table :ref:`i2s_frame_slave_62_5_speeds` shows the known working configurati
 
 .. _i2s_frame_slave_62_5_speeds:
 
-.. list-table:: Known working |I2S| frame-based master configurations on a 62.5MHz core
+.. list-table:: Known working |I2S| frame-based master configurations on a 62.5MHz core using one bit ports for I/O
      :class: vertical-borders horizontal-borders
      :header-rows: 1
      :widths: 20 20 20 20 20
@@ -308,8 +336,24 @@ The table :ref:`i2s_frame_slave_62_5_speeds` shows the known working configurati
        - 4 (8)
        - 4 (8)
 
+.. list-table:: Known working |I2S| frame-based master configurations on a 62.5MHz core using four bit ports for I/O
+     :class: vertical-borders horizontal-borders
+     :header-rows: 1
+     :widths: 20 20 20 20 20
+
+     * - **BCLK FREQ**
+       - **DATA WORD**
+       - **SAMPLE FREQ**
+       - **NUM IN (num channels)**
+       - **NUM OUT (num channels)**
+     * - 12.288MHz
+       - 32 bit
+       - 192000
+       - 4 (8)
+       - 4 (8)
+
 .. tip::
-   |I2S| "frame-master" is capable of running at higher rates such as 768kHz within a 62.5MIPS logical core. However, it may be necessary to modify the port timing delays to ensure proper sampling of the data and LRCLK lines. There are methods for doing this using pad and/or sample delays however this is beyond the scope of this document. Please consult `I/O timings for xCORE200` available on xmos.com for further information. 
+   |I2S| "frame-master" is capable of running at higher rates such as 768kHz within a 62.5MIPS logical core using one bit ports for I/O. However, it may be necessary to modify the port timing delays to ensure proper sampling of the data and LRCLK lines. There are methods for doing this using pad and/or sample delays however this is beyond the scope of this document. Please consult `I/O timings for xCORE200` available on xmos.com for further information. 
 
 
 |newpage|
