@@ -62,6 +62,7 @@ FUNCTION_NAME:
     zip    c, d, 0  
 
   // Load and bit-reverse the odd 32-bit samples we intend to send
+  // Output 32 1s to the lrclock transfer register
   // Output the even samples
   // Start the bit clock
   // Input the first even sample - this must happen here to meet timing
@@ -79,8 +80,7 @@ FUNCTION_NAME:
     zip    b, d, 0
     zip    a, b, 0
     zip    c, d, 0  
-
-  // Output 32 1s to the lrclock transfer register
+    
   // Output the first two odd samples
   // Input the remaining even samples
   {                                  ; in     e, res[inp_port] }
