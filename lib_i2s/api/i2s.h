@@ -422,6 +422,35 @@ void i2s_frame_slave(client i2s_frame_callback_if i2s_i,
         in buffered port:32 p_lrclk,
         clock bclk);
 
+/** I2S High Efficiency slave component.
+ *
+ *  This task performs I2S on the provided pins. It will perform callbacks over
+ *  the i2s_callback_if interface to get/receive data from the application
+ *  using this component.
+ *
+ *  The component performs I2S slave so will expect the word clock and
+ *  bit clock to be driven externally.
+ *
+ *  \param i2s_i          The I2S callback interface to connect to
+ *                        the application
+ *  \param p_dout         An array of data output ports
+ *  \param num_out        The number of output data ports
+ *  \param p_din          An array of data input ports
+ *  \param num_in         The number of input data ports
+ *  \param p_bclk         The bit clock input port
+ *  \param p_lrclk        The word clock input port
+ *  \param bclk           A clock that will get configured for use with
+ *                        the bit clock
+ */
+void i2s_frame_slave_4b(client i2s_frame_callback_if i2s_i,
+        out buffered port:32 (&?p_dout)[num_out],
+        static const size_t num_out,
+        in buffered port:32 (&?p_din)[num_in],
+        static const size_t num_in,
+        in port p_bclk,
+        in buffered port:32 p_lrclk,
+        clock bclk);
+
 /** TDM master component.
  *
  *  This task performs TDM on the provided pins. It will perform callbacks over
@@ -455,6 +484,7 @@ void tdm_master(client interface i2s_callback_if tdm_i,
 #include <i2s_frame_master_4b_impl.h>
 #include <i2s_slave_impl.h>
 #include <i2s_frame_slave_impl.h>
+#include <i2s_frame_slave_4b_impl.h>
 #include <tdm_master_impl.h>
 
 #endif // _i2s_h_
