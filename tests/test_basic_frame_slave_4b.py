@@ -58,15 +58,15 @@ def do_frame_slave_test(data_bits, num_in, num_out, testlevel):
         resources["xsim"],
         binary,
         simthreads=[clk, checker],
-        # simargs=[],
-        simargs=[
-            "--trace-to",
-            "./i2s_frame_slave_4b_test/logs/sim_{id}.log".format(id=id_string),
-            "--vcd-tracing",
-            "-o ./i2s_frame_slave_4b_test/traces/trace_{id}.vcd -tile tile[0] -ports-detailed -functions -cycles -clock-blocks -cores -instructions".format(
-                id=id_string
-            ),
-        ],
+        simargs=[],
+        # simargs=[
+        #     "--trace-to",
+        #     "./i2s_frame_slave_4b_test/logs/sim_{id}.log".format(id=id_string),
+        #     "--vcd-tracing",
+        #     "-o ./i2s_frame_slave_4b_test/traces/trace_{id}.vcd -tile tile[0] -ports-detailed -functions -cycles -clock-blocks -cores -instructions".format(
+        #         id=id_string
+        #     ),
+        # ],
         suppress_multidrive_messages=True,
         tester=tester,
     )
