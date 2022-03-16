@@ -212,7 +212,7 @@ void i2s_master(client i2s_callback_if i2s_i,
 
 #if defined(__XS2A__) || defined(__XS3A__) || defined(__DOXYGEN__)
 
-/** I2S frame-based master component **for xCORE200 only**
+/** I2S frame-based master component **for xCORE200 and xcore.ai only**
  *
  *  This task performs I2S on the provided pins. It will perform callbacks over
  *  the i2s_frame_callback_if interface to get/receive frames of data from the
@@ -223,7 +223,7 @@ void i2s_master(client i2s_callback_if i2s_i,
  *
  *  This is a more efficient version of i2s master which reduces callback
  *  frequency and allows useful processing to be done in distributable i2s handler tasks.
- *  It also uses xCORE200 specific features to remove the need for software
+ *  It also uses xCORE200 and xcore.ai specific features to remove the need for software
  *  BCLK generation which decreases processor overhead.
  *
  *  \param i2s_i          The I2S frame callback interface to connect to
@@ -250,7 +250,7 @@ void i2s_frame_master(client i2s_frame_callback_if i2s_i,
                 in port p_mclk,
                 clock bclk);
 
-/** I2S frame-based master component with 4-bit ports **for xCORE200 only**
+/** I2S frame-based master component with 4-bit ports **for xCORE200 and xcore.ai only**
  *
  *  This task performs I2S on the provided 4-bit ports. It will perform callbacks over
  *  the i2s_frame_callback_if interface to get/receive frames of data from the
@@ -261,17 +261,17 @@ void i2s_frame_master(client i2s_frame_callback_if i2s_i,
  *
  *  This is a more efficient version of i2s master which reduces callback
  *  frequency and allows useful processing to be done in distributable i2s handler tasks.
- *  It also uses xCORE200 specific features to remove the need for software
+ *  It also uses xCORE200 and xcore.ai specific features to remove the need for software
  *  BCLK generation which decreases processor overhead.
  *
  *  This component can only operate with a 32-bit data word length.
  *
  *  \param i2s_i          The I2S frame callback interface to connect to
  *                        the application
- *  \param p_dout         An array of data output ports
- *  \param num_out        The number of output data ports
- *  \param p_din          An array of data input ports
- *  \param num_in         The number of input data ports
+ *  \param p_dout         A 4-bit data output port
+ *  \param num_out        The number of output data streams
+ *  \param p_din          A 4-bit data input port
+ *  \param num_in         The number of input data streams
  *  \param p_bclk         The bit clock output port
  *  \param p_lrclk        The word clock output port
  *  \param p_mclk         Input port which supplies the master clock
@@ -288,7 +288,7 @@ void i2s_frame_master_4b(client i2s_frame_callback_if i2s_i,
                 in port p_mclk,
                 clock bclk);
 
-/** I2S frame-based master component **for xCORE200 only**
+/** I2S frame-based master component **for xCORE200 and xcore.ai only**
  *
  *  This task performs I2S on the provided pins. It will perform callbacks over
  *  the i2s_frame_callback_if interface to get/receive frames of data from the
@@ -299,7 +299,7 @@ void i2s_frame_master_4b(client i2s_frame_callback_if i2s_i,
  *
  *  This is a more efficient version of i2s master which reduces callback
  *  frequency and allows useful processing to be done in distributable i2s handler tasks.
- *  It also uses xCORE200 specific features to remove the need for software
+ *  It also uses xCORE200 and xcore.ai specific features to remove the need for software
  *  BCLK generation which decreases processor overhead.
  *
  *  \param i2s_i          The I2S frame callback interface to connect to
@@ -324,7 +324,7 @@ void i2s_frame_master_external_clock(client i2s_frame_callback_if i2s_i,
                 out buffered port:32 p_lrclk,
                 clock bclk);
 
-/** I2S frame-based master component with 4-bit ports **for xCORE200 only**
+/** I2S frame-based master component with 4-bit ports **for xCORE200 amd xcore.ai only**
  *
  *  This task performs I2S on the provided 4-bit ports. It will perform callbacks over
  *  the i2s_frame_callback_if interface to get/receive frames of data from the
@@ -335,7 +335,7 @@ void i2s_frame_master_external_clock(client i2s_frame_callback_if i2s_i,
  *
  *  This is a more efficient version of i2s master which reduces callback
  *  frequency and allows useful processing to be done in distributable i2s handler tasks.
- *  It also uses xCORE200 specific features to remove the need for software
+ *  It also uses xCORE200 and xcore.ai specific features to remove the need for software
  *  BCLK generation which decreases processor overhead.
  *
  *  This component can only operate with a 32-bit data word length.
