@@ -14,8 +14,10 @@ def do_master_test(data_bits, num_in, num_out, testlevel):
         db=data_bits, i=num_in, o=num_out, tl=testlevel
     )
 
-    binary = "i2s_frame_master_test/bin/{id}/i2s_frame_master_test_{id}.xe".format(
-        id=id_string
+    binary = (
+        "i2s_frame_master_4b_test/bin/{id}/i2s_frame_master_4b_test_{id}.xe".format(
+            id=id_string
+        )
     )
 
     clk = Clock("tile[0]:XS1_PORT_1A")
@@ -24,16 +26,16 @@ def do_master_test(data_bits, num_in, num_out, testlevel):
         "tile[0]:XS1_PORT_1B",
         "tile[0]:XS1_PORT_1C",
         [
-            "tile[0]:XS1_PORT_1H",
-            "tile[0]:XS1_PORT_1I",
-            "tile[0]:XS1_PORT_1J",
-            "tile[0]:XS1_PORT_1K",
+            "tile[0]:XS1_PORT_4F.3",
+            "tile[0]:XS1_PORT_4F.2",
+            "tile[0]:XS1_PORT_4F.1",
+            "tile[0]:XS1_PORT_4F.0",
         ],
         [
-            "tile[0]:XS1_PORT_1D",
-            "tile[0]:XS1_PORT_1E",
-            "tile[0]:XS1_PORT_1F",
-            "tile[0]:XS1_PORT_1G",
+            "tile[0]:XS1_PORT_4E.3",
+            "tile[0]:XS1_PORT_4E.2",
+            "tile[0]:XS1_PORT_4E.1",
+            "tile[0]:XS1_PORT_4E.0",
         ],
         "tile[0]:XS1_PORT_1L",
         "tile[0]:XS1_PORT_16A",
@@ -46,7 +48,7 @@ def do_master_test(data_bits, num_in, num_out, testlevel):
     tester = xmostest.ComparisonTester(
         open("master_test.expect"),
         "lib_i2s",
-        "i2s_frame_master_sim_tests",
+        "i2s_frame_master_4b_sim_tests",
         "basic_test_%s" % testlevel,
         {"data_bits": data_bits, "num_in": num_in, "num_out": num_out},
         ignore=["CONFIG:.*"],
@@ -61,9 +63,9 @@ def do_master_test(data_bits, num_in, num_out, testlevel):
         simargs=[],
         # simargs=[
         #     "--trace-to",
-        #     "./i2s_frame_master_test/logs/sim_{id}.log".format(id=id_string),
+        #     "./i2s_frame_master_4b_test/logs/sim_{id}.log".format(id=id_string),
         #     "--vcd-tracing",
-        #     "-o ./i2s_frame_master_test/traces/trace_{id}.vcd -tile tile[0] -ports-detailed -functions -cycles -clock-blocks -cores -instructions".format(
+        #     "-o ./i2s_frame_master_4b_test/traces/trace_{id}.vcd -tile tile[0] -ports-detailed -functions -cycles -clock-blocks -cores -instructions".format(
         #         id=id_string
         #     ),
         # ],
@@ -73,9 +75,8 @@ def do_master_test(data_bits, num_in, num_out, testlevel):
 
 
 def runtest():
-    for db in (32, 24, 16, 8):
-        do_master_test(db, 4, 4, "smoke")
-        do_master_test(db, 1, 1, "smoke")
-        do_master_test(db, 4, 0, "smoke")
-        do_master_test(db, 0, 4, "smoke")
-        do_master_test(db, 4, 4, "nightly")
+    do_master_test(32, 4, 4, "smoke")
+    do_master_test(32, 1, 1, "smoke")
+    do_master_test(32, 4, 0, "smoke")
+    do_master_test(32, 0, 4, "smoke")
+    do_master_test(32, 4, 4, "nightly")

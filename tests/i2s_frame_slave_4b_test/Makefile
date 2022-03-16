@@ -10,7 +10,7 @@ TARGET = XCORE-200-EXPLORER
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
 # the project name
-APP_NAME = i2s_frame_master_test
+APP_NAME = i2s_frame_slave_4b_test
 
 # The USED_MODULES variable lists other module used by the application.
 USED_MODULES = lib_i2s
@@ -21,9 +21,9 @@ USED_MODULES = lib_i2s
 # If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
 # xcc for the final link (mapping) stage.
 
-COMMON_FLAGS = -O3 -g -save-temps
+COMMON_FLAGS = -O2 -g -save-temps
 
-$(foreach db,8 16 24 32,\
+$(foreach db,32 16 8,\
   $(foreach out,0 1 2 3 4,\
     $(foreach in,0 1 2 3 4,\
       $(eval \
@@ -31,8 +31,14 @@ $(foreach db,8 16 24 32,\
       ) \
       $(eval \
         XCC_FLAGS_nightly_$(db)$(out)$(in) = $(COMMON_FLAGS) -DDATA_BITS=$(db) -DNUM_OUT=$(out) -DNUM_IN=$(in)\
-      )\
-    )\
+      ) \
+      $(eval \
+        XCC_FLAGS_smoke_$(db)$(out)$(in)_inv = $(COMMON_FLAGS) -DDATA_BITS=$(db) -DNUM_OUT=$(out) -DNUM_IN=$(in) -DSMOKE -DSLAVE_INVERT_BCLK\
+      ) \
+      $(eval \
+        XCC_FLAGS_nightly_$(db)$(out)$(in)_inv = $(COMMON_FLAGS) -DDATA_BITS=$(db) -DNUM_OUT=$(out) -DNUM_IN=$(in) -DSLAVE_INVERT_BCLK\
+      ) \
+    ) \
   )\
 )
 

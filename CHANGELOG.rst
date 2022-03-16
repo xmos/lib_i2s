@@ -5,6 +5,8 @@ I2S library change log
 -----
 
   * ADDED: Support for I2S data lengths less than 32 bit.
+  * ADDED: Implementation allowing use of a 4-bit port for up to 4 simultaneous
+    streaming inputs or outputs.
 
 4.3.0
 -----

@@ -1,6 +1,6 @@
 ifeq ($(USING_XWAF),1)
 all:
-	xwaf configure build --config $(CONFIG)
+	xwaf configure clean build --config $(CONFIG)
 else # USING_XWAF
 # The TARGET variable determines what target system the application is
 # compiled for. It either refers to an XN file in the source directories
@@ -10,7 +10,7 @@ TARGET = XCORE-200-EXPLORER
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
 # the project name
-APP_NAME = i2s_frame_master_test
+APP_NAME = i2s_frame_master_external_clock_4b_test
 
 # The USED_MODULES variable lists other module used by the application.
 USED_MODULES = lib_i2s
@@ -31,9 +31,9 @@ $(foreach db,8 16 24 32,\
       ) \
       $(eval \
         XCC_FLAGS_nightly_$(db)$(out)$(in) = $(COMMON_FLAGS) -DDATA_BITS=$(db) -DNUM_OUT=$(out) -DNUM_IN=$(in)\
-      )\
-    )\
-  )\
+      ) \
+    ) \
+  ) \
 )
 
 # The XCORE_ARM_PROJECT variable, if set to 1, configures this
