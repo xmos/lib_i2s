@@ -8,7 +8,7 @@ pipeline {
   parameters {
     string(
       name: 'TOOLS_VERSION',
-      defaultValue: '15.1.0',
+      defaultValue: '15.1.4',
       description: 'The tools version to build with (check /projects/tools/ReleasesTools/)'
       )
   }
@@ -19,8 +19,7 @@ pipeline {
       }
       environment {
         REPO = 'lib_i2s'
-        // VIEW = "${env.JOB_NAME.contains('PR-') ? REPO+'_'+env.CHANGE_TARGET : REPO+'_'+env.BRANCH_NAME}"
-        VIEW = "lib_i2s_feature_test_xs3"
+        VIEW = getViewName(REPO)
       }
       options {
         skipDefaultCheckout()
