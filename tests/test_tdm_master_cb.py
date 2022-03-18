@@ -30,8 +30,8 @@ def do_test(num_in, num_out, testlevel):
 
     xmostest.run_on_simulator(resources['xsim'], binary,
                               simthreads = [checker],
-                              #simargs=[],
-                              simargs=['--vcd-tracing', '-o ./tdm_master_cb_test/trace.vcd -tile tile[0] -ports-detailed'],
+                              simargs=[],
+                              #simargs=['--vcd-tracing', '-o ./tdm_master_cb_test/trace.vcd -tile tile[0] -ports-detailed'],
                               suppress_multidrive_messages = True,
                               tester = tester)
 

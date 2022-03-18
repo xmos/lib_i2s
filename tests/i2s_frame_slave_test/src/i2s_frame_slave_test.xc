@@ -17,19 +17,23 @@ out port setup_strobe_port = XS1_PORT_1L;
 out port setup_data_port = XS1_PORT_16A;
 in port  setup_resp_port = XS1_PORT_1M;
 
-#define MAX_CHANNELS 8
+#define MAX_CHANNELS (8)
 
-#define I2S_LOOPBACK_LATENCY 1
+#define I2S_LOOPBACK_LATENCY (1)
+
+#ifndef DATA_BITS
+#define DATA_BITS (32)
+#endif
 
 #if defined(SMOKE)
-#define NUM_BCLKS 1
-#define NUM_BCLKS_TO_CHECK 1
+#define NUM_BCLKS (1)
+#define NUM_BCLKS_TO_CHECK (1)
 static const unsigned bclk_freq_lut[NUM_BCLKS] = {
   1228800
 };
 #else
-#define NUM_BCLKS 10
-#define NUM_BCLKS_TO_CHECK 3
+#define NUM_BCLKS (10)
+#define NUM_BCLKS_TO_CHECK (3)
 static const unsigned bclk_freq_lut[NUM_BCLKS] = {
   1228800, 614400, 384000, 192000, 44100,
   22050, 96000, 176400, 88200, 48000, 24000, 352800
@@ -69,7 +73,7 @@ static void send_data_to_tester(
 }
 
 static void broadcast(unsigned bclk_freq,
-        unsigned num_in, unsigned num_out, int is_i2s_justified){
+        unsigned num_in, unsigned num_out, int is_i2s_justified, unsigned data_bits){
     setup_strobe_port <: 0;
 
     send_data_to_tester(setup_strobe_port, setup_data_port, bclk_freq>>16);
@@ -77,6 +81,7 @@ static void broadcast(unsigned bclk_freq,
     send_data_to_tester(setup_strobe_port, setup_data_port, num_in);
     send_data_to_tester(setup_strobe_port, setup_data_port, num_out);
     send_data_to_tester(setup_strobe_port, setup_data_port, is_i2s_justified);
+    send_data_to_tester(setup_strobe_port, setup_data_port, data_bits);
  }
 
 static int request_response(
@@ -110,7 +115,13 @@ void app(server interface i2s_frame_callback_if i2s_i){
         case i2s_i.receive(size_t n, int32_t receive_data[n]):{
             for(size_t c=0; c<n; c++){
                 unsigned i = rx_data_counter[c];
-                error |= (receive_data[c] != rx_data[c][i]);
+                // We shift here to pick up the case where the value we are
+                // testing with e.g. 401 cannot be represented in the given bit
+                // depth e.g. 8 bit
+                if ((receive_data[c] << (32-DATA_BITS)) != (rx_data[c][i] << (32-DATA_BITS)))
+                {
+                    error |= 1;
+                }
                 rx_data_counter[c] = i+1;
             }
             break;
@@ -168,7 +179,7 @@ void app(server interface i2s_frame_callback_if i2s_i){
             }
 
             broadcast(bclk_freq_lut[bclk_freq_index],
-                    NUM_IN, NUM_OUT, i2s_config.mode == I2S_MODE_I2S);
+                    NUM_IN, NUM_OUT, i2s_config.mode == I2S_MODE_I2S, DATA_BITS);
 
             break;
         }
@@ -181,7 +192,7 @@ int main(){
 
     par {
       [[distribute]] app(i2s_i);
-      i2s_frame_slave(i2s_i, p_dout, NUM_OUT, p_din, NUM_IN,
+      i2s_frame_slave(i2s_i, p_dout, NUM_OUT, p_din, NUM_IN, DATA_BITS, 
                 p_bclk, p_lrclk, bclk);
       par(int i=0;i<7;i++){
         { set_core_fast_mode_on();

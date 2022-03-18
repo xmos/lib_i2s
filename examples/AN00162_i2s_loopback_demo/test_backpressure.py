@@ -1,4 +1,4 @@
-# Copyright 2016-2021 XMOS LIMITED.
+# Copyright 2016-2022 XMOS LIMITED.
 # This Software is subject to the terms of the XMOS Public Licence: Version 1.
 import xmostest, os, subprocess, re, shutil
 
@@ -7,10 +7,8 @@ i2s_range = (1, 2, 3, 4)
 burn_range = (0, 5, 7)
 
 command_line_build = """ "make" "-B" """
-command_line_sim = """ "xsim" "--plugin" "LoopbackPort.dll" "-port tile[0] XS1_PORT_1A 1 0 -port tile[0] XS1_PORT_1G 1 0 " "--max-cycles" "50000000" "--xscope" "-xe '/Users/Ed/apps/scratch/lib_i2s_upgrade/a_dir/lib_i2s/examples/AN00162_i2s_loopback_demo/bin/AN00162_i2s_loopback_demo.xe' -offline  xscope.xmt" "/Users/Ed/apps/scratch/lib_i2s_upgrade/a_dir/lib_i2s/examples/AN00162_i2s_loopback_demo/bin/AN00162_i2s_loopback_demo.xe" """
-                                                        
-#command_line = """ "xsim" "--trace-plugin" "VcdPlugin.dll" "-o '/Users/Ed/apps/scratch/lib_i2s_upgrade/a_dir/lib_i2s/examples/AN00162_i2s_loopback_demo/AN00162_i2s_loopback_demo.vcd' -xe '/Users/Ed/apps/scratch/lib_i2s_upgrade/a_dir/lib_i2s/examples/AN00162_i2s_loopback_demo/bin/AN00162_i2s_loopback_demo.xe' -core tile[0] -ports -ports-detailed -cores -instructions " "--plugin" "LoopbackPort.dll" "-port tile[0] XS1_PORT_1A 1 0 -port tile[0] XS1_PORT_1G 1 0 " "--max-cycles" "5000000" "--xscope" "-xe '/Users/Ed/apps/scratch/lib_i2s_upgrade/a_dir/lib_i2s/examples/AN00162_i2s_loopback_demo/bin/AN00162_i2s_loopback_demo.xe' -offline  xscope.xmt" "/Users/Ed/apps/scratch/lib_i2s_upgrade/a_dir/lib_i2s/examples/AN00162_i2s_loopback_demo/bin/AN00162_i2s_loopback_demo.xe" """
-
+command_line_sim = """ "xsim" "--plugin" "LoopbackPort.dll" "-port tile[0] XS1_PORT_1A 1 0 -port tile[0] XS1_PORT_1G 1 0 " "--max-cycles" "50000000" """
+     
 result = ""
 
 for sr in sr_range:

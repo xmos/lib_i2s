@@ -61,9 +61,9 @@ out port setup_strobe_port = XS1_PORT_1L;
 out port setup_data_port = XS1_PORT_16A;
 in port  setup_resp_port = XS1_PORT_1M;
 
-#define MAX_CHANNELS 32
-#define NUM_SCLKS_TO_CHECK 3
-#define NUM_SCLKS 10
+#define MAX_CHANNELS (32)
+#define NUM_SCLKS_TO_CHECK (3)
+#define NUM_SCLKS (10)
 
 
 static void send_data_to_tester(

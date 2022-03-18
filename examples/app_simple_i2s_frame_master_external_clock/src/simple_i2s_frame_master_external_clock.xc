@@ -10,8 +10,9 @@
 #include <print.h>
 #include <stdlib.h>
 
-#define SAMPLE_FREQUENCY 192000
-#define MASTER_CLOCK_FREQUENCY 24576000
+#define SAMPLE_FREQUENCY (192000)
+#define MASTER_CLOCK_FREQUENCY (24576000)
+#define DATA_BITS (32)
 
 [[distributable]]
 void my_application(server i2s_frame_callback_if i_i2s) {
@@ -44,7 +45,7 @@ clock bclk = XS1_CLKBLK_1;
 
 static void setup_bclock()
 {
-    uint32_t mclk_bclk_ratio = (MASTER_CLOCK_FREQUENCY/SAMPLE_FREQUENCY)/64;
+    uint32_t mclk_bclk_ratio = (MASTER_CLOCK_FREQUENCY/(SAMPLE_FREQUENCY*2*DATA_BITS));
     configure_clock_src_divide(bclk, p_mclk, mclk_bclk_ratio >> 1);
 }
 
@@ -56,7 +57,7 @@ int main(void) {
       {
           setup_bclock();
           par {
-            i2s_frame_master_external_clock(i_i2s, p_dout, 2, p_din, 2, p_bclk, p_lrclk, bclk);
+            i2s_frame_master_external_clock(i_i2s, p_dout, 2, p_din, 2, DATA_BITS, p_bclk, p_lrclk, bclk);
             my_application(i_i2s);
           }
       }

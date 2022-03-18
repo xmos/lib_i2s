@@ -5,7 +5,7 @@ else # USING_XWAF
 # The TARGET variable determines what target system the application is
 # compiled for. It either refers to an XN file in the source directories
 # or a valid argument for the --target option when compiling
-TARGET = SLICEKIT-A16
+TARGET = XCORE-200-EXPLORER
 
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
@@ -24,10 +24,10 @@ USED_MODULES = lib_i2s
 $(foreach out,0 1 2 3 4,\
  $(foreach in,0 1 2 3 4,\
    $(eval \
-	XCC_FLAGS_master_$(out)$(in) = -O2 -g -DMASTER  -DNUM_OUT=$(out) -DNUM_IN=$(in)\
+    XCC_FLAGS_master_$(out)$(in) = -O2 -g -DMASTER  -DNUM_OUT=$(out) -DNUM_IN=$(in)\
     )\
    $(eval \
-	XCC_FLAGS_slave_$(out)$(in) = -O2 -g -DSLAVE  -DNUM_OUT=$(out) -DNUM_IN=$(in)\
+    XCC_FLAGS_slave_$(out)$(in) = -O2 -g -DSLAVE  -DNUM_OUT=$(out) -DNUM_IN=$(in)\
     ) \
  ) \
 )
