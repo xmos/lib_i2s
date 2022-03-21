@@ -5,11 +5,13 @@ from i2s_slave_checker import I2SSlaveChecker
 from i2s_slave_checker import Clock
 import os
 
-def do_frame_slave_test(num_in, num_out, testlevel):
+def do_frame_slave_test(data_bits, num_in, num_out, testlevel):
 
     resources = xmostest.request_resource("xsim")
 
-    binary = 'i2s_frame_slave_test/bin/{tl}_{i}{o}/i2s_frame_slave_test_{tl}_{i}{o}.xe'.format(i=num_in, o=num_out, tl=testlevel)
+    id_string = "{tl}_{db}{i}{o}".format(db=data_bits,i=num_in, o=num_out, tl=testlevel)
+
+    binary = 'i2s_frame_slave_test/bin/{id}/i2s_frame_slave_test_{id}.xe'.format(id=id_string)
 
     clk = Clock("tile[0]:XS1_PORT_1A")
 
@@ -21,12 +23,13 @@ def do_frame_slave_test(num_in, num_out, testlevel):
         "tile[0]:XS1_PORT_1L",
         "tile[0]:XS1_PORT_16A",
         "tile[0]:XS1_PORT_1M",
-         clk)
+         clk,
+         frame_based=True)
 
     tester = xmostest.ComparisonTester(open('slave_test.expect'),
                                      'lib_i2s', 'i2s_frame_slave_sim_tests',
                                      'basic_test_%s'%testlevel,
-                                     {'num_in':num_in, 'num_out':num_out},
+                                     {'num_in':num_in, 'num_out':num_out, 'data_bits':data_bits},
                                        regexp=True,
                                        ignore=["CONFIG:.*"])
 
@@ -34,12 +37,15 @@ def do_frame_slave_test(num_in, num_out, testlevel):
 
     xmostest.run_on_simulator(resources['xsim'], binary,
                               simthreads = [clk, checker],
-                              simargs=['--vcd-tracing', '-o ./i2s_frame_slave_test/trace.vcd -tile tile[0] -ports-detailed'],
+                              simargs=[],
+                              #simargs=['--trace-to', './i2s_frame_slave_test/logs/sim_{id}.log'.format(id=id_string), 
+                              #         '--vcd-tracing', '-o ./i2s_frame_slave_test/traces/trace_{id}.vcd -tile tile[0] -ports-detailed -functions -cycles -clock-blocks -cores -instructions'.format(id=id_string)],
                               suppress_multidrive_messages = True,
                               tester = tester)
 
 def runtest():
-    do_frame_slave_test(4, 4, "smoke")
-    do_frame_slave_test(4, 0, "smoke")
-    do_frame_slave_test(0, 4, "smoke")
-    do_frame_slave_test(4, 4, "nightly")
+    for db in (32, 16, 8):
+        do_frame_slave_test(db, 4, 4, "smoke")
+        do_frame_slave_test(db, 4, 0, "smoke")
+        do_frame_slave_test(db, 0, 4, "smoke")
+        do_frame_slave_test(db, 4, 4, "nightly")

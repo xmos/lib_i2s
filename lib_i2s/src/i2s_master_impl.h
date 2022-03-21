@@ -5,6 +5,8 @@
 #include "i2s.h"
 #include "xassert.h"
 
+#define FRAME_WORDS (2)
+
 static const unsigned i2s_clk_mask_lookup[5] = {
         0xaaaaaaaa, //div 2
         0xcccccccc, //div 4
@@ -32,8 +34,6 @@ static void i2s_init_ports(
         configure_in_port(p_din[i], bclk);
     start_clock(bclk);
 }
-
-#define FRAME_WORDS 2
 
 static void inline i2s_output_clock_pair(out buffered port:32 p_bclk,unsigned clk_mask){
     p_bclk <: clk_mask;

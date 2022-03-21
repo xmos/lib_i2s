@@ -10,8 +10,8 @@
 #include <print.h>
 #include <stdlib.h>
 
-#define SAMPLE_FREQUENCY 192000
-#define MASTER_CLOCK_FREQUENCY 24576000
+#define SAMPLE_FREQUENCY (192000)
+#define MASTER_CLOCK_FREQUENCY (24576000)
 
 [[distributable]]
 void my_application(server i2s_callback_if i_i2s) {

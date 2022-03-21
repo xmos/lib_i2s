@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <print.h>
 
-#define RATIO 2
+#define RATIO (2)
 
 in port p_mclk  = XS1_PORT_1A;
 

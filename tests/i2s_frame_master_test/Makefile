@@ -5,7 +5,7 @@ else # USING_XWAF
 # The TARGET variable determines what target system the application is
 # compiled for. It either refers to an XN file in the source directories
 # or a valid argument for the --target option when compiling
-TARGET = SLICEKIT-XL216
+TARGET = XCORE-200-EXPLORER
 
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
@@ -23,15 +23,17 @@ USED_MODULES = lib_i2s
 
 COMMON_FLAGS = -O3 -g -save-temps
 
-$(foreach out,0 1 2 3 4,\
- $(foreach in,0 1 2 3 4,\
-   $(eval \
-    XCC_FLAGS_smoke_$(out)$(in) = $(COMMON_FLAGS) -DNUM_OUT=$(out) -DNUM_IN=$(in) -DSMOKE\
-    ) \
-   $(eval \
-    XCC_FLAGS_nightly_$(out)$(in) = $(COMMON_FLAGS) -DNUM_OUT=$(out) -DNUM_IN=$(in)\
-    ) \
- ) \
+$(foreach db,8 16 24 32,\
+  $(foreach out,0 1 2 3 4,\
+    $(foreach in,0 1 2 3 4,\
+      $(eval \
+        XCC_FLAGS_smoke_$(db)$(out)$(in) = $(COMMON_FLAGS) -DDATA_BITS=$(db) -DNUM_OUT=$(out) -DNUM_IN=$(in) -DSMOKE\
+      ) \
+      $(eval \
+        XCC_FLAGS_nightly_$(db)$(out)$(in) = $(COMMON_FLAGS) -DDATA_BITS=$(db) -DNUM_OUT=$(out) -DNUM_IN=$(in)\
+      )\
+    )\
+  )\
 )
 
 # The XCORE_ARM_PROJECT variable, if set to 1, configures this
