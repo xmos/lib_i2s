@@ -43,6 +43,64 @@ FUNCTION_NAME:
   // Retrieve final argument to the function.
     ldw    lr_clock, sp[9]
 
+    bf     inp_port, i2s_frame_master_4b_loop_part_1_out_body
+
+i2s_frame_master_4b_loop_part_1_in_body:
+    bt     out_port, i2s_frame_master_4b_loop_part_1_in_out_body
+
+    //output 32 bits of 0 for lr clock
+    ldc    e, 0
+    out    res[lr_clock], e
+
+    ldw    f, inp_array[1]
+    ldw    e, inp_array[3]
+    in     d, res[inp_port]
+    in     c, res[inp_port]
+
+    // Unzip the recieved odd samples as required
+    // aeim bfjn cgko dhlp -> (abcd) (efgh) (ijkl) (mnop)
+    unzip  e, f, 0
+    unzip  c, d, 0
+    unzip  d, f, 0
+    unzip  c, e, 0 
+
+  // Bit-reverse and store the recieved odd samples. At this point, we have
+  // recieved all 8 samples and must call the recieve callback to pass these 
+  // to the user. 
+  {                        ; bitrev f, f             }
+  { stw    f, inp_array[7] ; bitrev e, e             } 
+  { stw    e, inp_array[5] ; bitrev d, d             } 
+  { stw    d, inp_array[3] ; bitrev c, c             } 
+  { stw    c, inp_array[1] ;                         }
+
+    bu     i2s_frame_master_4b_loop_part_1_final 
+
+i2s_frame_master_4b_loop_part_1_out_body:
+  // Load and bit-reverse the even 32-bit samples we intend to send
+  // Generate and output 32 bits of 0 for the lrclock
+  { ldw    a, out_array[0] ; ldc    e, 0             }
+  { ldw    b, out_array[2] ; out    res[lr_clock], e } 
+  { ldw    c, out_array[4] ; bitrev a, a             } 
+  { ldw    d, out_array[6] ; bitrev b, b             } 
+  { bitrev c, c            ; bitrev d, d             }
+
+  // Zip the even samples as required to send in parallel on a 4b port
+  // (abcd) (efgh) (ijkl) (mnop) -> aeim bfjn cgko dhlp
+    zip    a, c, 0
+    zip    b, d, 0
+    zip    a, b, 0
+    zip    c, d, 0  
+
+  // Stash the 3rd and 4th even samples for transmission later.
+  out    res[out_port], d
+  out    res[out_port], c
+  stw    a, out_array[0]
+  stw    b, out_array[2]
+    
+    bu     i2s_frame_master_4b_loop_part_1_final 
+
+i2s_frame_master_4b_loop_part_1_in_out_body:
+
   // Load and bit-reverse the even 32-bit samples we intend to send
   // Generate and output 32 bits of 0 for the lrclock
   { ldw    a, out_array[0] ; ldc    e, 0             }
@@ -82,6 +140,7 @@ FUNCTION_NAME:
   { stw    d, inp_array[3] ; bitrev c, c             } 
   { stw    c, inp_array[1] ;                         }
 
+i2s_frame_master_4b_loop_part_1_final:
   // Restore registers and return.
     ldw    lr_clock, sp[0]
     ldd    a, b, sp[1]

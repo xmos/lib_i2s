@@ -52,15 +52,22 @@ static void i2s_frame_init_ports_4b(
         clock bclk
         ){
 
+    if (!isnull(p_dout))
+    {
+        configure_out_port(p_dout, bclk, 0);
+        clearbuf(p_dout);
+    }
     
-    configure_out_port(p_dout, bclk, 0);
-    configure_in_port(p_din, bclk);
-    configure_out_port(p_lrclk, bclk, 1);
-    configure_port_clock_output(p_bclk, bclk);
+    if (!isnull(p_din))
+    {
+        configure_in_port(p_din, bclk);
+        clearbuf(p_din);
+    }
 
-    clearbuf(p_dout);
-    clearbuf(p_din);
+    configure_out_port(p_lrclk, bclk, 1);
     clearbuf(p_lrclk);
+
+    configure_port_clock_output(p_bclk, bclk);
 }
 
 #pragma unsafe arrays
@@ -89,15 +96,19 @@ static i2s_restart_t i2s_frame_ratio_n_4b(
 
     p_lrclk @ 1 <: 0;
 
-    
-    asm volatile("setpt res[%0], %1"
+    if (!isnull(p_din))
+    {
+        asm volatile("setpt res[%0], %1"
                     :
                     :"r"(p_din), "r"(8 + offset));
-    
+    }
 
-    asm volatile("setpt res[%0], %1"
-                    :
-                    :"r"(p_dout), "r"(1 + offset));
+    if (!isnull(p_dout))
+    {
+        asm volatile("setpt res[%0], %1"
+                        :
+                        :"r"(p_dout), "r"(1 + offset));
+    }
 
     i2s_frame_master_4b_setup(out_samps, in_samps, p_dout, p_din, bclk, p_lrclk);
 

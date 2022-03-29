@@ -75,8 +75,8 @@ def do_master_test(data_bits, num_in, num_out, testlevel):
 
 
 def runtest():
+    do_master_test(32, 0, 4, "smoke")
+    do_master_test(32, 4, 0, "smoke")
     do_master_test(32, 4, 4, "smoke")
     do_master_test(32, 1, 1, "smoke")
-    do_master_test(32, 4, 0, "smoke")
-    do_master_test(32, 0, 4, "smoke")
     do_master_test(32, 4, 4, "nightly")
