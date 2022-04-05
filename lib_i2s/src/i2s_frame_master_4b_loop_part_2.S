@@ -95,7 +95,7 @@ i2s_frame_master_4b_loop_part_2_out_body:
   // Generate and output 32 bits of 1 for the lrclock.
   // Output the 4th even sample
   // Load the odd samples we intend to send
-  // Input the 1st even sample
+  // Output the 4th even sample
   { ldw    d, out_array[7] ; mkmsk  e, 32            }
   { ldw    c, out_array[5] ; out    res[lr_clock], e }
   { ldw    b, out_array[3] ;                         }

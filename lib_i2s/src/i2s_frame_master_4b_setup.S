@@ -128,7 +128,8 @@ i2s_frame_master_4b_setup_out_body:
     zip    a, b, 0
     zip    c, d, 0  
     
-  // Output the odd samples
+  // Output the odd samples. At this point, we have transmitted all
+  // 8 samples, and must call the send callback to recieve the next batch.
   {                                  ; out    res[out_port], d }
   {                                  ; out    res[out_port], c }
   {                                  ; out    res[out_port], b }
