@@ -8,8 +8,17 @@
 in port p_bclk = XS1_PORT_1B;
 in buffered port:32 p_lrclk = XS1_PORT_1C;
 
-in buffered port:32 p_din = XS1_PORT_4E;
-out buffered port:32  p_dout = XS1_PORT_4F;
+#if NUM_IN
+    in buffered port:32   ?p_din =  {XS1_PORT_4E};
+#else
+   in buffered port:32   ?p_din =  null;
+#endif
+
+#if NUM_OUT
+    out buffered port:32  ?p_dout = {XS1_PORT_4F};
+#else
+    out buffered port:32  ?p_dout = null;
+#endif
 
 clock bclk = XS1_CLKBLK_1;
 
