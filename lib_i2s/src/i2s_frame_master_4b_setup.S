@@ -45,24 +45,30 @@ FUNCTION_NAME:
   // Retrieve final two arguments to function
     ldw    bt_clock, sp[9]
     ldw    lr_clock, sp[10]
-
+  
+  // Split into input-only, output-only, or input-output body implementations
+  // If the input port is nulled (0), only set up an output. Otherwise, proceed
+  // to set up an input.
     bf     inp_port, i2s_frame_master_4b_setup_out_body
 
 i2s_frame_master_4b_setup_in_body:
+  // If we are here and the output port is not null (non-0), then both in and 
+  // out are in use. Jump to the input-output implementation.
+  // Otherwise, just set up an input.
     bt     out_port, i2s_frame_master_4b_setup_in_out_body
 
-    // Start the bit clock
+  // Start the bit clock
     setc   res[bt_clock], 0xF
 
-    // Output 32 1s to lr_clock
+  // Output 32 1s to lr_clock
     mkmsk  e, 32                     
     out    res[lr_clock], e 
 
-    //input samples
-    in     f, res[inp_port]
-    in     e, res[inp_port]
-    in     d, res[inp_port]
-    in     c, res[inp_port]
+  // Input samples
+  {                                  ; in     f, res[inp_port] }
+  {                                  ; in     e, res[inp_port] }
+  {                                  ; in     d, res[inp_port] }
+  {                                  ; in     c, res[inp_port] }
 
   // Unzip the recieved even samples as required
   // aeim bfjn cgko dhlp -> (abcd) (efgh) (ijkl) (mnop)
@@ -78,11 +84,13 @@ i2s_frame_master_4b_setup_in_body:
   { stw    d, inp_array[2]           ; bitrev c, c             } 
   { stw    c, inp_array[0]           ;                         }
 
-    in     f, res[inp_port]
-    stw    f, inp_array[1]
-    in     e, res[inp_port]
-    stw    e, inp_array[3]
+  // Input the first two odd samples. As we are returning from this function, 
+  // we must store these recieved samples in memory to pick up later.
+  {                                  ; in     f, res[inp_port] }
+  { stw    f, inp_array[1]           ; in     e, res[inp_port] }
+  { stw    e, inp_array[3]           ;                         }
 
+  // Jump to the common end section
     bu     i2s_frame_master_4b_setup_final 
 
 i2s_frame_master_4b_setup_out_body:
@@ -121,10 +129,12 @@ i2s_frame_master_4b_setup_out_body:
     zip    c, d, 0  
     
   // Output the odd samples
-  out    res[out_port], d
-  out    res[out_port], c
-  out    res[out_port], b
-  out    res[out_port], a
+  {                                  ; out    res[out_port], d }
+  {                                  ; out    res[out_port], c }
+  {                                  ; out    res[out_port], b }
+  {                                  ; out    res[out_port], a }
+
+  // Jump to the common end section
     bu     i2s_frame_master_4b_setup_final 
 
 i2s_frame_master_4b_setup_in_out_body:
@@ -195,6 +205,8 @@ i2s_frame_master_4b_setup_in_out_body:
   { stw    f, inp_array[1]           ; out    res[out_port], a }
   {                                  ; in     e, res[inp_port] }
   { stw    e, inp_array[3]           ;                         }
+
+  // Continue to common end section
 
 i2s_frame_master_4b_setup_final:
   // Restore registers and return.

@@ -43,22 +43,26 @@ FUNCTION_NAME:
   // Retrieve final argument to the function.
     ldw    lr_clock, sp[9]
 
+  // Split into input-only, output-only, or input-output body implementations
+  // If the input port is nulled (0), only output. Otherwise, proceed to input
     bf     inp_port, i2s_frame_master_4b_loop_part_1_out_body
 
 i2s_frame_master_4b_loop_part_1_in_body:
+  // If we are here and the output port is not null (non-0), then both in and 
+  // out are in use. Jump to the input-output implementation.
+  // Otherwise, just input.
     bt     out_port, i2s_frame_master_4b_loop_part_1_in_out_body
 
-    //output 32 bits of 0 for lr clock
+  // Output 32 bits of 0 for lr clock
     ldc    e, 0
     out    res[lr_clock], e
 
-    ldw    f, inp_array[1]
-    ldw    e, inp_array[3]
-    in     d, res[inp_port]
-    in     c, res[inp_port]
-
-    // Unzip the recieved odd samples as required
-    // aeim bfjn cgko dhlp -> (abcd) (efgh) (ijkl) (mnop)
+  // Retrieve the two odd samples we stored earlier, and input the other two
+  { ldw    f, inp_array[1] ; in     d, res[inp_port] }
+  { ldw    e, inp_array[3] ; in     c, res[inp_port] }
+    
+  // Unzip the recieved odd samples as required
+  // aeim bfjn cgko dhlp -> (abcd) (efgh) (ijkl) (mnop)
     unzip  e, f, 0
     unzip  c, d, 0
     unzip  d, f, 0
@@ -73,6 +77,7 @@ i2s_frame_master_4b_loop_part_1_in_body:
   { stw    d, inp_array[3] ; bitrev c, c             } 
   { stw    c, inp_array[1] ;                         }
 
+  // Jump to the common end section
     bu     i2s_frame_master_4b_loop_part_1_final 
 
 i2s_frame_master_4b_loop_part_1_out_body:
@@ -91,12 +96,13 @@ i2s_frame_master_4b_loop_part_1_out_body:
     zip    a, b, 0
     zip    c, d, 0  
 
+  // Output the first two even samples. 
   // Stash the 3rd and 4th even samples for transmission later.
-  out    res[out_port], d
-  out    res[out_port], c
-  stw    a, out_array[0]
-  stw    b, out_array[2]
-    
+  { stw    a, out_array[0] ; out    res[out_port], d }
+  { stw    b, out_array[2] ; out    res[out_port], c }
+  
+  
+  // Jump to the common end section
     bu     i2s_frame_master_4b_loop_part_1_final 
 
 i2s_frame_master_4b_loop_part_1_in_out_body:
@@ -139,6 +145,8 @@ i2s_frame_master_4b_loop_part_1_in_out_body:
   { stw    e, inp_array[5] ; bitrev d, d             } 
   { stw    d, inp_array[3] ; bitrev c, c             } 
   { stw    c, inp_array[1] ;                         }
+
+  // Continue to common end section
 
 i2s_frame_master_4b_loop_part_1_final:
   // Restore registers and return.
