@@ -246,7 +246,6 @@ void i2s_handler(server i2s_frame_callback_if i_i2s, client i2c_master_if i_i2c,
 
     case i_i2s.restart_check() -> i2s_restart_t restart:
       restart = I2S_NO_RESTART;
-      //delay_microseconds(1);
       break;
     }
   }

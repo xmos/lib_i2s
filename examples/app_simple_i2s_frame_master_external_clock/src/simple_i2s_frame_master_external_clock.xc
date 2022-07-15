@@ -24,6 +24,7 @@ void my_application(server i2s_frame_callback_if i_i2s) {
         break;
       case i_i2s.restart_check() -> i2s_restart_t restart:
         // Inform the I2S slave whether it should restart or exit
+        restart = I2S_NO_RESTART;
         break;
       case i_i2s.receive(size_t num_in, int32_t samples[num_in]):
         // Handle a received sample
