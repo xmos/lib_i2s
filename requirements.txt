@@ -18,6 +18,7 @@
 # same modules should appear in the setup.py list as given below.
 
 flake8==3.8.3
+pytest
 
 # Development dependencies
 #
