@@ -38,6 +38,7 @@ def test_i2s_basic_master(capfd, request, nightly, num_in, num_out):
         regexp = True,
         ordered = True,
         suppress_multidrive_messages=True,
+        ignore=["CONFIG:.*"]
     )
 
     Pyxsim.run_on_simulator(

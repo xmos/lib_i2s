@@ -41,7 +41,8 @@ def test_backpressure(nightly, capfd, request, sample_rate, num_channels, receiv
     tester = Pyxsim.testers.AssertiveComparisonTester(f'{cwd}/expected/backpressure_test.expect',
                                                     regexp = True,
                                                     ordered = True,
-                                                    suppress_multidrive_messages=True)
+                                                    suppress_multidrive_messages=True,
+                                                    ignore=["CONFIG:.*"])
 
     Pyxsim.run_on_simulator(
         binary,

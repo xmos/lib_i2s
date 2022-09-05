@@ -44,6 +44,7 @@ def test_i2s_basic_frame_master_external_clock_4b(capfd, request, nightly, bitde
         regexp = True,
         ordered = True,
         suppress_multidrive_messages=True,
+        ignore=["CONFIG:.*"]
     )
 
     Pyxsim.run_on_simulator(

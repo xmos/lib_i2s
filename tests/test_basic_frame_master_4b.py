@@ -44,6 +44,7 @@ def test_i2s_basic_frame_master_4b(capfd, request, nightly, bitdepth, num_in, nu
         regexp = True,
         ordered = True,
         suppress_multidrive_messages=True,
+        ignore=["CONFIG:.*"]
     )
 
     Pyxsim.run_on_simulator(
