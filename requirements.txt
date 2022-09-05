@@ -19,6 +19,7 @@
 
 flake8==3.8.3
 pytest
+pytest-xdist
 
 # Development dependencies
 #

@@ -52,11 +52,7 @@ pipeline {
         }
         stage('Tests') {
           steps {
-            dir('lib_i2s/tests/backpressure_test'){
-              runXmake(".", "", "CONFIG=XCORE_AI")
-              stash name: 'backpressure_test', includes: 'bin/XCORE_AI/backpressure_test_XCORE_AI.xe, '
-            }
-            runXmostest("${REPO}", 'tests')
+            runPytest()
           }
         }
       }// stages
