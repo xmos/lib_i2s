@@ -39,10 +39,6 @@ def test_i2s_basic_master_external_clock(capfd, request, nightly, bitdepth, num_
          False, # Don't check the bclk stops precisely as the hardware can't do that
          True)  # We're running the frame-based master, so can have variable data widths
 
-    binary = f"{cwd}/i2s_frame_master_external_clock_test/bin/{id_string}/i2s_frame_master_external_clock_test_{id_string}.xe"
-
-    clk = Clock("tile[0]:XS1_PORT_1A")
-
     tester = Pyxsim.testers.AssertiveComparisonTester(
         f'{cwd}/expected/master_test.expect',
         regexp = True,
