@@ -21,21 +21,59 @@ USED_MODULES = lib_i2s
 # If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
 # xcc for the final link (mapping) stage.
 
-$(foreach out,0 1 2 3 4,\
- $(foreach in,0 1 2 3 4,\
-   $(eval \
-    XCC_FLAGS_master_$(out)$(in) = -O2 -g -DMASTER  -DNUM_OUT=$(out) -DNUM_IN=$(in)\
-    )\
-   $(eval \
-    XCC_FLAGS_slave_$(out)$(in) = -O2 -g -DSLAVE  -DNUM_OUT=$(out) -DNUM_IN=$(in)\
-    ) \
- ) \
-)
+NUMS_IN_OUT ?= 4;4 4;0 0;4
+TDM_CHANS_PER_FRAME ?= 8
+SMOKE ?= 1
+TDM ?= 0
+MASTER ?= 1
 
-XCC_FLAGS_tdm_118 = -O2 -g -DTDM  -DTDM_CHANS_PER_FRAME=8 -DNUM_OUT=1 -DNUM_IN=1
-XCC_FLAGS_tdm_108 = -O2 -g -DTDM  -DTDM_CHANS_PER_FRAME=8 -DNUM_OUT=1 -DNUM_IN=0
-XCC_FLAGS_tdm_018 = -O2 -g -DTDM  -DTDM_CHANS_PER_FRAME=8 -DNUM_OUT=0 -DNUM_IN=1
-XCC_FLAGS_tdm_224 = -O2 -g -DTDM  -DTDM_CHANS_PER_FRAME=4 -DNUM_OUT=2 -DNUM_IN=2
+COMMON_FLAGS = -O2 -g
+
+ifeq ($(TDM), 1)
+  ifeq ($(SMOKE), 1)
+    $(foreach in_out,$(NUMS_IN_OUT),\
+      $(eval \
+        XCC_FLAGS_tdm_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out)))_smoke = $(COMMON_FLAGS) -DTDM -DTDM_CHANS_PER_FRAME=$(TDM_CHANS_PER_FRAME) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DSMOKE\
+      ) \
+    )
+  else
+    $(foreach in_out,$(NUMS_IN_OUT),\
+      $(eval \
+        XCC_FLAGS_tdm_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out))) = $(COMMON_FLAGS) -DTDM -DTDM_CHANS_PER_FRAME=$(TDM_CHANS_PER_FRAME) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out)))\
+      ) \
+    )
+  endif
+else
+  ifeq ($(MASTER), 1)
+    ifeq ($(SMOKE), 1)
+      $(foreach in_out,$(NUMS_IN_OUT),\
+        $(eval \
+          XCC_FLAGS_master_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out)))_smoke = $(COMMON_FLAGS) -DMASTER -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DSMOKE\
+        ) \
+      )
+    else
+      $(foreach in_out,$(NUMS_IN_OUT),\
+        $(eval \
+          XCC_FLAGS_master_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out))) = $(COMMON_FLAGS) -DMASTER -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out)))\
+        ) \
+      )
+    endif
+  else
+    ifeq ($(SMOKE), 1)
+      $(foreach in_out,$(NUMS_IN_OUT),\
+        $(eval \
+          XCC_FLAGS_slave_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out)))_smoke = $(COMMON_FLAGS) -DSLAVE -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DSMOKE\
+        ) \
+      )
+    else
+      $(foreach in_out,$(NUMS_IN_OUT),\
+        $(eval \
+          XCC_FLAGS_slave_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out))) = $(COMMON_FLAGS) -DSLAVE -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out)))\
+        ) \
+      )
+    endif
+  endif
+endif
 
 # The XCORE_ARM_PROJECT variable, if set to 1, configures this
 # project to create both xCORE and ARM binaries.
