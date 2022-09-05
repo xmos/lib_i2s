@@ -10,7 +10,7 @@ TARGET = XCORE-200-EXPLORER
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
 # the project name
-APP_NAME = i2s_slave_test
+APP_NAME =
 
 # The USED_MODULES variable lists other module used by the application.
 USED_MODULES = lib_i2s
@@ -22,23 +22,39 @@ USED_MODULES = lib_i2s
 # xcc for the final link (mapping) stage.
 
 COMMON_FLAGS = -O2 -g -save-temps
+NUMS_IN_OUT ?= 4;4 1;1 4;0 0;4
+SMOKE ?= 1
+INVERT ?= 0
 
-$(foreach out,0 1 2 3 4,\
- $(foreach in,0 1 2 3 4,\
-   $(eval \
-    XCC_FLAGS_smoke_$(out)$(in) = $(COMMON_FLAGS) -DNUM_OUT=$(out) -DNUM_IN=$(in) -DSMOKE\
-    ) \
-   $(eval \
-    XCC_FLAGS_nightly_$(out)$(in) = $(COMMON_FLAGS) -DNUM_OUT=$(out) -DNUM_IN=$(in)\
-    ) \
-   $(eval \
-    XCC_FLAGS_smoke_$(out)$(in)_inv = $(COMMON_FLAGS) -DNUM_OUT=$(out) -DNUM_IN=$(in) -DSMOKE -DSLAVE_INVERT_BCLK\
-    ) \
-   $(eval \
-    XCC_FLAGS_nightly_$(out)$(in)_inv = $(COMMON_FLAGS) -DNUM_OUT=$(out) -DNUM_IN=$(in) -DSLAVE_INVERT_BCLK\
-    ) \
- ) \
-)
+ifeq ($(SMOKE), 1)
+  ifeq ($(INVERT), 1)
+      $(foreach in_out,$(NUMS_IN_OUT), \
+        $(eval \
+          XCC_FLAGS_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out)))_smoke_inv = $(COMMON_FLAGS)-DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DSMOKE -DSLAVE_INVERT_BCLK\
+        ) \
+      )
+  else
+      $(foreach in_out,$(NUMS_IN_OUT), \
+        $(eval \
+          XCC_FLAGS_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out)))_smoke = $(COMMON_FLAGS) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DSMOKE\
+        ) \
+      )
+  endif
+else
+  ifeq ($(INVERT), 1)
+      $(foreach in_out,$(NUMS_IN_OUT), \
+        $(eval \
+          XCC_FLAGS_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out)))_inv = $(COMMON_FLAGS) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DSLAVE_INVERT_BCLK\
+        ) \
+      )
+  else
+      $(foreach in_out,$(NUMS_IN_OUT), \
+        $(eval \
+          XCC_FLAGS_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out))) = $(COMMON_FLAGS) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out)))\
+        ) \
+      )
+  endif
+endif
 
 # The XCORE_ARM_PROJECT variable, if set to 1, configures this
 # project to create both xCORE and ARM binaries.
