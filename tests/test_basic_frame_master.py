@@ -17,7 +17,7 @@ bitdepth_args = {"8b": 8,
 
 @pytest.mark.parametrize("bitdepth", bitdepth_args.values(), ids=bitdepth_args.keys())
 @pytest.mark.parametrize(("num_in", "num_out"), num_in_out_args.values(), ids=num_in_out_args.keys())
-def test_i2s_basic_master(capfd, request, nightly, bitdepth, num_in, num_out):
+def test_i2s_basic_frame_master(capfd, request, nightly, bitdepth, num_in, num_out):
     testlevel = '0' if nightly else '1'
     id_string = f"{bitdepth}_{num_in}_{num_out}"
     id_string += "_smoke" if testlevel == '1' else ""
