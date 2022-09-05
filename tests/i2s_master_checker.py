@@ -1,25 +1,20 @@
-# Copyright 2015-2021 XMOS LIMITED.
+# Copyright 2015-2022 XMOS LIMITED.
 # This Software is subject to the terms of the XMOS Public Licence: Version 1.
-import xmostest
+import Pyxsim as px
+from typing import Sequence
+from numbers import Number
+from functools import partial
 
 
-class Clock(xmostest.SimThread):
+class Clock(px.SimThread):
 
-    def set_rate(self, rate):
-        if rate == 0:
-            self._driving = False
-        else:
-            self._driving = True
-            self._half_period = float(500000000) / rate
-        return
-
-    def __init__(self, port):
-        rate = 1000000
+    def __init__(self, port: str) -> None:
+        self._rate = 1000000000
         self._driving = True
-        self._half_period = float(500000000) / rate
+        self._half_period = float(500000000000) / self._rate
         self._port = port
 
-    def run(self):
+    def run(self) -> None:
         t = self.xsi.get_time()
         t += self._half_period
         while True:
@@ -31,42 +26,37 @@ class Clock(xmostest.SimThread):
                 t += self._half_period
                 self.wait_until(t)
 
-    def is_high(self):
-        return (self._val == 1)
+    @property
+    def rate(self) -> Number:
+        return self._rate
 
-    def is_low(self):
-        return (self._val == 0)
-
-    def get_val(self):
-        return (self._val)
-
-    def get_rate(self):
-        return self._clk
-
-    def get_name(self):
-        return self._name
+    @rate.setter
+    def rate(self, new_rate: Number) -> None:
+        if new_rate == 0:
+            self._driving = False
+        else:
+            self._driving = True
+            self._half_period = float(500000000000) / new_rate
+        self._rate = new_rate
 
 
-class I2SMasterChecker(xmostest.SimThread):
+class I2SMasterChecker(px.SimThread):
     """"
     This simulator thread will act as I2S master and check any transactions
     caused by the Slave.
     """
 
-    def print_setup(self, mclk_frequency, mclk_bclk_ratio, num_outs, num_ins, is_i2s_justified, data_bits, prefix=""):
-        bclk_frequency = mclk_frequency / mclk_bclk_ratio
-        sr_frequency = bclk_frequency / (2 * data_bits)
-
-        print "%sMCLK frequency: %d, MCLK/BCLK ratio: %d, BCLK frequency: %d,\tSample rate %d, Data bits %d\tnum ins %d num outs %d, is i2s justified: %d" % (
-            prefix, mclk_frequency, mclk_bclk_ratio, bclk_frequency, sr_frequency, data_bits, num_outs, num_ins, is_i2s_justified)
-        return
-
-    def get_setup_data(self, xsi, setup_strobe_port, setup_data_port):
-        self.wait_for_port_pins_change([setup_strobe_port])
-        self.wait_for_port_pins_change([setup_strobe_port])
-        return xsi.sample_port_pins(setup_data_port)
-
-    def __init__(self,  bclk, lrclk, din, dout, setup_strobe_port, setup_data_port, setup_resp_port, c, check_extra_bclk=True, frame_based=False):
+    def __init__(self,  
+                 bclk: str, 
+                 lrclk: str, 
+                 din: Sequence[str], 
+                 dout: Sequence[str], 
+                 setup_strobe_port: str, 
+                 setup_data_port: str, 
+                 setup_resp_port: str, 
+                 c: Clock, 
+                 check_extra_bclk: bool = True,
+                 frame_based: bool = False):
         self._din = din
         self._dout = dout
         self._bclk = bclk
@@ -78,39 +68,50 @@ class I2SMasterChecker(xmostest.SimThread):
         self._check_extra_bclk = check_extra_bclk
         self._frame_based = frame_based
 
+    def print_setup(self, 
+                    mclk_frequency: Number, 
+                    mclk_bclk_ratio: Number, 
+                    num_outs: Number, 
+                    num_ins: Number, 
+                    is_i2s_justified: bool,
+                    data_bits: Number,
+                    prefix: str = "") -> None:
+        bclk_frequency = mclk_frequency / mclk_bclk_ratio
+        sr_frequency = bclk_frequency / (2 * data_bits)
+
+        print(f"{prefix}\tMCLK frequency: {mclk_frequency},\tMCLK/BCLK ratio: {mclk_bclk_ratio},\tBCLK frequency: {bclk_frequency},\tSample rate {sr_frequency},\tData bits {data_bits},\tnum ins {num_outs},\tnum outs:{num_ins},\tis i2s justified: {is_i2s_justified}")
+
+    def get_setup_data(self, 
+                       xsi:px.pyxsim.Xsi, 
+                       setup_strobe_port: str, 
+                       setup_data_port: str) -> int:
+        self.wait_for_port_pins_change([setup_strobe_port])
+        self.wait_for_port_pins_change([setup_strobe_port])
+        return xsi.sample_port_pins(setup_data_port)
+
     def run(self):
-        xsi = self.xsi
-        print "I2S Master Checker Started"
+        xsi: px.pyxsim.Xsi = self.xsi
+        print("I2S Master Checker Started")
 
         while True:
             xsi.drive_port_pins(self._setup_resp_port, 0)
             strobe_val = xsi.sample_port_pins(self._setup_strobe_port)
-
             if strobe_val == 1:
                 self.wait_for_port_pins_change([self._setup_strobe_port])
 
-            mclk_frequency_u = self.get_setup_data(
-                xsi, self._setup_strobe_port, self._setup_data_port)
-            mclk_frequency_l = self.get_setup_data(
-                xsi, self._setup_strobe_port, self._setup_data_port)
-            mclk_bclk_ratio = self.get_setup_data(
-                xsi, self._setup_strobe_port, self._setup_data_port)
-            num_outs = self.get_setup_data(
-                xsi, self._setup_strobe_port, self._setup_data_port)
-            num_ins = self.get_setup_data(
-                xsi, self._setup_strobe_port, self._setup_data_port)
-            is_i2s_justified = self.get_setup_data(
-                xsi, self._setup_strobe_port, self._setup_data_port)
+            mclk_frequency_u      = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
+            mclk_frequency_l      = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
+            mclk_bclk_ratio       = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
+            num_outs              = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
+            num_ins               = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
+            is_i2s_justified      = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
             if self._frame_based:
-                data_bits = self.get_setup_data(
-                    xsi, self._setup_strobe_port, self._setup_data_port)
+                data_bits         = self.get_setup_data(xsi, self._setup_strobe_port, self._setup_data_port)
             else:
-                data_bits = 32
+                data_bits         = 32
+            mclk_frequency        = (mclk_frequency_u<<16) + mclk_frequency_l
 
-            mclk_frequency = (mclk_frequency_u << 16) + mclk_frequency_l
-
-            self.print_setup(mclk_frequency, mclk_bclk_ratio, num_outs,
-                             num_ins, is_i2s_justified, data_bits, prefix="CONFIG:")
+            self.print_setup(mclk_frequency, mclk_bclk_ratio, num_outs, num_ins, is_i2s_justified, data_bits, prefix="CONFIG: ")
 
             bclk_frequency = mclk_frequency / mclk_bclk_ratio
             data_bit_mask = int("1"*data_bits, base=2)
@@ -123,30 +124,30 @@ class I2SMasterChecker(xmostest.SimThread):
             word_count = 0
             words_per_frame = 2
 
-            rx_word = [0, 0, 0, 0]
-            tx_word = [0, 0, 0, 0]
-            tx_data = [[1,   2,   3,   4,   5,   6,   7,   8],
-                       [101, 102, 103, 104, 105, 106, 107, 108],
-                       [201, 202, 203, 204, 205, 206, 207, 208],
-                       [301, 302, 303, 304, 305, 306, 307, 308],
-                       [401, 402, 403, 404, 405, 406, 407, 408],
-                       [501, 502, 503, 504, 505, 506, 507, 508],
-                       [601, 602, 603, 604, 605, 606, 607, 608],
-                       [701, 702, 703, 704, 705, 706, 707, 708]]
-            rx_data = [[1,   2,   3,   4,   5,   6,   7,   8],
-                       [101, 102, 103, 104, 105, 106, 107, 108],
-                       [201, 202, 203, 204, 205, 206, 207, 208],
-                       [301, 302, 303, 304, 305, 306, 307, 308],
-                       [401, 402, 403, 404, 405, 406, 407, 408],
-                       [501, 502, 503, 504, 505, 506, 507, 508],
-                       [601, 602, 603, 604, 605, 606, 607, 608],
-                       [701, 702, 703, 704, 705, 706, 707, 708]]
+            rx_word=[0, 0, 0, 0]
+            tx_word=[0, 0, 0, 0]
+            tx_data=[[ 1,   2,   3,   4,   5,   6,   7,   8],
+                    [101, 102, 103, 104, 105, 106, 107, 108],
+                    [201, 202, 203, 204, 205, 206, 207, 208],
+                    [301, 302, 303, 304, 305, 306, 307, 308],
+                    [401, 402, 403, 404, 405, 406, 407, 408],
+                    [501, 502, 503, 504, 505, 506, 507, 508],
+                    [601, 602, 603, 604, 605, 606, 607, 608],
+                    [701, 702, 703, 704, 705, 706, 707, 708]]
+            rx_data=[[ 1,   2,   3,   4,   5,   6,   7,   8],
+                    [101, 102, 103, 104, 105, 106, 107, 108],
+                    [201, 202, 203, 204, 205, 206, 207, 208],
+                    [301, 302, 303, 304, 305, 306, 307, 308],
+                    [401, 402, 403, 404, 405, 406, 407, 408],
+                    [501, 502, 503, 504, 505, 506, 507, 508],
+                    [601, 602, 603, 604, 605, 606, 607, 608],
+                    [701, 702, 703, 704, 705, 706, 707, 708]]
 
-            # start the master clock running
-            self._clk.set_rate(mclk_frequency)
+            #start the master clock running
+            self._clk.rate = mclk_frequency
 
-            # for verifing the clock stability
-            half_period = float(500000000) / bclk_frequency
+            #for verifing the clock stability
+            half_period = float(500000000000) / bclk_frequency
 
             for i in range(0, max_num_in_or_outs):
                 rx_word[i] = 0
@@ -158,7 +159,7 @@ class I2SMasterChecker(xmostest.SimThread):
 
             left = xsi.sample_port_pins(self._lrclk)
 
-            # if i2s mode ignore the first bit
+            #if i2s mode ignore the first bit
             if is_i2s_justified == True:
                 self.wait_for_port_pins_change([self._bclk])
                 self.wait_for_port_pins_change([self._bclk])
@@ -171,17 +172,14 @@ class I2SMasterChecker(xmostest.SimThread):
 
                 if frame_count > 0:
                     t = fall_time - rise_time
-                    if abs(t - half_period) > 4.0:
+                    if abs(t - half_period) > 4000.0:
                         if not error:
-                            self.print_setup(
-                                mclk_frequency, mclk_bclk_ratio, num_outs, num_ins, is_i2s_justified, data_bits, prefix="ERROR:")
-                            print "Timing error(falling edge): Frame: %d word:%d bit:%d" % (
-                                frame_count, word_count, bit_count)
-                            print "elapsed %dns expected %dns" % (
-                                t, half_period)
+                            self.print_setup(mclk_frequency, mclk_bclk_ratio, num_outs, num_ins, is_i2s_justified, data_bits, prefix="ERROR:")
+                            print(f"Timing error (falling edge): Frame: {frame_count} word: {word_count} bit: {bit_count}")
+                            print(f"elapsed {t}ps, expected {half_period}ps")
                         error = True
 
-                # drive
+                #drive
                 for i in range(0, num_outs):
                     xsi.drive_port_pins(self._dout[i], tx_word[i] >> (data_bits - 1))
                     tx_word[i] = tx_word[i] << 1
@@ -190,21 +188,19 @@ class I2SMasterChecker(xmostest.SimThread):
 
                 rise_time = xsi.get_time()
                 t = rise_time - fall_time
-                if abs(t - half_period) > 4.0:
+                if abs(t - half_period) > 4000.0:
                     if not error:
-                        self.print_setup(
-                            mclk_frequency, mclk_bclk_ratio, num_outs, num_ins, is_i2s_justified, data_bits)
-                        print "Timing error(rising edge): Frame: %d word:%d bit:%d" % (
-                            frame_count, word_count, bit_count)
-                        print "elapsed %dns expected %dns" % (t, half_period)
+                        self.print_setup(mclk_frequency, mclk_bclk_ratio, num_outs, num_ins, is_i2s_justified, data_bits, prefix="ERROR:")
+                        print(f"Timing error (rising edge): Frame: {frame_count} word: {word_count} bit: {bit_count}")
+                        print(f"elapsed {t}ps, expected {half_period}ps")
                     error = True
 
-                # read
+                #read
                 for i in range(0, num_ins):
                     val = xsi.sample_port_pins(self._din[i])
-                    rx_word[i] = (rx_word[i] << 1) + val
+                    rx_word[i] = (rx_word[i]<<1) + val
 
-                # check the lr clock
+                #check the lr clock
                 if xsi.sample_port_pins(self._lrclk) == left:
                     lr_count += 1
                 else:
@@ -216,30 +212,26 @@ class I2SMasterChecker(xmostest.SimThread):
                     bit_count = 0
 
                     if is_i2s_justified:
-                        if lr_count != 1:
-                            print "bad i2s lr"
+                        if lr_count != 1 :
+                            print("Bad I2S LR")
                     else:
                         if lr_count != data_bits:
                             if not error:
-                                self.print_setup(
-                                    mclk_frequency, mclk_bclk_ratio, num_outs, num_ins, is_i2s_justified, data_bits)
-                                print "LR count error"
+                                self.print_setup(mclk_frequency, mclk_bclk_ratio, num_outs, num_ins, is_i2s_justified, data_bits, prefix="ERROR:")
+                                print("LR count error")
                             error = True
 
-                    # check the rx'd word
+                    #check the rx'd word
                     for i in range(0, num_ins):
                         if is_i2s_justified:
                             chan = i * 2 + (1 - left)
                         else:
                             chan = i * 2 + left
 
-                        #print rx_word[i]
                         if (data_bit_mask & rx_data[chan][frame_count]) != rx_word[i]:
                             if not error:
-                                self.print_setup(
-                                    mclk_frequency, mclk_bclk_ratio, num_outs, num_ins, is_i2s_justified, data_bits)
-                                print "rx error: expected:%08x actual:%08x" % (
-                                    (data_bit_mask & rx_data[chan][frame_count]), rx_word[i])
+                                self.print_setup(mclk_frequency, mclk_bclk_ratio, num_outs, num_ins, is_i2s_justified, data_bits, prefix="ERROR:")
+                                print(f"rx error: expected:{data_bit_mask & rx_data[chan][frame_count]:08x} actual:{rx_word[i]:08x}")
                             error = True
                         rx_word[i] = 0
 
@@ -250,34 +242,28 @@ class I2SMasterChecker(xmostest.SimThread):
                     if frame_count < 8:
                         for i in range(0, num_outs):
                             tx_word[i] = tx_data[2*i+word_count][frame_count]
+                            
             if frame_count != num_test_frames:
-                self.print_setup(mclk_frequency, mclk_bclk_ratio,
-                                 num_outs, num_ins, is_i2s_justified, data_bits)
-                print "Error: word lost MCLK:%d ratio:%d" % (
-                    mclk_frequency, mclk_bclk_ratio)
+                self.print_setup(mclk_frequency, mclk_bclk_ratio, num_outs, num_ins, is_i2s_justified, data_bits, prefix="ERROR:")
+                print(f"Error: word lost: {frame_count} MCLK:{mclk_frequency} ratio:{mclk_bclk_ratio}")
 
             xsi.drive_port_pins(self._setup_resp_port, 1)
             not_done = True
             while not_done:
-                bclk_val = xsi.sample_port_pins(self._bclk) #1
-                setup_strobe_port_val = xsi.sample_port_pins(
-                    self._setup_strobe_port)#0
+                bclk_val              =  xsi.sample_port_pins(self._bclk)
+                setup_strobe_port_val =  xsi.sample_port_pins(self._setup_strobe_port)
 
-                # send the response
-                self.wait_for_port_pins_change(
-                    [self._setup_strobe_port, self._bclk])
+                #send the response
+                self.wait_for_port_pins_change([self._setup_strobe_port, self._bclk])
 
-                bclk_val_n = xsi.sample_port_pins(self._bclk)
-                setup_strobe_port_val_n = xsi.sample_port_pins(
-                    self._setup_strobe_port)
+                bclk_val_n              =  xsi.sample_port_pins(self._bclk)
+                setup_strobe_port_val_n =  xsi.sample_port_pins(self._setup_strobe_port)
 
                 if self._check_extra_bclk and (bclk_val_n != bclk_val):
-                    if not error:
-                        self.print_setup(
-                            mclk_frequency, mclk_bclk_ratio, num_outs, num_ins, is_i2s_justified, data_bits)
-                        print "Unexpected bclk edge MCLK:%d ratio:%d" % (
-                            mclk_frequency, mclk_bclk_ratio)
-                    error = True
+                        if not error:
+                            self.print_setup(mclk_frequency, mclk_bclk_ratio, num_outs, num_ins, is_i2s_justified, data_bits, prefix="ERROR:")
+                            print(f"Unexpected bclk edge MCLK:{mclk_frequency} ratio:{mclk_bclk_ratio}")
+                        error = True
 
                 if setup_strobe_port_val_n != setup_strobe_port_val:
                     xsi.drive_port_pins(self._setup_resp_port, error)

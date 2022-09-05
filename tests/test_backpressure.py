@@ -26,7 +26,7 @@ bitdepth_args = {"8b": 8,
 @pytest.mark.parametrize("sample_rate", sample_rate_args.values(), ids=sample_rate_args.keys())
 @pytest.mark.parametrize("num_channels", num_channels_args.values(), ids=num_channels_args.keys())
 @pytest.mark.parametrize(("receive_increment", "send_increment"), rx_tx_inc_args.values(), ids=rx_tx_inc_args.keys())
-def test_i2s_backpressure(nightly, capfd, request, sample_rate, num_channels, receive_increment, send_increment, bitdepth):
+def test_backpressure(nightly, capfd, request, sample_rate, num_channels, receive_increment, send_increment, bitdepth):
     if (num_channels != 4) and not nightly:
         pytest.skip("Only run 4 channel tests unless it is a nightly")
 
