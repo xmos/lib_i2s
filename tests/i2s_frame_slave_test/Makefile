@@ -33,7 +33,7 @@ ifeq ($(SMOKE), 1)
     $(foreach db,$(BITDEPTHS), \
       $(foreach in_out,$(NUMS_IN_OUT), \
         $(eval \
-          XCC_FLAGS_$(db)_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out)))_smoke = $(COMMON_FLAGS) -DDATA_BITS=$(db) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DSMOKE -DSLAVE_INVERT_BCLK\
+          XCC_FLAGS_$(db)_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out)))_smoke_inv = $(COMMON_FLAGS) -DDATA_BITS=$(db) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DSMOKE -DSLAVE_INVERT_BCLK\
         ) \
       ) \
     )
@@ -51,7 +51,7 @@ else
     $(foreach db,$(BITDEPTHS), \
       $(foreach in_out,$(NUMS_IN_OUT), \
         $(eval \
-          XCC_FLAGS_$(db)_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out))) = $(COMMON_FLAGS) -DDATA_BITS=$(db) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DSLAVE_INVERT_BCLK\
+          XCC_FLAGS_$(db)_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out)))_inv = $(COMMON_FLAGS) -DDATA_BITS=$(db) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DSLAVE_INVERT_BCLK\
         ) \
       ) \
     )
