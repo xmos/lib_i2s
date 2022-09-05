@@ -13,9 +13,9 @@ print = partial(print, flush=True)
 class Clock(px.SimThread):
 
     def __init__(self, port: str) -> None:
-        self._rate = 1000000000
+        self._rate = 1000000000 # Hz
         self._driving = True
-        self._half_period = float(500000000000) / self._rate
+        self._half_period = float(500000000000000) / self._rate # 1/2 second in fs
         self._port = port
 
     def run(self) -> None:
@@ -40,7 +40,7 @@ class Clock(px.SimThread):
             self._driving = False
         else:
             self._driving = True
-            self._half_period = float(500000000000) / new_rate
+            self._half_period = float(500000000000000) / new_rate # 1/2 second in fs
         self._rate = new_rate
 
 
@@ -151,7 +151,7 @@ class I2SMasterChecker(px.SimThread):
             self._clk.rate = mclk_frequency
 
             #for verifing the clock stability
-            half_period = float(500000000000) / bclk_frequency
+            half_period = float(500000000000000) / bclk_frequency # 1/2 second in fs
 
             for i in range(0, max_num_in_or_outs):
                 rx_word[i] = 0
@@ -176,11 +176,11 @@ class I2SMasterChecker(px.SimThread):
 
                 if frame_count > 0:
                     t = fall_time - rise_time
-                    if abs(t - half_period) > 4000.0:
+                    if abs(t - half_period) > 4000000.0: # 4ns
                         if not error:
                             self.print_setup(mclk_frequency, mclk_bclk_ratio, num_outs, num_ins, is_i2s_justified, data_bits, prefix="ERROR:")
                             print(f"Timing error (falling edge): Frame: {frame_count} word: {word_count} bit: {bit_count}")
-                            print(f"elapsed {t}ps, expected {half_period}ps")
+                            print(f"elapsed {t}fs, expected {half_period}fs")
                         error = True
 
                 #drive
@@ -192,11 +192,11 @@ class I2SMasterChecker(px.SimThread):
 
                 rise_time = xsi.get_time()
                 t = rise_time - fall_time
-                if abs(t - half_period) > 4000.0:
+                if abs(t - half_period) > 4000000.0: # 4ns
                     if not error:
                         self.print_setup(mclk_frequency, mclk_bclk_ratio, num_outs, num_ins, is_i2s_justified, data_bits, prefix="ERROR:")
                         print(f"Timing error (rising edge): Frame: {frame_count} word: {word_count} bit: {bit_count}")
-                        print(f"elapsed {t}ps, expected {half_period}ps")
+                        print(f"elapsed {t}fs, expected {half_period}fs")
                     error = True
 
                 #read
