@@ -22,7 +22,7 @@ USED_MODULES = lib_i2s
 # xcc for the final link (mapping) stage.
 
 COMMON_FLAGS = -O2 -g -save-temps
-NUMS_IN_OUT ?= 4;4 1;1 4;0 0;4
+NUMS_IN_OUT ?= 4;4 1;1 2;2 4;0 0;4
 SMOKE ?= 1
 INVERT ?= 0
 
@@ -30,7 +30,7 @@ ifeq ($(SMOKE), 1)
   ifeq ($(INVERT), 1)
       $(foreach in_out,$(NUMS_IN_OUT), \
         $(eval \
-          XCC_FLAGS_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out)))_smoke_inv = $(COMMON_FLAGS)-DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DSMOKE -DSLAVE_INVERT_BCLK\
+          XCC_FLAGS_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out)))_smoke_inv = $(COMMON_FLAGS) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DSMOKE -DSLAVE_INVERT_BCLK\
         ) \
       )
   else

@@ -65,12 +65,12 @@ class I2SSlaveChecker(px.SimThread):
         xsi = self.xsi
         bits_per_word = 32
         num_frames = 4
-        bclk0 = 0
-        bclk1 = 1
+        self.bclk0 = 0
+        self.bclk1 = 1
         din_sample_offset = 0
         first_iteration = True
 
-        xsi.drive_port_pins(self._bclk, bclk1)
+        xsi.drive_port_pins(self._bclk, self.bclk1)
         if not self._no_start_msg:
             print("I2S Slave Checker Started")
         while True:
@@ -99,7 +99,7 @@ class I2SSlaveChecker(px.SimThread):
                     xsi, self._setup_strobe_port, self._setup_data_port)
             else:
                 data_bits = 32
-            xsi.drive_port_pins(self._bclk, bclk1)
+            xsi.drive_port_pins(self._bclk, self.bclk1)
             xsi.drive_port_pins(self._lrclk, 1)
 
             bclk_frequency = (bclk_frequency_u << 16) + bclk_frequency_l
@@ -110,8 +110,8 @@ class I2SSlaveChecker(px.SimThread):
             data_bit_mask = int("1"*data_bits, base=2)
 
             if self._invert_bclk:
-                bclk0 = 1
-                bclk1 = 0
+                self.bclk0 = 1
+                self.bclk1 = 0
                 din_sample_offset = +clock_half_period / 4
                 if first_iteration:
                     print("Slave bit clock inverted")
@@ -181,14 +181,14 @@ class I2SSlaveChecker(px.SimThread):
                 for i in range(0, data_bits):
                     xsi.drive_port_pins(self._lrclk, lr_counter >= data_bits)
                     lr_counter = lr_counter + 1 if lr_counter < lr_count_max else 0
-                    xsi.drive_port_pins(self._bclk, bclk0)
+                    xsi.drive_port_pins(self._bclk, self.bclk0)
 
                     for p in range(0, num_ins):
                         xsi.drive_port_pins(self._dout[p], tx_word[p] >> (data_bits - 1))
                         tx_word[p] = tx_word[p] << 1
 
                     time = self.wait_until_ret(time + clock_half_period)
-                    xsi.drive_port_pins(self._bclk, bclk1)
+                    xsi.drive_port_pins(self._bclk, self.bclk1)
                     time = self.wait_until_ret(time + din_sample_offset)
 
                     for p in range(0, num_outs):
@@ -210,14 +210,14 @@ class I2SSlaveChecker(px.SimThread):
                     xsi.drive_port_pins(self._lrclk, lr_counter >= data_bits)
                     lr_counter = lr_counter + 1 if lr_counter < lr_count_max else 0
 
-                    xsi.drive_port_pins(self._bclk, bclk0)
+                    xsi.drive_port_pins(self._bclk, self.bclk0)
 
                     for p in range(0, num_ins):
                         xsi.drive_port_pins(self._dout[p], tx_word[p] >> (data_bits - 1))
                         tx_word[p] = tx_word[p] << 1
 
                     time = self.wait_until_ret(time + clock_half_period)
-                    xsi.drive_port_pins(self._bclk, bclk1)
+                    xsi.drive_port_pins(self._bclk, self.bclk1)
                     time = self.wait_until_ret(time + din_sample_offset)
 
                     for p in range(0, num_outs):
