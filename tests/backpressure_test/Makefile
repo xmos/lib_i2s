@@ -27,25 +27,23 @@ SHARED_FLAGS = -O2 -report -g -DSIM=1 -DDEBUG_PRINT_ENABLE=1 -DGENERATE_MCLK
 # XCC_XC_FLAGS, XCC_C_FLAGS, XCC_ASM_FLAGS, XCC_CPP_FLAGS
 # If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
 # xcc for the final link (mapping) stage.
-XCC_FLAGS_SIM = $(SHARED_FLAGS) -DRECEIVE_DELAY_INCREMENT=0 -DSEND_DELAY_INCREMENT=10
 
-$(foreach db,8 16 24 32, \
-  $(foreach sr,768000 384000 192000,\
-  $(foreach chan,1 4,\
-    $(eval \
-      XCC_FLAGS_$(db)_$(sr)_$(chan)_5_5 = $(SHARED_FLAGS) -DDATA_BITS=$(db) -DSAMPLE_FREQUENCY=$(sr) -DNUM_I2S_LINES=$(chan) -DRECEIVE_DELAY_INCREMENT=5 -DSEND_DELAY_INCREMENT=5\
-      ) \
-    $(eval \
-      XCC_FLAGS_$(db)_$(sr)_$(chan)_10_0 = $(SHARED_FLAGS) -DDATA_BITS=$(db) -DSAMPLE_FREQUENCY=$(sr) -DNUM_I2S_LINES=$(chan) -DRECEIVE_DELAY_INCREMENT=10 -DSEND_DELAY_INCREMENT=0\
-      ) \
-    $(eval \
-      XCC_FLAGS_$(db)_$(sr)_$(chan)_0_10 = $(SHARED_FLAGS) -DDATA_BITS=$(db) -DSAMPLE_FREQUENCY=$(sr) -DNUM_I2S_LINES=$(chan) -DRECEIVE_DELAY_INCREMENT=0 -DSEND_DELAY_INCREMENT=10\
+SAMPLE_RATES ?= 768000 384000 192000
+CHANS ?= 1 4
+RX_TX_INCS ?= 5;5 10;0 0;10
+BITDEPTHS ?= 8 16 24 32
+
+$(foreach db,$(BITDEPTHS), \
+  $(foreach sr,$(SAMPLE_RATES),\
+    $(foreach chan,$(CHANS),\
+      $(foreach incs,$(RX_TX_INCS),\
+        $(eval \
+          XCC_FLAGS_$(db)_$(sr)_$(chan)_$(word 1, $(subst ;, ,$(incs)))_$(word 2, $(subst ;, ,$(incs))) = $(SHARED_FLAGS) -DDATA_BITS=$(db) -DSAMPLE_FREQUENCY=$(sr) -DNUM_I2S_LINES=$(chan) -DRECEIVE_DELAY_INCREMENT=$(word 1, $(subst ;, ,$(incs))) -DSEND_DELAY_INCREMENT=$(word 2, $(subst ;, ,$(incs)))\
+        ) \
       ) \
     ) \
   )\
 )
-
-XCC_FLAGS_XCORE_AI = $(SHARED_FLAGS) -DSAMPLE_FREQUENCY=768000 -DNUM_I2S_LINES=1 -DRECEIVE_DELAY_INCREMENT=5 -DSEND_DELAY_INCREMENT=5
 
 test: bin/i2s_loopback_demo.xe
 	xsim bin/i2s_loopback_demo.xe --plugin LoopbackPort.dll '-port tile[0] XS1_PORT_1G 1 0 -port tile[0] XS1_PORT_1A 1 0'
