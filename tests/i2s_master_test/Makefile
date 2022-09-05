@@ -22,7 +22,7 @@ USED_MODULES = lib_i2s
 # xcc for the final link (mapping) stage.
 COMMON_FLAGS = -O3 -g -save-temps
 
-NUMS_IN_OUT ?= 4;4 2;2 4;0 0;4
+NUMS_IN_OUT ?= 4;4 1;1 4;0 0;4
 SMOKE ?= 1
 
 ifeq ($(SMOKE), 1)
