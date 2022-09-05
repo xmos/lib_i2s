@@ -33,13 +33,13 @@ ifeq ($(TDM), 1)
   ifeq ($(SMOKE), 1)
     $(foreach in_out,$(NUMS_IN_OUT),\
       $(eval \
-        XCC_FLAGS_tdm_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out)))_smoke = $(COMMON_FLAGS) -DTDM -DTDM_CHANS_PER_FRAME=$(TDM_CHANS_PER_FRAME) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DSMOKE\
+        XCC_FLAGS_tdm_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out)))_$(TDM_CHANS_PER_FRAME)_smoke = $(COMMON_FLAGS) -DTDM -DTDM_CHANS_PER_FRAME=$(TDM_CHANS_PER_FRAME) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DSMOKE\
       ) \
     )
   else
     $(foreach in_out,$(NUMS_IN_OUT),\
       $(eval \
-        XCC_FLAGS_tdm_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out))) = $(COMMON_FLAGS) -DTDM -DTDM_CHANS_PER_FRAME=$(TDM_CHANS_PER_FRAME) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out)))\
+        XCC_FLAGS_tdm_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out)))_$(TDM_CHANS_PER_FRAME) = $(COMMON_FLAGS) -DTDM -DTDM_CHANS_PER_FRAME=$(TDM_CHANS_PER_FRAME) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out)))\
       ) \
     )
   endif
