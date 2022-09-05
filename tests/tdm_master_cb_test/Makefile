@@ -22,16 +22,22 @@ USED_MODULES = lib_i2s
 # xcc for the final link (mapping) stage.
 COMMON_FLAGS = -O3 -g
 
-$(foreach out,0 1 2 3 4,\
- $(foreach in,0 1 2 3 4,\
-   $(eval \
-    XCC_FLAGS_smoke_$(out)$(in) = $(COMMON_FLAGS) -DNUM_OUT=$(out) -DNUM_IN=$(in) -DSMOKE\
+NUMS_IN_OUT ?= 4;4 2;2 4;0 0;4
+SMOKE ?= 1
+
+ifeq ($(SMOKE), 1)
+  $(foreach in_out,$(NUMS_IN_OUT),\
+    $(eval \
+      XCC_FLAGS_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out)))_smoke = $(COMMON_FLAGS) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DSMOKE\
     ) \
-   $(eval \
-    XCC_FLAGS_nightly_$(out)$(in) = $(COMMON_FLAGS) -DNUM_OUT=$(out) -DNUM_IN=$(in)\
+  )
+else
+  $(foreach in_out,$(NUMS_IN_OUT),\
+    $(eval \
+      XCC_FLAGS_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out))) = $(COMMON_FLAGS) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out)))\
     ) \
- ) \
-)
+  )
+endif
 
 # The XCORE_ARM_PROJECT variable, if set to 1, configures this
 # project to create both xCORE and ARM binaries.
