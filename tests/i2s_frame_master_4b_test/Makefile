@@ -23,26 +23,21 @@ USED_MODULES = lib_i2s
 
 COMMON_FLAGS = -O3 -g -save-temps
 
-BITDEPTHS ?= 8 16 24 32
 NUMS_IN_OUT ?= 4;4 1;1 4;0 0;4
 SMOKE ?= 1
 
 ifeq ($(SMOKE), 1)
-  $(foreach db,$(BITDEPTHS), \
-    $(foreach in_out,$(NUMS_IN_OUT), \
-      $(eval \
-        XCC_FLAGS_$(db)_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out)))_smoke = $(COMMON_FLAGS) -DDATA_BITS=$(db) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DSMOKE\
-      ) \
+  $(foreach in_out,$(NUMS_IN_OUT), \
+    $(eval \
+      XCC_FLAGS_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out)))_smoke = $(COMMON_FLAGS) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DSMOKE\
     ) \
   ) 
 else
-  $(foreach db,$(BITDEPTHS), \
-    $(foreach in_out,$(NUMS_IN_OUT), \
-      $(eval \
-        XCC_FLAGS_$(db)_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out))) = $(COMMON_FLAGS) -DDATA_BITS=$(db) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out)))\
-      ) \
+  $(foreach in_out,$(NUMS_IN_OUT), \
+    $(eval \
+      XCC_FLAGS_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out))) = $(COMMON_FLAGS) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out)))\
     ) \
-  )
+  ) 
 endif
 
 # The XCORE_ARM_PROJECT variable, if set to 1, configures this
