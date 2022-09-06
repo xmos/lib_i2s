@@ -52,7 +52,9 @@ pipeline {
         }
         stage('Tests') {
           steps {
-            runPytest()
+            dir("${REPO}") {
+              runPytest()
+            }
           }
         }
       }// stages
