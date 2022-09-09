@@ -97,7 +97,7 @@ pipeline {
         stage('Run xdoc'){
           steps{
             dir("${REPO}") {
-              runXdoc('doc')
+              runXdoc('lib_i2s/doc')
             }
           }
         }
