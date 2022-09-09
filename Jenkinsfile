@@ -35,22 +35,26 @@ pipeline {
             xcoreLibraryChecks("${REPO}")
           }
         }
-        stage('Build and Test - XS2 and XS3') {
-          parallel {
-            stage("Build and Test - XS2"){
+        stage('Build and Test - XS2 and XS3'){
+          stages{
+            stage("Build Examples - XS2"){
               steps{
                 dir("${REPO}") {
                   xcoreAllAppsBuild('examples')
                   xcoreAllAppNotesBuild('examples')
                 }
-                dir("${REPO}") {
+              }
+            }
+            stage("Test - XS2"){
+              steps{
+                dir("${REPO}/tests") {
                   viewEnv {
                     runPytest()
                   }
                 }
               }
             }
-            stage("Build and Test - XS3"){
+            stage("Build Examples - XS3"){
               environment {
                 XCORE_AI = 1
               }
@@ -59,7 +63,14 @@ pipeline {
                   xcoreAllAppsBuild('examples')
                   xcoreAllAppNotesBuild('examples')
                 }
-                dir("${REPO}") {
+              }
+            }
+            stage("Test - XS3"){
+              environment {
+                XCORE_AI = 1
+              }
+              steps{
+                dir("${REPO}/tests") {
                   viewEnv {
                     runPytest()
                   }
