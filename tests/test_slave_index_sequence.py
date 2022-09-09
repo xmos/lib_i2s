@@ -14,7 +14,7 @@ num_in_out_args = {"4ch_in,4ch_out": (4, 4),
                    "3ch_in,3ch_out": (3, 3)}
 
 @pytest.mark.parametrize(("num_in", "num_out"), num_in_out_args.values(), ids=num_in_out_args.keys())
-def test_i2s_basic_slave(capfd, request, nightly, num_in, num_out):
+def test_i2s_index_sequence_slave(capfd, request, nightly, num_in, num_out):
     if (num_in in (1,2,3) or num_out in (1,2,3)) and not nightly:
         pytest.skip("Only test 4ch modes if not nightly")
     testlevel = '0' if nightly else '1'

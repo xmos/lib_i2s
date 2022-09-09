@@ -18,7 +18,7 @@ def test_i2s_basic_frame_slave_4b(capfd, request, nightly, num_in, num_out):
     id_string += "_smoke" if testlevel == '1' else ""
 
     cwd = Path(request.fspath).parent
-    binary = f'{cwd}/i2s_frame_slave_4b_/bin/{id_string}/i2s_frame_slave_4b_test_{id_string}.xe'
+    binary = f'{cwd}/i2s_frame_slave_4b_test/bin/{id_string}/i2s_frame_slave_4b_test_{id_string}.xe'
 
     clk = Clock("tile[0]:XS1_PORT_1A")
 
@@ -31,8 +31,7 @@ def test_i2s_basic_frame_slave_4b(capfd, request, nightly, num_in, num_out):
         "tile[0]:XS1_PORT_16A",
         "tile[0]:XS1_PORT_1M",
          clk,
-         False, # Don't check the bclk stops precisely as the hardware can't do that
-         True)  # We're running the frame-based master, so can have variable data widths
+         frame_based=True)  # We're running the frame-based master, so can have variable data widths
 
     tester = Pyxsim.testers.AssertiveComparisonTester(
         f'{cwd}/expected/slave_test.expect',
