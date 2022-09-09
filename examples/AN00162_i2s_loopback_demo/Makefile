@@ -1,8 +1,8 @@
 # The TARGET variable determines what target system the application is
 # compiled for. It either refers to an XN file in the source directories
 # or a valid argument for the --target option when compiling
-XCOREAI ?= 0
-ifeq ($(XCOREAI),0)
+XCORE_AI ?= 0
+ifeq ($(XCORE_AI),0)
 TARGET = XCORE-200-EXPLORER
 XCC_FLAGS = $(EXTRA_FLAGS) -O2 -report -g -DSIM_LOOPBACK_TEST=1 -DDEBUG_PRINT_ENABLE=1
 else
