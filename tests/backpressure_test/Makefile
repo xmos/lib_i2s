@@ -15,7 +15,7 @@ endif
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
 # the project name
-APP_NAME = 
+APP_NAME =
 
 # The USED_MODULES variable lists other module used by the application.
 USED_MODULES = lib_logging lib_i2s
@@ -32,6 +32,8 @@ SAMPLE_RATES ?= 768000 384000 192000
 CHANS ?= 1 4
 RX_TX_INCS ?= 5;5 10;0 0;10
 BITDEPTHS ?= 8 16 32
+
+XCC_FLAGS_XCORE_AI = $(SHARED_FLAGS) -DSAMPLE_FREQUENCY=768000 -DNUM_I2S_LINES=4 -DRECEIVE_DELAY_INCREMENT=5 -DSEND_DELAY_INCREMENT=5
 
 $(foreach db,$(BITDEPTHS), \
   $(foreach sr,$(SAMPLE_RATES),\
