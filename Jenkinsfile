@@ -13,7 +13,7 @@ pipeline {
       )
   }
   stages {
-    stage('Standard build and XS2 tests') {
+    stage('Library Checks, Build, and Test') {
       agent {
         label 'x86_64&&macOS'
       }
@@ -35,31 +35,43 @@ pipeline {
             xcoreLibraryChecks("${REPO}")
           }
         }
-        stage('xCORE builds') {
-          steps {
-            dir("${REPO}") {
-              xcoreAllAppsBuild('examples')
-              xcoreAllAppNotesBuild('examples')
-              dir('examples/AN00162_i2s_loopback_demo'){
-                runXmake(".", "", "XCOREAI=1")
-                stash name: 'AN00162', includes: 'bin/XCORE_AI/AN00162_i2s_loopback_demo.xe, '
+        stage('Build and Test - XS2 and XS3') {
+          parallel {
+            stage("Build and Test - XS2"){
+              steps{
+                dir("${REPO}") {
+                  xcoreAllAppsBuild('examples')
+                  xcoreAllAppNotesBuild('examples')
+                }
+                dir("${REPO}") {
+                  viewEnv {
+                    runPytest()
+                  }
+                }
               }
-              dir("${REPO}") {
-                runXdoc('doc')
+            }
+            stage("Build and Test - XS3"){
+              environment {
+                XCORE_AI = 1
+              }
+              steps{
+                dir("${REPO}") {
+                  xcoreAllAppsBuild('examples')
+                  xcoreAllAppNotesBuild('examples')
+                }
+                dir("${REPO}") {
+                  viewEnv {
+                    runPytest()
+                  }
+                }
               }
             }
           }
         }
-        stage('Tests') {
-          steps {
-            dir('lib_i2s/tests/backpressure_test'){
-              runXmake(".", "", "CONFIG=XCORE_AI")
-              stash name: 'backpressure_test', includes: 'bin/XCORE_AI/backpressure_test_XCORE_AI.xe, '
-            }
+        stage('Run xdoc'){
+          steps{
             dir("${REPO}") {
-              viewEnv {
-                runPytest()
-              }
+              runXdoc('doc')
             }
           }
         }
@@ -70,41 +82,6 @@ pipeline {
         }
       }
     }// Stage standard build
-
-    stage('xcore.ai Verification'){
-      agent {
-        label 'xcore.ai'
-      }
-      stages{
-        stage('Install Dependencies') {
-          steps {
-            installDependencies()
-          }
-        }
-        stage('xrun'){
-          steps{
-            withTools(params.TOOLS_VERSION) {  // load xmos tools
-              //Just run on HW and error on incorrect binary etc. We need specific HW for it to run so just check it loads OK
-              unstash 'AN00162'
-              sh 'xrun --id 0 bin/XCORE_AI/AN00162_i2s_loopback_demo.xe'
-
-              //Just run on HW and error on incorrect binary etc. It will not run otherwise due to lack of loopback (intended for sim)
-              //We run xsim afterwards for actual test (with loopback)
-              unstash 'backpressure_test'
-              sh 'xrun --id 0 bin/XCORE_AI/backpressure_test_XCORE_AI.xe'
-              sh 'xsim bin/XCORE_AI/backpressure_test_XCORE_AI.xe --plugin LoopbackPort.dll "-port tile[0] XS1_PORT_1G 1 0 -port tile[0] XS1_PORT_1A 1 0" > bp_test.txt'
-              sh 'cat bp_test.txt && diff bp_test.txt tests/backpressure_test.expect'
-            }
-          }
-        }
-      }//stages
-      post {
-        cleanup {
-          cleanWs()
-        }
-      }
-    }// xcore.ai
-
     stage('Update view files') {
       agent {
         label 'x86_64&&macOS'
