@@ -9,7 +9,7 @@ import pytest
 num_in_out_args = {"2ch_in,2ch_out": (2, 2)}
 
 @pytest.mark.parametrize(("num_in", "num_out"), num_in_out_args.values(), ids=num_in_out_args.keys())
-def test_i2s_basic_slave(capfd, request, nightly, num_in, num_out):
+def test_i2s_basic_slave_invert(capfd, request, nightly, num_in, num_out):
     testlevel = '0' if nightly else '1'
     id_string = f"{num_in}_{num_out}"
     id_string += "_smoke" if testlevel == '1' else ""

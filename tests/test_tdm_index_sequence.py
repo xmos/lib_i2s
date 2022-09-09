@@ -10,7 +10,7 @@ num_in_out_args = {"1ch_in,1ch_out,8ch": (1, 1, 8),
                    "2ch_in,2ch_out,4ch": (2, 2, 4)}
 
 @pytest.mark.parametrize(("num_in", "num_out", "num_chan"), num_in_out_args.values(), ids=num_in_out_args.keys())
-def test_index_sequence(capfd, request, nightly, num_in, num_out, num_chan):
+def test_tdm_index_sequence(capfd, request, nightly, num_in, num_out, num_chan):
     if (num_chan == 4) and not nightly:
         pytest.skip("Only test non-8chan modes if nightly")
 
