@@ -56,7 +56,7 @@ pipeline {
               runXmake(".", "", "CONFIG=XCORE_AI")
               stash name: 'backpressure_test', includes: 'bin/XCORE_AI/backpressure_test_XCORE_AI.xe, '
             }
-            dir("${REPO}") {
+            dir("${REPO}/tests") {
               viewEnv {
                 runPytest()
               }
