@@ -10,7 +10,7 @@ TARGET = XCORE-200-EXPLORER
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
 # the project name
-APP_NAME = i2s_frame_master_4b_test
+APP_NAME = 
 
 # The USED_MODULES variable lists other module used by the application.
 USED_MODULES = lib_i2s
@@ -23,18 +23,22 @@ USED_MODULES = lib_i2s
 
 COMMON_FLAGS = -O3 -g -save-temps
 
-$(foreach db,8 16 24 32,\
-  $(foreach out,0 1 2 3 4,\
-    $(foreach in,0 1 2 3 4,\
-      $(eval \
-        XCC_FLAGS_smoke_$(db)$(out)$(in) = $(COMMON_FLAGS) -DDATA_BITS=$(db) -DNUM_OUT=$(out) -DNUM_IN=$(in) -DSMOKE\
-      ) \
-      $(eval \
-        XCC_FLAGS_nightly_$(db)$(out)$(in) = $(COMMON_FLAGS) -DDATA_BITS=$(db) -DNUM_OUT=$(out) -DNUM_IN=$(in)\
-      )\
-    )\
-  )\
-)
+NUMS_IN_OUT ?= 4;4 1;1 4;0 0;4
+SMOKE ?= 1
+
+ifeq ($(SMOKE), 1)
+  $(foreach in_out,$(NUMS_IN_OUT), \
+    $(eval \
+      XCC_FLAGS_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out)))_smoke = $(COMMON_FLAGS) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DSMOKE\
+    ) \
+  ) 
+else
+  $(foreach in_out,$(NUMS_IN_OUT), \
+    $(eval \
+      XCC_FLAGS_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out))) = $(COMMON_FLAGS) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out)))\
+    ) \
+  ) 
+endif
 
 # The XCORE_ARM_PROJECT variable, if set to 1, configures this
 # project to create both xCORE and ARM binaries.

@@ -56,7 +56,11 @@ pipeline {
               runXmake(".", "", "CONFIG=XCORE_AI")
               stash name: 'backpressure_test', includes: 'bin/XCORE_AI/backpressure_test_XCORE_AI.xe, '
             }
-            runXmostest("${REPO}", 'tests')
+            dir("${REPO}/tests") {
+              viewEnv {
+                runPytest()
+              }
+            }
           }
         }
       }// stages
@@ -72,11 +76,6 @@ pipeline {
         label 'xcore.ai'
       }
       stages{
-        stage('Install Dependencies') {
-          steps {
-            installDependencies()
-          }
-        }
         stage('xrun'){
           steps{
             withTools(params.TOOLS_VERSION) {  // load xmos tools
@@ -89,7 +88,7 @@ pipeline {
               unstash 'backpressure_test'
               sh 'xrun --id 0 bin/XCORE_AI/backpressure_test_XCORE_AI.xe'
               sh 'xsim bin/XCORE_AI/backpressure_test_XCORE_AI.xe --plugin LoopbackPort.dll "-port tile[0] XS1_PORT_1G 1 0 -port tile[0] XS1_PORT_1A 1 0" > bp_test.txt'
-              sh 'cat bp_test.txt && diff bp_test.txt tests/backpressure_test.expect'
+              sh 'cat bp_test.txt && diff bp_test.txt tests/expected/backpressure_test.expect'
             }
           }
         }

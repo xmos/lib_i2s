@@ -1,29 +1,38 @@
-# Copyright 2015-2021 XMOS LIMITED.
+# Copyright 2015-2022 XMOS LIMITED.
 # This Software is subject to the terms of the XMOS Public Licence: Version 1.
-import xmostest
-from i2s_master_checker import I2SMasterChecker
-from i2s_master_checker import Clock
-import os
+from pathlib import Path
+import Pyxsim
+import pytest
 
-def do_test(num_in, num_out, chans_per_frame, testlevel):
+num_in_out_args = {"1ch_in,1ch_out,8ch": (1, 1, 8),
+                   "1ch_in,0ch_out,8ch": (1, 0, 8),
+                   "0ch_in,1ch_out,8ch": (0, 1, 8),
+                   "2ch_in,2ch_out,4ch": (2, 2, 4)}
 
-    resources = xmostest.request_resource("xsim")
+@pytest.mark.parametrize(("num_in", "num_out", "num_chan"), num_in_out_args.values(), ids=num_in_out_args.keys())
+def test_tdm_index_sequence(capfd, request, nightly, num_in, num_out, num_chan):
+    if (num_chan == 4) and not nightly:
+        pytest.skip("Only test non-8chan modes if nightly")
 
-    binary = 'test_i2s_callback_sequence/bin/tdm_{o}{i}{C}/test_i2s_callback_sequence_tdm_{o}{i}{C}.xe'.format(i=num_in, o=num_out, C=chans_per_frame)
+    testlevel = '0' if nightly else '1'
+    id_string = f"{num_in}_{num_out}_{num_chan}"
+    id_string += "_smoke" if testlevel == '1' else ""
 
-    tester = xmostest.ComparisonTester(open('tdm_sequence_check_{o}{i}{C}.expect'.format(i=num_in, o=num_out, C=chans_per_frame)),
-                                     'lib_i2s', 'tdm_master_sim_tests',
-                                     'sequence_check',
-                                       {'ins':num_in, 'outs':num_out, 'chans_per_frame':chans_per_frame})
+    cwd = Path(request.fspath).parent
+    binary = f'{cwd}/test_i2s_callback_sequence/bin/tdm_{id_string}/test_i2s_callback_sequence_tdm_{id_string}.xe'
 
-    tester.set_min_testlevel(testlevel)
+    tester = Pyxsim.testers.AssertiveComparisonTester(
+        f'{cwd}/expected/tdm_sequence_check_{num_out}{num_in}{num_chan}.expect',
+        regexp = True,
+        ordered = True,
+        suppress_multidrive_messages=True,
+        ignore=["CONFIG:.*"]
+    )
 
-    xmostest.run_on_simulator(resources['xsim'], binary,
-                              tester = tester)
-
-def runtest():
-    do_test(1, 1, 8, "smoke")
-    do_test(1, 0, 8, "smoke")
-    do_test(0, 1, 8, "smoke")
-    do_test(2, 2, 4, "nightly")
-
+    Pyxsim.run_on_simulator(
+        binary,
+        tester=tester,
+        build_env = {"NUMS_IN_OUT":f'{num_in};{num_out}', "TDM_CHANS_PER_FRAME":f"{num_chan}", "SMOKE":testlevel, "TDM":"1"},
+        simargs=[],
+        capfd=capfd
+    )

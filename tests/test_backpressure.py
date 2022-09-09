@@ -1,77 +1,54 @@
 # Copyright 2016-2022 XMOS LIMITED.
 # This Software is subject to the terms of the XMOS Public Licence: Version 1.
-import xmostest
+import pytest
+import Pyxsim
+from Pyxsim.pyxsim import XsiLoopbackPlugin
+from pathlib import Path
 
+sample_rate_args = {"768kbps": 768000,
+                    "384kbps": 384000,
+                    "192kbps": 192000}
 
-def do_test(
-    sample_rate, num_channels, data_bits, receive_increment, send_increment, testlevel
-):
+num_channels_args = {"1ch": 1,
+                     "2ch": 2,
+                     "3ch": 3,
+                     "4ch": 4}
 
-    resources = xmostest.request_resource("xsim")
+rx_tx_inc_args = {"rx_delay_inc_50ns,tx_delay_inc_50ns": (5, 5),
+                  "rx_delay_inc_0ns,tx_delay_inc_100ns": (0, 10),
+                  "rx_delay_inc_100ns,tx_delay_inc_0ns": (10, 0)}
 
-    id_string = "{db}_{sr}_{nc}_{ri}_{si}".format(
-        db=data_bits,
-        sr=sample_rate,
-        nc=num_channels,
-        ri=receive_increment,
-        si=send_increment,
-    )
+bitdepth_args = {"8b": 8,
+                 "16b": 16,
+                 "32b": 32}
 
-    binary = "backpressure_test/bin/{id}/backpressure_test_{id}.xe".format(id=id_string)
+@pytest.mark.parametrize("bitdepth", bitdepth_args.values(), ids=bitdepth_args.keys())
+@pytest.mark.parametrize("sample_rate", sample_rate_args.values(), ids=sample_rate_args.keys())
+@pytest.mark.parametrize("num_channels", num_channels_args.values(), ids=num_channels_args.keys())
+@pytest.mark.parametrize(("receive_increment", "send_increment"), rx_tx_inc_args.values(), ids=rx_tx_inc_args.keys())
+def test_backpressure(nightly, capfd, request, sample_rate, num_channels, receive_increment, send_increment, bitdepth):
+    if (num_channels != 4) and not nightly:
+        pytest.skip("Only run 4 channel tests unless it is a nightly")
 
-    tester = xmostest.ComparisonTester(
-        open("backpressure_test.expect"),
-        "lib_i2s",
-        "i2s_backpressure_tests",
-        "backpressure_%s" % testlevel,
-        {
-            "data_bits": data_bits,
-            "sample_rate": sample_rate,
-            "num_channels": num_channels,
-            "receive_increment": receive_increment,
-            "send_increment": send_increment,
-        },
-    )
+    id_string = f"{bitdepth}_{sample_rate}_{num_channels}_{receive_increment}_{send_increment}"
 
-    tester.set_min_testlevel(testlevel)
+    cwd = Path(request.fspath).parent
 
-    xmostest.run_on_simulator(
-        resources["xsim"],
+    binary = f'{cwd}/backpressure_test/bin/{id_string}/backpressure_test_{id_string}.xe'
+
+    loopback = XsiLoopbackPlugin(tile="tile[0]", from_port="XS1_PORT_1G", to_port="XS1_PORT_1A")
+
+    tester = Pyxsim.testers.AssertiveComparisonTester(f'{cwd}/expected/backpressure_test.expect',
+                                                    regexp = True,
+                                                    ordered = True,
+                                                    suppress_multidrive_messages=True,
+                                                    ignore=["CONFIG:.*"])
+
+    Pyxsim.run_on_simulator(
         binary,
-        simargs=[],
-        # simargs=['--trace-to', './backpressure_test/logs/sim_{id}.log'.format(id=id_string),
-        #         '--vcd-tracing', '-o ./backpressure_test/traces/trace_{id}.vcd -tile tile[0] -ports-detailed -functions -cycles -clock-blocks -cores -instructions'.format(id=id_string)],
-        loopback=[{"from": "tile[0]:XS1_PORT_1G", "to": "tile[0]:XS1_PORT_1A"}],
-        suppress_multidrive_messages=True,
         tester=tester,
+        build_env = {"BITDEPTHS":bitdepth, "SAMPLE_RATES":sample_rate, "CHANS":num_channels, "RX_TX_INCS":f"{receive_increment};{send_increment}"},
+        simargs=[],
+        capfd=capfd,
+        plugins=[loopback]
     )
-
-
-def runtest():
-    for sample_rate in [768000, 384000, 192000]:
-        for data_bits in [8, 16, 32]:
-            for num_channels in [1, 2, 3, 4]:
-                do_test(
-                    sample_rate,
-                    num_channels,
-                    data_bits,
-                    5,
-                    5,
-                    "smoke" if (num_channels == 4) else "nightly",
-                )
-                do_test(
-                    sample_rate,
-                    num_channels,
-                    data_bits,
-                    0,
-                    10,
-                    "smoke" if (num_channels == 4) else "nightly",
-                )
-                do_test(
-                    sample_rate,
-                    num_channels,
-                    data_bits,
-                    10,
-                    0,
-                    "smoke" if (num_channels == 4) else "nightly",
-                )

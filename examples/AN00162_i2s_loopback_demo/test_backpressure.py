@@ -40,7 +40,7 @@ for sr in sr_range:
             proc = subprocess.Popen(cmd_line_build_split, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             tmp = proc.stdout.read()
             if not tmp.find("Build Complete"):
-                    print "Build fail"
+                    print("Build fail")
                     exit()
 
 
@@ -54,7 +54,7 @@ for sr in sr_range:
             try:
                 ticks = int(tmp2.split("=",1)[1])
             except:
-                print "Could not extract value from line " + tmp2
+                print("Could not extract value from line " + tmp2)
             print ("SR: %i, I2S: %i, BURN: %i, Ticks: %i" % (sr, i2s, burn, ticks))
 
 
