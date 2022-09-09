@@ -29,31 +29,31 @@ INVERT ?= 0
 
 ifeq ($(SMOKE), 1)
   ifeq ($(INVERT), 1)
-      $(foreach in_out,$(NUMS_IN_OUT), \
-        $(eval \
-          XCC_FLAGS_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out)))_smoke = $(COMMON_FLAGS) -DDATA_BITS=$(db) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DSMOKE -DSLAVE_INVERT_BCLK\
-        ) \
-      ) 
+    $(foreach in_out,$(NUMS_IN_OUT), \
+      $(eval \
+        XCC_FLAGS_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out)))_smoke = $(COMMON_FLAGS) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DSMOKE -DSLAVE_INVERT_BCLK\
+      ) \
+    ) 
   else
-      $(foreach in_out,$(NUMS_IN_OUT), \
-        $(eval \
-          XCC_FLAGS_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out)))_smoke = $(COMMON_FLAGS) -DDATA_BITS=$(db) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DSMOKE\
-        ) \
-      ) 
+    $(foreach in_out,$(NUMS_IN_OUT), \
+      $(eval \
+        XCC_FLAGS_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out)))_smoke = $(COMMON_FLAGS) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DSMOKE\
+      ) \
+    ) 
   endif
 else
   ifeq ($(INVERT), 1)
-      $(foreach in_out,$(NUMS_IN_OUT), \
-        $(eval \
-          XCC_FLAGS_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out))) = $(COMMON_FLAGS) -DDATA_BITS=$(db) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DSLAVE_INVERT_BCLK\
-        ) \
-      ) 
+    $(foreach in_out,$(NUMS_IN_OUT), \
+      $(eval \
+        XCC_FLAGS_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out))) = $(COMMON_FLAGS) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DSLAVE_INVERT_BCLK\
+      ) \
+    ) 
   else
-      $(foreach in_out,$(NUMS_IN_OUT), \
-        $(eval \
-          XCC_FLAGS_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out))) = $(COMMON_FLAGS) -DDATA_BITS=$(db) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out)))\
-        ) \
-      ) 
+    $(foreach in_out,$(NUMS_IN_OUT), \
+      $(eval \
+        XCC_FLAGS_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out))) = $(COMMON_FLAGS) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out)))\
+      ) \
+    ) 
   endif
 endif
 

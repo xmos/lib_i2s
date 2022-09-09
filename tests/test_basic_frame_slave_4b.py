@@ -18,7 +18,7 @@ def test_i2s_basic_frame_slave_4b(capfd, request, nightly, num_in, num_out):
     id_string += "_smoke" if testlevel == '1' else ""
 
     cwd = Path(request.fspath).parent
-    binary = f'{cwd}/i2s_frame_slave_4b_/bin/{id_string}/i2s_frame_slave_4b_test_{id_string}.xe'
+    binary = f'{cwd}/i2s_frame_slave_4b_test/bin/{id_string}/i2s_frame_slave_4b_test_{id_string}.xe'
 
     clk = Clock("tile[0]:XS1_PORT_1A")
 
