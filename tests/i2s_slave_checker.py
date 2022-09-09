@@ -78,7 +78,7 @@ class I2SSlaveChecker(px.SimThread):
             strobe_val = xsi.sample_port_pins(self._setup_strobe_port)
             if strobe_val == 1:
                 self.wait_for_port_pins_change([self._setup_strobe_port])
-                
+
             bclk_frequency_u = self.get_setup_data(
                 xsi, self._setup_strobe_port, self._setup_data_port
             )
@@ -112,7 +112,7 @@ class I2SSlaveChecker(px.SimThread):
             if self._invert_bclk:
                 self.bclk0 = 1
                 self.bclk1 = 0
-                din_sample_offset = +clock_half_period / 4
+                din_sample_offset = clock_half_period / 4
                 if first_iteration:
                     print("Slave bit clock inverted")
                     print(

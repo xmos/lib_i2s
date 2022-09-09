@@ -58,7 +58,7 @@ class TDMMasterChecker(Pyxsim.SimThread):
             tx_word=[0, 0, 0, 0]
     
             #for verifing the clock stability
-            clock_half_period = float(500000000000) / sclk_frequency
+            clock_half_period = float(500000000000000) / sclk_frequency
             fsync_count = 0
     
             #there is one frame lead in for the slave to sync to
