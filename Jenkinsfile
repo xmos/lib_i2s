@@ -13,7 +13,7 @@ pipeline {
       )
   }
   stages {
-    stage('Library Checks, Build, and Test') {
+    stage('Library Checks and XS2 Tests') {
       agent {
         label 'x86_64&&macOS'
       }
@@ -35,46 +35,61 @@ pipeline {
             xcoreLibraryChecks("${REPO}")
           }
         }
-        stage('Build and Test - XS2 and XS3'){
-          stages{
-            stage("Build Examples - XS2"){
-              steps{
-                dir("${REPO}") {
-                  xcoreAllAppsBuild('examples')
-                  xcoreAllAppNotesBuild('examples')
-                }
+        stage("Build Examples - XS2"){
+          steps{
+            dir("${REPO}") {
+              xcoreAllAppsBuild('examples')
+              xcoreAllAppNotesBuild('examples')
+            }
+          }
+        }
+        stage("Test - XS2"){
+          steps{
+            dir("${REPO}/tests") {
+              viewEnv {
+                runPytest()
               }
             }
-            stage("Test - XS2"){
-              steps{
-                dir("${REPO}/tests") {
-                  viewEnv {
-                    runPytest()
-                  }
-                }
-              }
+          }
+        }
+      }
+      post {
+        cleanup {
+          xcoreCleanSandbox()
+        }
+      }
+    }
+    stage("XS3 Tests and xdoc") {
+      agent {
+        label 'x86_64&&macOS'
+      }
+      environment {
+        REPO = 'lib_i2s'
+        VIEW = getViewName(REPO)
+        XCORE_AI = 1
+      }
+      options {
+        skipDefaultCheckout()
+      }
+      stages{
+        stage('Get view') {
+          steps {
+            xcorePrepareSandbox("${VIEW}", "${REPO}")
+          }
+        }
+        stage("Build Examples - XS3"){
+          steps{
+            dir("${REPO}") {
+              xcoreAllAppsBuild('examples')
+              xcoreAllAppNotesBuild('examples')
             }
-            stage("Build Examples - XS3"){
-              environment {
-                XCORE_AI = 1
-              }
-              steps{
-                dir("${REPO}") {
-                  xcoreAllAppsBuild('examples')
-                  xcoreAllAppNotesBuild('examples')
-                }
-              }
-            }
-            stage("Test - XS3"){
-              environment {
-                XCORE_AI = 1
-              }
-              steps{
-                dir("${REPO}/tests") {
-                  viewEnv {
-                    runPytest()
-                  }
-                }
+          }
+        }
+        stage("Test - XS3"){
+          steps{
+            dir("${REPO}/tests") {
+              viewEnv {
+                runPytest()
               }
             }
           }
@@ -86,13 +101,13 @@ pipeline {
             }
           }
         }
-      }// stages
+      }
       post {
         cleanup {
           xcoreCleanSandbox()
         }
       }
-    }// Stage standard build
+    }
     stage('Update view files') {
       agent {
         label 'x86_64&&macOS'
@@ -104,5 +119,5 @@ pipeline {
         updateViewfiles()
       }
     }
-  }
+  }// stages
 }
