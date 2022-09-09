@@ -31,8 +31,7 @@ def test_i2s_basic_frame_slave_4b(capfd, request, nightly, num_in, num_out):
         "tile[0]:XS1_PORT_16A",
         "tile[0]:XS1_PORT_1M",
          clk,
-         False, # Don't check the bclk stops precisely as the hardware can't do that
-         True)  # We're running the frame-based master, so can have variable data widths
+         frame_based=True)  # We're running the frame-based master, so can have variable data widths
 
     tester = Pyxsim.testers.AssertiveComparisonTester(
         f'{cwd}/expected/slave_test.expect',
