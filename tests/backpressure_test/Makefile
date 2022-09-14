@@ -6,10 +6,13 @@ else # USING_XWAF
 # compiled for. It either refers to an XN file in the source directories
 # or a valid argument for the --target option when compiling
 
-ifeq ($(CONFIG),XCORE_AI)
+TARGET ?= XCORE-200-EXPLORER
+
+ifeq ($(XCORE_AI), 1)
 TARGET = XCORE-AI-EXPLORER
-else
-TARGET = XCORE-200-EXPLORER
+endif
+ifeq ($(CONFIG), XCORE_AI)
+TARGET = XCORE-AI-EXPLORER
 endif
 
 # The APP_NAME variable determines the name of the final .xe file. It should
@@ -33,8 +36,6 @@ CHANS ?= 1 4
 RX_TX_INCS ?= 5;5 10;0 0;10
 BITDEPTHS ?= 8 16 32
 
-XCC_FLAGS_XCORE_AI = $(SHARED_FLAGS) -DSAMPLE_FREQUENCY=768000 -DNUM_I2S_LINES=4 -DRECEIVE_DELAY_INCREMENT=5 -DSEND_DELAY_INCREMENT=5
-
 $(foreach db,$(BITDEPTHS), \
   $(foreach sr,$(SAMPLE_RATES),\
     $(foreach chan,$(CHANS),\
@@ -46,9 +47,6 @@ $(foreach db,$(BITDEPTHS), \
     ) \
   )\
 )
-
-test: bin/i2s_loopback_demo.xe
-	xsim bin/i2s_loopback_demo.xe --plugin LoopbackPort.dll '-port tile[0] XS1_PORT_1G 1 0 -port tile[0] XS1_PORT_1A 1 0'
 
 XMOS_MAKE_PATH ?= ../..
 -include $(XMOS_MAKE_PATH)/xcommon/module_xcommon/build/Makefile.common
