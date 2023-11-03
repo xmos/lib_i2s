@@ -1,6 +1,11 @@
 I2S library change log
 ======================
 
+UNRELEASED
+----------
+
+  * ADDED: Support for XCommon CMake build system
+
 5.0.0
 -----
 
