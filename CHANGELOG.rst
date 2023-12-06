@@ -4,7 +4,8 @@ I2S library change log
 UNRELEASED
 ----------
 
-  * ADDED: Support for XCommon CMake build system
+  * ADDED:     Support for XCommon CMake build system
+  * RESOLVED:  Added missing shutdown feature to i2s_frame_slave
 
 5.0.0
 -----
