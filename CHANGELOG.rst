@@ -6,6 +6,7 @@ UNRELEASED
 
   * ADDED:     Support for XCommon CMake build system
   * RESOLVED:  Added missing shutdown feature to i2s_frame_slave
+  * ADDED:     Frame synch error field in i2s_config_t for I2S frame slave
 
 5.0.0
 -----

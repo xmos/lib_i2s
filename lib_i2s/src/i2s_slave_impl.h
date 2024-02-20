@@ -60,12 +60,16 @@ static void i2s_slave0(client i2s_callback_if i2s_i,
     unsigned port_time;
     i2s_slave_init_ports(p_dout, num_out, p_din, num_in, p_bclk, p_lrclk, bclk);
 
+    i2s_config_t config;
+    config.slave_frame_synch_error = 0;
+
     while(1) {
         i2s_mode_t m;
-        i2s_config_t config;
         i2s_restart_t restart = I2S_NO_RESTART;
         config.slave_bclk_polarity = I2S_SLAVE_SAMPLE_ON_BCLK_RISING;
         i2s_i.init(config, null);
+        config.slave_frame_synch_error = 0;
+
         m = config.mode;
 
         if (config.slave_bclk_polarity == I2S_SLAVE_SAMPLE_ON_BCLK_FALLING)
@@ -117,6 +121,10 @@ static void i2s_slave0(client i2s_callback_if i2s_i,
 
         if (restart == I2S_SHUTDOWN) {
             return;
+        }
+
+        if(syncerror){
+            config.slave_frame_synch_error = 1;
         }
     }
 }

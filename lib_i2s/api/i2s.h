@@ -34,6 +34,7 @@ typedef struct i2s_config_t {
   unsigned mclk_bclk_ratio; ///< The ratio between the master clock and bit clock signals.
   i2s_mode_t mode;          ///< The mode of the LR clock.
   i2s_slave_bclk_polarity_t slave_bclk_polarity;  ///< Slave bit clock polarity.
+  unsigned slave_frame_synch_error;///< Set if I2S slave restarted because of a frame synch error. No meaning for master.
 } i2s_config_t;
 
 /** TDM configuration structure.
