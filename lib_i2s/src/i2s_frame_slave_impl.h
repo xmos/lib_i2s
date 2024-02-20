@@ -56,7 +56,6 @@ static void i2s_frame_slave0(client i2s_frame_callback_if i2s_i,
         while(1){
             i2s_frame_slave_init_ports(p_dout, num_out, p_din, num_in, p_bclk, p_lrclk, bclk);
 
-            config.slave_frame_synch_error = 0;
             i2s_restart_t restart = I2S_NO_RESTART;
             i2s_i.init(config, null);
             config.slave_frame_synch_error = 0;
@@ -190,6 +189,7 @@ static void i2s_frame_slave0(client i2s_frame_callback_if i2s_i,
             i2s_config_t config;
             i2s_restart_t restart = I2S_NO_RESTART;
             i2s_i.init(config, null);
+            config.slave_frame_synch_error = 0;
 
             // Get initial send data if output enabled
             if (num_out)
@@ -329,6 +329,11 @@ static void i2s_frame_slave0(client i2s_frame_callback_if i2s_i,
             if(restart == I2S_SHUTDOWN)
             {
                 return;
+            }
+
+            if(syncerror)
+            {
+                config.slave_frame_synch_error = 1;
             }
         }// while(1)
     } // if num_data_bits == 32
