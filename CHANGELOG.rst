@@ -1,11 +1,18 @@
 I2S library change log
 ======================
 
-UNRELEASED
-----------
+5.1.0
+-----
 
-  * ADDED:     Support for XCommon CMake build system
-  * RESOLVED:  Added missing shutdown feature to i2s_frame_slave
+  * ADDED: Support for XCommon CMake build system
+  * RESOLVED: Added missing shutdown feature to i2s_frame_slave
+  * REMOVED: Unused dependency lib_logging
+
+  * Changes to dependencies:
+
+    - lib_logging: Removed dependency
+
+    - lib_xassert: 2.0.0 -> 4.2.0
 
 5.0.0
 -----
