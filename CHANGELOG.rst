@@ -8,7 +8,8 @@ I2S library change log
   * RESOLVED: Added missing shutdown feature to i2s_frame_slave
   * FIXED: Allow input and output ports in the 4-bit port implementation to be
     nullable
-  * FIXED: Behaviour of the restart_check() callback function
+  * FIXED: Behaviour of the restart_check() callback function in the example
+    applications
   * REMOVED: Unused dependency lib_logging
 
   * Changes to dependencies:
