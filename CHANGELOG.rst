@@ -6,6 +6,10 @@ I2S library change log
 
   * ADDED: Support for XCommon CMake build system
   * RESOLVED: Added missing shutdown feature to i2s_frame_slave
+  * FIXED: Allow input and output ports in the 4-bit port implementation to be
+    nullable
+  * FIXED: Behaviour of the restart_check() callback function in the example
+    applications
   * REMOVED: Unused dependency lib_logging
   * ADDED: Frame synch error field in i2s_config_t for I2S slave
 
