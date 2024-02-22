@@ -11,6 +11,7 @@ I2S library change log
   * FIXED: Behaviour of the restart_check() callback function in the example
     applications
   * REMOVED: Unused dependency lib_logging
+  * ADDED: Frame synch error field in i2s_config_t for I2S slave
 
   * Changes to dependencies:
 
