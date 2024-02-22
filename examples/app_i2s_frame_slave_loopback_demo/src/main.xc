@@ -1,4 +1,4 @@
-// Copyright 2014-2021 XMOS LIMITED.
+// Copyright 2014-2022 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 #include <platform.h>
 #include <xs1.h>
@@ -246,7 +246,6 @@ void i2s_handler(server i2s_frame_callback_if i_i2s, client i2c_master_if i_i2c,
 
     case i_i2s.restart_check() -> i2s_restart_t restart:
       restart = I2S_NO_RESTART;
-      //delay_microseconds(1);
       break;
     }
   }

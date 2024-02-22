@@ -1,109 +1,113 @@
-@Library('xmos_jenkins_shared_library@v0.18.0') _
+@Library('xmos_jenkins_shared_library@v0.20.0') _
 
 getApproval()
 
 pipeline {
   agent none
-  //Tools for AI verif stage. Tools for standard stage in view file
-  parameters {
-    string(
-      name: 'TOOLS_VERSION',
-      defaultValue: '15.1.4',
-      description: 'The tools version to build with (check /projects/tools/ReleasesTools/)'
-      )
-  }
+
   stages {
-    stage('Standard build and XS2 tests') {
-      agent {
-        label 'x86_64&&macOS'
-      }
-      environment {
-        REPO = 'lib_i2s'
-        VIEW = getViewName(REPO)
-      }
-      options {
-        skipDefaultCheckout()
-      }
-      stages {
-        stage('Get view') {
-          steps {
-            xcorePrepareSandbox("${VIEW}", "${REPO}")
+    stage("Main") {
+      parallel {
+        stage('Library Checks and XS2 Tests') {
+          agent {
+            label 'x86_64&&linux'
           }
-        }
-        stage('Library checks') {
-          steps {
-            xcoreLibraryChecks("${REPO}")
+          environment {
+            REPO = 'lib_i2s'
+            VIEW = getViewName(REPO)
           }
-        }
-        stage('xCORE builds') {
-          steps {
-            dir("${REPO}") {
-              xcoreAllAppsBuild('examples')
-              xcoreAllAppNotesBuild('examples')
-              dir('examples/AN00162_i2s_loopback_demo'){
-                runXmake(".", "", "XCOREAI=1")
-                stash name: 'AN00162', includes: 'bin/XCORE_AI/AN00162_i2s_loopback_demo.xe, '
-              }
-              dir("${REPO}") {
-                runXdoc('doc')
+          options {
+            skipDefaultCheckout()
+          }
+          stages {
+            stage('Get view') {
+              steps {
+                xcorePrepareSandbox("${VIEW}", "${REPO}")
               }
             }
-          }
-        }
-        stage('Tests') {
-          steps {
-            dir('lib_i2s/tests/backpressure_test'){
-              runXmake(".", "", "CONFIG=XCORE_AI")
-              stash name: 'backpressure_test', includes: 'bin/XCORE_AI/backpressure_test_XCORE_AI.xe, '
+            stage('Library checks') {
+              steps {
+                xcoreLibraryChecks("${REPO}")
+              }
             }
-            runXmostest("${REPO}", 'tests')
-          }
-        }
-      }// stages
-      post {
-        cleanup {
-          xcoreCleanSandbox()
-        }
-      }
-    }// Stage standard build
-
-    stage('xcore.ai Verification'){
-      agent {
-        label 'xcore.ai'
-      }
-      stages{
-        stage('Install Dependencies') {
-          steps {
-            installDependencies()
-          }
-        }
-        stage('xrun'){
-          steps{
-            withTools(params.TOOLS_VERSION) {  // load xmos tools
-              //Just run on HW and error on incorrect binary etc. We need specific HW for it to run so just check it loads OK
-              unstash 'AN00162'
-              sh 'xrun --id 0 bin/XCORE_AI/AN00162_i2s_loopback_demo.xe'
-
-              //Just run on HW and error on incorrect binary etc. It will not run otherwise due to lack of loopback (intended for sim)
-              //We run xsim afterwards for actual test (with loopback)
-              unstash 'backpressure_test'
-              sh 'xrun --id 0 bin/XCORE_AI/backpressure_test_XCORE_AI.xe'
-              sh 'xsim bin/XCORE_AI/backpressure_test_XCORE_AI.xe --plugin LoopbackPort.dll "-port tile[0] XS1_PORT_1G 1 0 -port tile[0] XS1_PORT_1A 1 0" > bp_test.txt'
-              sh 'cat bp_test.txt && diff bp_test.txt tests/backpressure_test.expect'
+            stage("Build Examples - XS2") {
+              steps {
+                dir("${REPO}") {
+                  xcoreAllAppsBuild('examples')
+                  xcoreAllAppNotesBuild('examples')
+                }
+              }
+            }
+            stage("Test - XS2") {
+              steps {
+                dir("${REPO}/tests") {
+                  viewEnv {
+                    runPytest()
+                  }
+                }
+              }
             }
           }
-        }
-      }//stages
-      post {
-        cleanup {
-          cleanWs()
-        }
-      }
-    }// xcore.ai
-
+          post {
+            cleanup {
+              xcoreCleanSandbox()
+            }
+          }
+        } // Library Checks and XS2 Tests
+        stage("XS3 Tests and xdoc") {
+          agent {
+            label 'x86_64&&linux'
+          }
+          environment {
+            REPO = 'lib_i2s'
+            VIEW = getViewName(REPO)
+            XCORE_AI = 1
+          }
+          options {
+            skipDefaultCheckout()
+          }
+          stages {
+            stage('Get view') {
+              steps {
+                xcorePrepareSandbox("${VIEW}", "${REPO}")
+              }
+            }
+            stage("Build Examples - XS3") {
+              steps {
+                dir("${REPO}") {
+                  xcoreAllAppsBuild('examples')
+                  xcoreAllAppNotesBuild('examples')
+                }
+              }
+            }
+            stage("Test - XS3") {
+              steps {
+                dir("${REPO}/tests") {
+                  viewEnv {
+                    runPytest()
+                  }
+                }
+              }
+            }
+            stage('Run xdoc') {
+              steps {
+                dir("${REPO}") {
+                  runXdoc('lib_i2s/doc')
+                }
+              }
+            }
+          }
+          post {
+            cleanup {
+              xcoreCleanSandbox()
+            }
+          }
+        } // XS3 Tests and xdoc
+      } // Parallel
+    } // Main
     stage('Update view files') {
       agent {
-        label 'x86_64&&macOS'
+        label 'x86_64&&linux'
       }
       when {
         expression { return currentBuild.currentResult == "SUCCESS" }
@@ -111,6 +115,6 @@ pipeline {
       steps {
         updateViewfiles()
       }
-    }
-  }
-}
+    } // Update view files
+  } // stages
+} // pipeline

@@ -1,11 +1,11 @@
 # Copyright 2015-2022 XMOS LIMITED.
 # This Software is subject to the terms of the XMOS Public Licence: Version 1.
-import xmostest
+import Pyxsim
 
-class TDMMasterChecker(xmostest.SimThread):
+class TDMMasterChecker(Pyxsim.SimThread):
 
     def print_setup(self, sr_frequency, sclk_frequency, num_outs, num_ins, is_i2s_justified, sclk_edge_count, channels_per_data_line, prefix=""):
-        print "%ssample rate: %d\tSCLK: %d\tnum ins %d,\tnum outs:%d, is i2s justified: %d\tsclk_edge_count %d\tchannels_per_data_line: %d"%(prefix,sr_frequency, sclk_frequency, num_outs, num_ins, is_i2s_justified, sclk_edge_count, channels_per_data_line)
+        print(f"{prefix}\tSample Rate: {sr_frequency},\tSCLK: {sclk_frequency},\tNum ins: {num_outs},\tNum outs: {num_ins},\tIs i2s justified: {is_i2s_justified},\tSCLK edge count: {sclk_edge_count},\tChannels per data line: {channels_per_data_line}")
         return
 
     def get_setup_data(self, xsi, setup_strobe_port, setup_data_port):
@@ -25,7 +25,7 @@ class TDMMasterChecker(xmostest.SimThread):
 
     def run(self):
         xsi = self.xsi
-        print "TDM Master Checker Started"
+        print("TDM Master Checker Started")
 
         while True: 
             xsi.drive_port_pins(self._setup_resp_port, 0)
@@ -58,7 +58,7 @@ class TDMMasterChecker(xmostest.SimThread):
             tx_word=[0, 0, 0, 0]
     
             #for verifing the clock stability
-            clock_half_period = float(500000000) / sclk_frequency
+            clock_half_period = float(500000000000000) / sclk_frequency
             fsync_count = 0
     
             #there is one frame lead in for the slave to sync to
@@ -125,7 +125,7 @@ class TDMMasterChecker(xmostest.SimThread):
                     for p in range(0, num_outs):
                         if num_ins > 0:
                             if rx_counter != rx_word[p]:
-                                print "rx error %08x %08x"%(rx_counter, rx_word[p])
+                                print(f"rx error {rx_counter} {rx_word[p]}")
                                 error = True
                         rx_counter+=1
                 
