@@ -4,20 +4,13 @@ getApproval()
 
 pipeline {
   agent none
-  //Tools for AI verif stage. Tools for standard stage in view file
-  parameters {
-    string(
-      name: 'TOOLS_VERSION',
-      defaultValue: '15.1.4',
-      description: 'The tools version to build with (check /projects/tools/ReleasesTools/)'
-      )
-  }
+
   stages {
     stage("Main") {
       parallel {
         stage('Library Checks and XS2 Tests') {
           agent {
-            label 'x86_64&&macOS'
+            label 'x86_64&&linux'
           }
           environment {
             REPO = 'lib_i2s'
@@ -63,7 +56,7 @@ pipeline {
         } // Library Checks and XS2 Tests
         stage("XS3 Tests and xdoc") {
           agent {
-            label 'x86_64&&macOS'
+            label 'x86_64&&linux'
           }
           environment {
             REPO = 'lib_i2s'
@@ -114,7 +107,7 @@ pipeline {
     } // Main
     stage('Update view files') {
       agent {
-        label 'x86_64&&macOS'
+        label 'x86_64&&linux'
       }
       when {
         expression { return currentBuild.currentResult == "SUCCESS" }
