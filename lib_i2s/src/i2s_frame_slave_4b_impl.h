@@ -44,8 +44,16 @@ static void i2s_frame_slave_init_ports_4b(
     set_clock_on(bclk);
     configure_clock_src(bclk, p_bclk);
     configure_in_port(p_lrclk, bclk);
-    configure_out_port(p_dout, bclk, 0);
-    configure_in_port(p_din, bclk);
+    
+    if (!isnull(p_din))
+    {
+        configure_in_port(p_din, bclk);
+    }
+    if (!isnull(p_dout))
+    {
+        configure_out_port(p_dout, bclk, 0);
+    }
+
     start_clock(bclk);
 }
 
@@ -88,9 +96,14 @@ static void i2s_frame_slave_4b0(client i2s_frame_callback_if i2s_i,
 
         unsigned syncerror = 0;
         unsigned lrval;
-
-        clearbuf(p_dout);
-        clearbuf(p_din);
+        if (!isnull(p_dout))
+        {
+            clearbuf(p_dout);
+        }
+        if (!isnull(p_din))
+        {
+            clearbuf(p_din);
+        }
         clearbuf(p_lrclk);
 
         unsigned offset = (mode == I2S_MODE_I2S ? 1 : 0);
@@ -106,12 +119,18 @@ static void i2s_frame_slave_4b0(client i2s_frame_callback_if i2s_i,
         asm volatile("setpt res[%0], %1"
                    :
                    :"r"(p_lrclk),"r"(initial_lr_port_time));
-        asm volatile("setpt res[%0], %1"
-                   :
-                   :"r"(p_din),"r"(initial_in_port_time));
-        asm volatile("setpt res[%0], %1"
-                    :
-                    :"r"(p_dout),"r"(initial_out_port_time));
+        if (!isnull(p_din))
+        {
+            asm volatile("setpt res[%0], %1"
+                       :
+                       :"r"(p_din),"r"(initial_in_port_time));
+        }
+        if (!isnull(p_dout))
+        {
+            asm volatile("setpt res[%0], %1"
+                        :
+                        :"r"(p_dout),"r"(initial_out_port_time));
+        }
         
         //Get initial send data if output enabled
         if (num_out) 

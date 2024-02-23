@@ -17,6 +17,8 @@
 .*.swp
 test_results.csv
 **/.venv/**
+**/python/*.egg-info/**
+.python-version
 
 # waf build files
 .lock-waf_*

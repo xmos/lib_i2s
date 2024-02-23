@@ -5,7 +5,15 @@ else # USING_XWAF
 # The TARGET variable determines what target system the application is
 # compiled for. It either refers to an XN file in the source directories
 # or a valid argument for the --target option when compiling
-TARGET = XCORE-200-EXPLORER
+
+TARGET ?= XCORE-200-EXPLORER
+
+ifeq ($(XCORE_AI), 1)
+TARGET = XCORE-AI-EXPLORER
+endif
+ifeq ($(CONFIG), XCORE_AI)
+TARGET = XCORE-AI-EXPLORER
+endif
 
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
@@ -22,20 +30,22 @@ USED_MODULES = lib_i2s
 # xcc for the final link (mapping) stage.
 COMMON_FLAGS = -O3 -g
 
-$(foreach out,0 1 2 3 4,\
- $(foreach in,0 1 2 3 4,\
-   $(eval \
-    XCC_FLAGS_smoke_$(out)$(in) = $(COMMON_FLAGS) -DNUM_OUT=$(out) -DNUM_IN=$(in) -DSMOKE\
-    ) \
-   $(eval \
-    XCC_FLAGS_nightly_$(out)$(in) = $(COMMON_FLAGS) -DNUM_OUT=$(out) -DNUM_IN=$(in)\
-    ) \
- ) \
-)
+NUMS_IN_OUT ?= 4;4 2;2 4;0 0;4
+SMOKE ?= 1
 
-# The XCORE_ARM_PROJECT variable, if set to 1, configures this
-# project to create both xCORE and ARM binaries.
-XCORE_ARM_PROJECT = 0
+ifeq ($(SMOKE), 1)
+  $(foreach in_out,$(NUMS_IN_OUT),\
+    $(eval \
+      XCC_FLAGS_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out)))_smoke = $(COMMON_FLAGS) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DSMOKE\
+    ) \
+  )
+else
+  $(foreach in_out,$(NUMS_IN_OUT),\
+    $(eval \
+      XCC_FLAGS_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out))) = $(COMMON_FLAGS) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out)))\
+    ) \
+  )
+endif
 
 XMOS_MAKE_PATH ?= ../..
 -include $(XMOS_MAKE_PATH)/xcommon/module_xcommon/build/Makefile.common

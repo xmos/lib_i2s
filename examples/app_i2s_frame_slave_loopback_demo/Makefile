@@ -1,7 +1,11 @@
 # The TARGET variable determines what target system the application is
 # compiled for. It either refers to an XN file in the source directories
 # or a valid argument for the --target option when compiling
-TARGET = XR-AUDIO-216-MC
+TARGET ?= XCORE-200-EXPLORER
+
+ifeq ($(XCORE_AI), 1)
+TARGET = XCORE-AI-EXPLORER
+endif
 
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
@@ -9,7 +13,7 @@ TARGET = XR-AUDIO-216-MC
 APP_NAME =
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = lib_gpio(>=1.1.0) lib_i2c(>=5.0.0) lib_i2s(>=3.0.0)
+USED_MODULES = lib_logging(>=3.2.0) lib_gpio(>=1.1.0) lib_i2c(>=5.0.0) lib_i2s(>=3.0.0)
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:

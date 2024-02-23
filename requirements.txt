@@ -18,6 +18,10 @@
 # same modules should appear in the setup.py list as given below.
 
 flake8==3.8.3
+# Pin importlib-metadata to <5 due to https://github.com/python/importlib_metadata/issues/409.
+importlib-metadata==4.13.0
+pytest
+pytest-xdist
 
 # Development dependencies
 #
@@ -32,3 +36,4 @@ flake8==3.8.3
 # of its own setup.py file, then this list must include an entry for that
 # setup.py file, e.g., '-e .' or '-e ./python' (without the quotes).
 -e ./python
+-e ./../test_support

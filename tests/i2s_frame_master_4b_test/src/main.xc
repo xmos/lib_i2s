@@ -8,19 +8,6 @@
 
 #define IS_POWER_OF_2(x) ((x) && !((x) & ((x) - 1)))
 
-in port p_mclk  = XS1_PORT_1A;
-out port p_bclk = XS1_PORT_1B;
-out buffered port:32 p_lrclk = XS1_PORT_1C;
-
-in buffered port:32   p_din =  {XS1_PORT_4E};
-out buffered port:32  p_dout = {XS1_PORT_4F};
-
-clock bclk = XS1_CLKBLK_2;
-
-out port setup_strobe_port = XS1_PORT_1L;
-out port setup_data_port = XS1_PORT_16A;
-in port  setup_resp_port = XS1_PORT_1M;
-
 #define MAX_RATIO (4)
 #define MAX_CHANNELS (8)
 #define MAX_SAMPLE_RATE (192000)
@@ -37,6 +24,28 @@ in port  setup_resp_port = XS1_PORT_1M;
 #ifndef NUM_IN
 #define NUM_IN (4)
 #endif
+
+in port p_mclk  = XS1_PORT_1A;
+out port p_bclk = XS1_PORT_1B;
+out buffered port:32 p_lrclk = XS1_PORT_1C;
+
+#if NUM_IN
+    in buffered port:32   ?p_din =  {XS1_PORT_4E};
+#else
+    in buffered port:32   ?p_din =  null;
+#endif
+
+#if NUM_OUT
+    out buffered port:32  ?p_dout = {XS1_PORT_4F};
+#else
+    out buffered port:32  ?p_dout = null;
+#endif
+
+clock bclk = XS1_CLKBLK_2;
+
+out port setup_strobe_port = XS1_PORT_1L;
+out port setup_data_port = XS1_PORT_16A;
+in port  setup_resp_port = XS1_PORT_1M;
 
 #if defined(SMOKE)
 #if NUM_OUT > 1 || NUM_IN > 1
