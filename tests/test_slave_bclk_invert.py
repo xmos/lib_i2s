@@ -6,8 +6,13 @@ from pathlib import Path
 import Pyxsim
 import pytest
 
-num_in_out_args = {"2ch_in,2ch_out": (2, 2)}
-
+num_in_out_args = {
+    "4ch_in,4ch_out": (4, 4),
+    "2ch_in,2ch_out": (2, 2),
+    "1ch_in,1ch_out": (1, 1),
+    "4ch_in,0ch_out": (4, 0),
+    "0ch_in,4ch_out": (0, 4),
+}
 @pytest.mark.parametrize(("num_in", "num_out"), num_in_out_args.values(), ids=num_in_out_args.keys())
 def test_i2s_basic_slave_invert(capfd, request, nightly, num_in, num_out):
     testlevel = '0' if nightly else '1'
@@ -28,8 +33,8 @@ def test_i2s_basic_slave_invert(capfd, request, nightly, num_in, num_out):
         "tile[0]:XS1_PORT_16A",
         "tile[0]:XS1_PORT_1M",
          clk,
-         invert_bclk=True, 
-         frame_based=False) # We're not running frame-based, so assume 32b data 
+         invert_bclk=True,
+         frame_based=False) # We're not running frame-based, so assume 32b data
 
     tester = Pyxsim.testers.AssertiveComparisonTester(
         f'{cwd}/expected/bclk_invert.expect',
