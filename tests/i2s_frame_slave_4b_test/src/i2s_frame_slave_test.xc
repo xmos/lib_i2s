@@ -34,7 +34,7 @@ in port  setup_resp_port = XS1_PORT_1M;
 #define DATA_BITS (32)
 #endif
 
-// Only 1 in, 1 out pass timing for 192KHz sampling freq, all the other channel count combinations fail timing for 192 KHz(and 176.4)
+// Only 1 channel in, 1 channel out pass timing for 192KHz sampling freq, all the other channel count combinations fail timing for 192 KHz(and 176.4)
 #if defined(SMOKE)
 #define NUM_LRCLKS_TO_CHECK 1
 #if NUM_IN == 1 && NUM_OUT == 1
