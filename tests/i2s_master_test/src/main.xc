@@ -19,7 +19,7 @@ out port setup_strobe_port = XS1_PORT_1L;
 out port setup_data_port = XS1_PORT_16A;
 in port  setup_resp_port = XS1_PORT_1M;
 
-#define MAX_RATIO (4)
+
 
 #define MAX_CHANNELS (8)
 
@@ -27,31 +27,31 @@ in port  setup_resp_port = XS1_PORT_1M;
 
 
 #if defined(SMOKE)
-#if NUM_OUT > 1 || NUM_IN > 1
 #define NUM_MCLKS (1)
+#if NUM_OUT == 4 && NUM_IN == 4
+#define MAX_RATIO (2) // 96 and 48KHz. 4in, 4out, 192KHz doesn't meet timing
 static const unsigned mclock_freq[NUM_MCLKS] = {
         12288000,
 };
 #else
-#define NUM_MCLKS (1)
+#define MAX_RATIO (3) // 192, 96 and 48KHz
 static const unsigned mclock_freq[NUM_MCLKS] = {
         24576000,
 };
 #endif
 #else
-#if NUM_OUT > 1 || NUM_IN > 1
 #define NUM_MCLKS (2)
+#if NUM_OUT == 4 && NUM_IN == 4
+#define MAX_RATIO (2) // 96, 48, and 88.2, 44.1KHz
 static const unsigned mclock_freq[NUM_MCLKS] = {
         12288000,
         11289600,
 };
 #else
-#define NUM_MCLKS (4)
+#define MAX_RATIO (3) // 192, 96, 48 and 176.4, 88.2, 44.1KHz
 static const unsigned mclock_freq[NUM_MCLKS] = {
         24576000,
         22579200,
-        12288000,
-        11289600,
 };
 #endif
 #endif
@@ -147,30 +147,24 @@ void app(server interface i2s_callback_if i2s_i){
         }
         case i2s_i.init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config):{
             if(!first_time){
-                 unsigned x=request_response(setup_strobe_port, setup_resp_port);
-                 error |= x;
-                 if(error)
-                   printf("Error: test fail\n");
-
-                 int s = 0;
-                 while(!s){
-                     if (ratio_log2 == MAX_RATIO){
-                         ratio_log2 = 1;
-                        if(mclock_freq_index == NUM_MCLKS-1){
-                            mclock_freq_index = 0;
-                            if (current_mode == I2S_MODE_I2S) {
-                                current_mode = I2S_MODE_LEFT_JUSTIFIED;
-                            } else {
-                                _Exit(1);
-                            }
+                unsigned x=request_response(setup_strobe_port, setup_resp_port);
+                error |= x;
+                if(error)
+                    printf("Error: test fail\n");
+                if (ratio_log2 == MAX_RATIO){
+                    ratio_log2 = 1;
+                    if(mclock_freq_index == NUM_MCLKS-1){
+                        mclock_freq_index = 0;
+                        if (current_mode == I2S_MODE_I2S) {
+                            current_mode = I2S_MODE_LEFT_JUSTIFIED;
                         } else {
-                            mclock_freq_index++;
+                            _Exit(1);
                         }
                     } else {
-                        ratio_log2++;
+                        mclock_freq_index++;
                     }
-                    if(mclock_freq[mclock_freq_index] / ((1<<ratio_log2)*64) <=48000)
-                        s=1;
+                } else {
+                    ratio_log2++;
                 }
             }
 

@@ -5,7 +5,10 @@ from pathlib import Path
 import Pyxsim
 import pytest
 
+DEBUG = False
+
 num_in_out_args = {"4ch_in,4ch_out": (4, 4),
+                   "2ch_in,2ch_out": (2, 2),
                    "1ch_in,1ch_out": (1, 1),
                    "4ch_in,0ch_out": (4, 0),
                    "0ch_in,4ch_out": (0, 4)}
@@ -31,7 +34,7 @@ def test_i2s_basic_master(capfd, request, nightly, num_in, num_out):
         "tile[0]:XS1_PORT_1M",
          clk,
          False, # Don't check the bclk stops precisely as the hardware can't do that
-         False) # We're not running frame-based, so assume 32b data 
+         False) # We're not running frame-based, so assume 32b data
 
     tester = Pyxsim.testers.AssertiveComparisonTester(
         f'{cwd}/expected/master_test.expect',
@@ -40,12 +43,28 @@ def test_i2s_basic_master(capfd, request, nightly, num_in, num_out):
         suppress_multidrive_messages=True,
         ignore=["CONFIG:.*"]
     )
-
-    Pyxsim.run_on_simulator(
-        binary,
-        tester=tester,
-        simthreads=[clk, checker],
-        build_env = {"NUMS_IN_OUT":f'{num_in};{num_out}', "SMOKE":testlevel},
-        simargs=[],
-        capfd=capfd
-    )
+    if DEBUG:
+        Pyxsim.run_on_simulator(
+            binary,
+            tester=tester,
+            simthreads=[clk, checker],
+            clean_before_build=True,
+            build_env = {"NUMS_IN_OUT":f'{num_in};{num_out}', "SMOKE":testlevel},
+            simargs=[
+                    "--vcd-tracing",
+                    f"-o i2s_trace_{num_in}_{num_out}.vcd -tile tile[0] -cycles -ports -ports-detailed -cores -instructions -clock-blocks",
+                    "--trace-to",
+                    f"i2s_trace_{num_in}_{num_out}.txt",
+                ],
+            capfd=capfd
+        )
+    else:
+        Pyxsim.run_on_simulator(
+            binary,
+            tester=tester,
+            simthreads=[clk, checker],
+            clean_before_build=True,
+            build_env = {"NUMS_IN_OUT":f'{num_in};{num_out}', "SMOKE":testlevel},
+            simargs=[],
+            capfd=capfd
+        )

@@ -51,7 +51,7 @@ def test_i2s_basic_slave(capfd, request, nightly, num_in, num_out):
             tester=tester,
             simthreads=[clk, checker],
             build_env = {"NUMS_IN_OUT":f'{num_in};{num_out}', "SMOKE":testlevel},
-            #simargs=[],
+            clean_before_build=True,
             simargs=[
                 "--vcd-tracing",
                 f"-o i2s_trace_{num_in}_{num_out}.vcd -tile tile[0] -cycles -ports -ports-detailed -cores -instructions",
@@ -66,6 +66,7 @@ def test_i2s_basic_slave(capfd, request, nightly, num_in, num_out):
             tester=tester,
             simthreads=[clk, checker],
             build_env = {"NUMS_IN_OUT":f'{num_in};{num_out}', "SMOKE":testlevel},
+            clean_before_build=True,
             simargs=[],
             capfd=capfd
         )
