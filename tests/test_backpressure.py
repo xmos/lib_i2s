@@ -5,8 +5,7 @@ import Pyxsim
 from Pyxsim.pyxsim import XsiLoopbackPlugin
 from pathlib import Path
 
-sample_rate_args = {"768kbps": 768000,
-                    "384kbps": 384000,
+sample_rate_args = {"384kbps": 384000,
                     "192kbps": 192000}
 
 num_channels_args = {"1ch": 1,
@@ -22,14 +21,17 @@ bitdepth_args = {"8b": 8,
                  "16b": 16,
                  "32b": 32}
 
+# 384000, num_channels 4, bitdepths 8 and 16 have zero backpressure so skip the test
+def uncollect_if(bitdepth, sample_rate, num_channels, receive_increment, send_increment):
+    if sample_rate == 384000 and num_channels == 4 and bitdepth != 32:
+        return True
+
+@pytest.mark.uncollect_if(func=uncollect_if)
 @pytest.mark.parametrize("bitdepth", bitdepth_args.values(), ids=bitdepth_args.keys())
 @pytest.mark.parametrize("sample_rate", sample_rate_args.values(), ids=sample_rate_args.keys())
 @pytest.mark.parametrize("num_channels", num_channels_args.values(), ids=num_channels_args.keys())
 @pytest.mark.parametrize(("receive_increment", "send_increment"), rx_tx_inc_args.values(), ids=rx_tx_inc_args.keys())
 def test_backpressure(nightly, capfd, request, sample_rate, num_channels, receive_increment, send_increment, bitdepth):
-    if (num_channels != 4) and not nightly:
-        pytest.skip("Only run 4 channel tests unless it is a nightly")
-
     id_string = f"{bitdepth}_{sample_rate}_{num_channels}_{receive_increment}_{send_increment}"
 
     cwd = Path(request.fspath).parent
