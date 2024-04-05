@@ -50,6 +50,7 @@ def test_i2s_basic_frame_master_external_clock(capfd, request, nightly, bitdepth
     Pyxsim.run_on_simulator(
         binary,
         tester=tester,
+        clean_before_build=True,
         simthreads=[clk, checker],
         build_env = {"BITDEPTHS":f"{bitdepth}", "NUMS_IN_OUT":f'{num_in};{num_out}', "SMOKE":testlevel},
         simargs=[],
