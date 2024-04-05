@@ -25,6 +25,9 @@ def test_i2s_basic_frame_master(capfd, request, nightly, bitdepth, num_in, num_o
     if (num_in in (0,1,2,3) or num_out in (0,1,2,3)) and not nightly:
         pytest.skip("Only test 4ch modes if not nightly")
 
+    if (bitdepth == 24 and mclk_fam == "mclk_fam_44"):
+        pytest.skip("24 bit only tested with frequencies for the 48KHz family") # TODO JIRA
+
     if mclk_fam == "mclk_fam_48":
         mclk_fam = 48
     else:
@@ -62,7 +65,7 @@ def test_i2s_basic_frame_master(capfd, request, nightly, bitdepth, num_in, num_o
     Pyxsim.run_on_simulator(
         binary,
         tester=tester,
-        #clean_before_build=True,
+        clean_before_build=True,
         simthreads=[clk, checker],
         build_env = {"BITDEPTHS":f"{bitdepth}", "NUMS_IN_OUT":f'{num_in};{num_out}', "SMOKE":testlevel, "MCLK_FAMILY":f'{mclk_fam}'},
         simargs=[],

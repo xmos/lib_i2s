@@ -38,22 +38,22 @@ MCLK_FAMILY ?= 48
 
 ifeq ($(SMOKE), 1)
   $(foreach db,$(BITDEPTHS), \
-	$(foreach mclk,$(MCLK_FAMILY), \
-    $(foreach in_out,$(NUMS_IN_OUT), \
-      $(eval \
-        XCC_FLAGS_$(db)_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out)))_$(mclk)_smoke = $(COMMON_FLAGS) -DDATA_BITS=$(db) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DSMOKE -DMCLK_FAMILY=$(mclk)\
+    $(foreach mclk,$(MCLK_FAMILY), \
+      $(foreach in_out,$(NUMS_IN_OUT), \
+        $(eval \
+          XCC_FLAGS_$(db)_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out)))_$(mclk)_smoke = $(COMMON_FLAGS) -DDATA_BITS=$(db) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DSMOKE -DMCLK_FAMILY=$(mclk)\
+        ) \
       ) \
-    ) \
 	) \
   )
 else
   $(foreach db,$(BITDEPTHS), \
     $(foreach mclk,$(MCLK_FAMILY), \
-    $(foreach in_out,$(NUMS_IN_OUT), \
-      $(eval \
-        XCC_FLAGS_$(db)_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out)))_$(mclk) = $(COMMON_FLAGS) -DDATA_BITS=$(db) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DMCLK_FAMILY=$(mclk)\
+      $(foreach in_out,$(NUMS_IN_OUT), \
+        $(eval \
+          XCC_FLAGS_$(db)_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out)))_$(mclk) = $(COMMON_FLAGS) -DDATA_BITS=$(db) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DMCLK_FAMILY=$(mclk)\
+        ) \
       ) \
-    ) \
 	) \
   )
 endif

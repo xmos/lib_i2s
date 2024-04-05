@@ -18,7 +18,7 @@ endif
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
 # the project name
-APP_NAME = 
+APP_NAME =
 
 # The USED_MODULES variable lists other module used by the application.
 USED_MODULES = lib_i2s
@@ -32,21 +32,17 @@ USED_MODULES = lib_i2s
 COMMON_FLAGS = -O3 -g -save-temps
 
 NUMS_IN_OUT ?= 4;4 1;1 4;0 0;4
-SMOKE ?= 1
+MCLK_FAMILY ?= 48
 
-ifeq ($(SMOKE), 1)
-  $(foreach in_out,$(NUMS_IN_OUT), \
+
+$(foreach in_out,$(NUMS_IN_OUT), \
+  $(foreach mclk,$(MCLK_FAMILY), \
     $(eval \
-      XCC_FLAGS_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out)))_smoke = $(COMMON_FLAGS) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DSMOKE\
+      XCC_FLAGS_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out)))_$(mclk) = $(COMMON_FLAGS) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out))) -DMCLK_FAMILY=$(mclk)\
     ) \
-  ) 
-else
-  $(foreach in_out,$(NUMS_IN_OUT), \
-    $(eval \
-      XCC_FLAGS_$(word 1, $(subst ;, ,$(in_out)))_$(word 2, $(subst ;, ,$(in_out))) = $(COMMON_FLAGS) -DNUM_OUT=$(word 2, $(subst ;, ,$(in_out))) -DNUM_IN=$(word 1, $(subst ;, ,$(in_out)))\
-    ) \
-  ) 
-endif
+  ) \
+)
+
 
 XMOS_MAKE_PATH ?= ../..
 -include $(XMOS_MAKE_PATH)/xcommon/module_xcommon/build/Makefile.common

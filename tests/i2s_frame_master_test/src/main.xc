@@ -319,7 +319,7 @@ int main()
     par
     {
         {
-        setup_bclk(); // For the very first iteration. For subsequent iterations, set in i2s_i.init()
+            setup_bclk(); // For the very first iteration. For subsequent iterations, set in i2s_i.init()
             par {
                 [[distribute]]
                     app(i2s_i);
