@@ -15,12 +15,24 @@ bitdepth_args = {"8b": 8,
                  "24b": 24,
                  "32b": 32}
 
+mclk_family = ["mclk_fam_48", "mclk_fam_44"] # The base sampling rate needs to be configured differently for 48KHz vs 44.1KHz family
+
+@pytest.mark.parametrize("mclk_fam", mclk_family)
 @pytest.mark.parametrize("bitdepth", bitdepth_args.values(), ids=bitdepth_args.keys())
 @pytest.mark.parametrize(("num_in", "num_out"), num_in_out_args.values(), ids=num_in_out_args.keys())
-def test_i2s_basic_frame_master(capfd, request, nightly, bitdepth, num_in, num_out):
+def test_i2s_basic_frame_master(capfd, request, nightly, bitdepth, num_in, num_out, mclk_fam):
     testlevel = '0' if nightly else '1'
-    id_string = f"{bitdepth}_{num_in}_{num_out}"
+    if (num_in in (0,1,2,3) or num_out in (0,1,2,3)) and not nightly:
+        pytest.skip("Only test 4ch modes if not nightly")
+
+    if mclk_fam == "mclk_fam_48":
+        mclk_fam = 48
+    else:
+        mclk_fam = 44
+
+    id_string = f"{bitdepth}_{num_in}_{num_out}_{mclk_fam}"
     id_string += "_smoke" if testlevel == '1' else ""
+
 
     cwd = Path(request.fspath).parent
     binary = f'{cwd}/i2s_frame_master_test/bin/{id_string}/i2s_frame_master_test_{id_string}.xe'
@@ -50,8 +62,9 @@ def test_i2s_basic_frame_master(capfd, request, nightly, bitdepth, num_in, num_o
     Pyxsim.run_on_simulator(
         binary,
         tester=tester,
+        #clean_before_build=True,
         simthreads=[clk, checker],
-        build_env = {"BITDEPTHS":f"{bitdepth}", "NUMS_IN_OUT":f'{num_in};{num_out}', "SMOKE":testlevel},
+        build_env = {"BITDEPTHS":f"{bitdepth}", "NUMS_IN_OUT":f'{num_in};{num_out}', "SMOKE":testlevel, "MCLK_FAMILY":f'{mclk_fam}'},
         simargs=[],
         capfd=capfd
     )

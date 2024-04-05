@@ -21,54 +21,61 @@ out port setup_strobe_port = XS1_PORT_1L;
 out port setup_data_port = XS1_PORT_16A;
 in port  setup_resp_port = XS1_PORT_1M;
 
+#if MCLK_FAMILY == 48
+    #define BASE_SAMPLE_RATE (6000)
+    #define MAX_SAMPLE_RATE (192000)
+#elif MCLK_FAMILY == 44
+    #define BASE_SAMPLE_RATE (11025)
+    #define MAX_SAMPLE_RATE (176400)
+#else
+    #error Set MCLK_FAMILY to either 48 or 44
+#endif
+
+
 #define MAX_RATIO (4)
 #define MAX_CHANNELS (8)
-#define MAX_SAMPLE_RATE (192000)
 
 #ifndef DATA_BITS
 #define DATA_BITS (32)
 #endif
-#ifndef BASE_SAMPLE_RATE
-#define BASE_SAMPLE_RATE (6000)
-#endif
+
 #ifndef NUM_OUT
 #define NUM_OUT (4)
 #endif
+
 #ifndef NUM_IN
 #define NUM_IN (4)
 #endif
 
 #if defined(SMOKE)
-#if NUM_OUT == 4 && NUM_IN == 4
-#define NUM_MCLKS (1)
-static const unsigned mclk_freq[NUM_MCLKS] = {
-        12288000,
-};
-#else
-#define NUM_MCLKS (1)
-static const unsigned mclk_freq[NUM_MCLKS] = {
-        24576000,
-};
-#endif
-#else
-#if NUM_OUT > 1 || NUM_IN > 1
-#define NUM_MCLKS (2)
-static const unsigned mclk_freq[NUM_MCLKS] = {
-        12288000,
-        11289600,
-};
-#else
-#define NUM_MCLKS (4)
-static const unsigned mclk_freq[NUM_MCLKS] = {
-        24576000,
-        22579200,
-        12288000,
-        11289600,
-};
-#endif
+    #define NUM_MCLKS (1)
+    #if MCLK_FAMILY == 48
+        static const unsigned mclk_freq[NUM_MCLKS] = {
+            24576000,
+        };
+    #elif MCLK_FAMILY == 44
+        static const unsigned mclk_freq[NUM_MCLKS] = {
+            22579200,
+        };
+    #endif
+#else // Not smoke
+    #define NUM_MCLKS (2)
+    #if MCLK_FAMILY == 48
+        static const unsigned mclk_freq[NUM_MCLKS] = {
+            24576000,
+            12288000
+        };
+    #elif MCLK_FAMILY == 44
+        static const unsigned mclk_freq[NUM_MCLKS] = {
+            22579200,
+            11289600
+        };
+    #endif
 #endif
 
+
 unsigned current_sample_frequency = BASE_SAMPLE_RATE;
+
 unsigned current_mclk_frequency;
 unsigned mclk_count = NUM_MCLKS;
 i2s_mode_t current_mode = I2S_MODE_I2S;
@@ -251,23 +258,25 @@ void app(server interface i2s_frame_callback_if i2s_i)
                         printf("Error: No response from test harness, or data TX/RX mismatch!\n");
 
 
-                    if (mclk_index == mclk_count - 1)
-                    {
-                        current_mode = (current_mode == I2S_MODE_I2S ? I2S_MODE_LEFT_JUSTIFIED : I2S_MODE_I2S);
-                        current_sample_frequency = (current_mode == I2S_MODE_I2S ? current_sample_frequency * 2 : current_sample_frequency);
-                    }
-                    else
-                    {
-                        mclk_index += 1;
-                    }
+                    do {
+                        if (mclk_index == mclk_count - 1)
+                        {
+                            current_mode = (current_mode == I2S_MODE_I2S ? I2S_MODE_LEFT_JUSTIFIED : I2S_MODE_I2S);
+                            current_sample_frequency = (current_mode == I2S_MODE_I2S ? current_sample_frequency * 2 : current_sample_frequency);
+                            mclk_index = 0;
+                            if(current_sample_frequency > MAX_SAMPLE_RATE)
+                            {
+                                _Exit(0);
+                            }
+                        }
+                        else
+                        {
+                            // For a given current_sample_frequency, go through all the mclks in mclk_freq array
+                            mclk_index += 1;
+                        }
 
-                    set_mclk_and_ratio(current_sample_frequency);
-
-                    if (current_sample_frequency > MAX_SAMPLE_RATE ||
-                        mclk_bclk_ratio == 1)
-                    {
-                        _Exit(1);
-                    }
+                        set_mclk_and_ratio(current_sample_frequency);
+                    }while((current_sample_frequency > MAX_SAMPLE_RATE || mclk_bclk_ratio == 1));
                 }
 
                 frames_sent = 0;
@@ -282,6 +291,8 @@ void app(server interface i2s_frame_callback_if i2s_i)
                     rx_data_counter[i] = 0;
                 }
 
+                //printf("current_mclk_frequency %d, mclk_bclk_ratio %d, current_sample_frequency %d, current_mode %d\n", current_mclk_frequency, mclk_bclk_ratio, current_sample_frequency, current_mode);
+
                 broadcast(current_mclk_frequency, mclk_bclk_ratio, NUM_IN, NUM_OUT,
                         i2s_config.mode == I2S_MODE_I2S, DATA_BITS);
 
@@ -290,7 +301,6 @@ void app(server interface i2s_frame_callback_if i2s_i)
         }
     }
 }
-
 
 void setup_bclk()
 {
@@ -309,7 +319,7 @@ int main()
     par
     {
         {
-        setup_bclk();
+        setup_bclk(); // For the very first iteration. For subsequent iterations, set in i2s_i.init()
             par {
                 [[distribute]]
                     app(i2s_i);
