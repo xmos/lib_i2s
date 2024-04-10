@@ -12,9 +12,7 @@ num_in_out_args = {"4ch_in,4ch_out": (4, 4),
 
 @pytest.mark.parametrize(("num_in", "num_out"), num_in_out_args.values(), ids=num_in_out_args.keys())
 def test_i2s_basic_frame_master_external_clock_4b(capfd, request, nightly, num_in, num_out):
-    testlevel = '0' if nightly else '1'
     id_string = f"{num_in}_{num_out}"
-    id_string += "_smoke" if testlevel == '1' else ""
 
     cwd = Path(request.fspath).parent
     binary = f'{cwd}/i2s_frame_master_external_clock_4b_test/bin/{id_string}/i2s_frame_master_external_clock_4b_test_{id_string}.xe'
@@ -44,8 +42,9 @@ def test_i2s_basic_frame_master_external_clock_4b(capfd, request, nightly, num_i
     Pyxsim.run_on_simulator(
         binary,
         tester=tester,
+        clean_before_build=True,
         simthreads=[clk, checker],
-        build_env = {"NUMS_IN_OUT":f'{num_in};{num_out}', "SMOKE":testlevel},
+        build_env = {"NUMS_IN_OUT":f'{num_in};{num_out}'},
         simargs=[],
         capfd=capfd
     )

@@ -21,11 +21,8 @@ out port setup_strobe_port = XS1_PORT_1L;
 out port setup_data_port = XS1_PORT_16A;
 in port  setup_resp_port = XS1_PORT_1M;
 
-#define MAX_RATIO (4)
 
 #define MAX_CHANNELS (8)
-
-#define MAX_NUM_RESTARTS (4)
 
 #ifndef DATA_BITS
 #define DATA_BITS (32)
