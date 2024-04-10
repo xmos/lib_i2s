@@ -54,25 +54,17 @@ out port setup_data_port = XS1_PORT_16A;
 in port  setup_resp_port = XS1_PORT_1M;
 
 
-#define NUM_MCLKS (1)
-#if MCLK_FAMILY == 48
-    static const unsigned mclk_freq[NUM_MCLKS] = {
-        #if NUM_OUT > 1 || NUM_IN > 1
-            12288000,
-        #else
-            24576000,
-        #endif
-    };
-#elif MCLK_FAMILY == 44
-    static const unsigned mclk_freq[NUM_MCLKS] = {
-        #if NUM_OUT > 1 || NUM_IN > 1
-            11289600,
-        #else
-            22579200,
-        #endif
-    };
-#endif
+#define MAX_BCLK_FREQ (MAX_SAMPLE_RATE * 2 * DATA_BITS)
+#define MCLK_FREQUENCY (MAX_BCLK_FREQ * 2) // 2 times the bclk required for the maximum sampling frequency
 
+#define NUM_MCLKS (1)
+static const unsigned mclk_freq[NUM_MCLKS] = {
+    #if NUM_OUT > 1 || NUM_IN > 1
+    MCLK_FREQUENCY/2  // Test fails for 192KHz for anything other than 1in, 1out
+    #else
+    MCLK_FREQUENCY
+    #endif
+};
 
 unsigned current_sample_frequency = BASE_SAMPLE_RATE;
 unsigned current_mclk_frequency;
@@ -143,59 +135,8 @@ static int request_response(
 void set_mclk_and_ratio(unsigned sample_frequency)
 {
     unsigned bclk_freq = 2 * sample_frequency * DATA_BITS;
-
-    // If we're testing 1,2,4,8,16,32b data widths, then we can just use
-    // the predesigned master clk frequencies
-    // as there will be no error using an integer divider.
-    // If we're testing anything else, we're better off providing an internal
-    // clk and calculating the correct divider.
-    if (IS_POWER_OF_2(DATA_BITS))
-    {
-        current_mclk_frequency = mclk_freq[mclk_index];
-        mclk_bclk_ratio = current_mclk_frequency / bclk_freq;
-    }
-    else
-    {
-        unsigned numerator = bclk_freq / 1000;
-        unsigned denominator = 1000;
-        unsigned long long test_divisor;
-
-        // Let's assume the use of a default core clk i.e. 500MHz.
-        // This always gives better performance than the use of a 100MHz,
-        // but may not be divisible in certain combinations - max clk divisor
-        // is 255. In these instances, try other sensible lower clk speeds.
-        // Unfortunately, the simulator doesn't seem to be able to go above 250.
-
-        unsigned test_mclk_freqs[6] = {250000000, 100000000, 24576000,
-                                            1228800, 6144000, 3072000};
-        unsigned test_clk_idx = 0;
-
-        do
-        {
-            test_divisor = ((unsigned long long) denominator * test_mclk_freqs[test_clk_idx])
-                            / ((unsigned long long) numerator * (2 * 1000000));
-            test_clk_idx += (test_divisor > 255 ? 1 : 0);
-
-            if (test_clk_idx > 5)
-            {
-                printf("Unsupported sample rate and data bit depth combination!");
-                _Exit(1);
-            }
-        } while (test_divisor > 255);
-
-        if (test_divisor % 2 != 0)
-        {
-            test_divisor--;
-        }
-
-        mclk_bclk_ratio = 2 * test_divisor;
-
-        // If we're here, then we don't want to iterate through multiple mclk
-        // options - set the count to 1.
-        current_mclk_frequency = test_mclk_freqs[test_clk_idx];
-        mclk_count = 1;
-        mclk_index = 0;
-    }
+    current_mclk_frequency = mclk_freq[mclk_index];
+    mclk_bclk_ratio = current_mclk_frequency / bclk_freq;
 }
 
 [[distributable]]
@@ -288,6 +229,7 @@ void app(server interface i2s_frame_callback_if i2s_i)
                     tx_data_counter[i] = 0;
                     rx_data_counter[i] = 0;
                 }
+
                 broadcast(current_mclk_frequency, mclk_bclk_ratio, NUM_IN, NUM_OUT,
                         i2s_config.mode == I2S_MODE_I2S, DATA_BITS);
 

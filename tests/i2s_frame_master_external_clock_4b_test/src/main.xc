@@ -27,17 +27,22 @@ in port  setup_resp_port = XS1_PORT_1M;
 #define DATA_BITS (32)
 #endif
 
+#define MAX_BCLK_FREQ_192 (192000 * 2 * DATA_BITS)
+#define MAX_BCLK_FREQ_176 (176400 * 2 * DATA_BITS)
+
+#define MCLK_FREQUENCY_192 (MAX_BCLK_FREQ_192 * 2) // 2 times the bclk required for the maximum sampling frequency
+#define MCLK_FREQUENCY_176 (MAX_BCLK_FREQ_176 * 2)
 
 #define NUM_MCLKS (2)
 #if NUM_OUT > 1 || NUM_IN > 1
 static const unsigned mclock_freq[NUM_MCLKS] = { // in0, out4 test fails timing check with the higher mclk
-        12288000,
-        11289600
+        MCLK_FREQUENCY_192/2,
+        MCLK_FREQUENCY_176/2
 };
 #else
 static const unsigned mclock_freq[NUM_MCLKS] = {
-        24576000,
-        22579200
+        MCLK_FREQUENCY_192,
+        MCLK_FREQUENCY_176
 };
 #endif
 

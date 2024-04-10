@@ -29,20 +29,17 @@ in port  setup_resp_port = XS1_PORT_1M;
 #endif
 
 
+#define MAX_BCLK_FREQ_192 (192000 * 2 * DATA_BITS)
+#define MAX_BCLK_FREQ_176 (176400 * 2 * DATA_BITS)
+
+#define MCLK_FREQUENCY_192 (MAX_BCLK_FREQ_192 * 2) // 2 times the bclk required for the maximum sampling frequency
+#define MCLK_FREQUENCY_176 (MAX_BCLK_FREQ_176 * 2)
 
 #define NUM_MCLKS (2)
-#if (DATA_BITS != 24)
 static const unsigned mclock_freq[NUM_MCLKS] = {
-        24576000,
-        22579200
+        MCLK_FREQUENCY_192,
+        MCLK_FREQUENCY_176
 };
-#else
-static const unsigned mclock_freq[NUM_MCLKS] = {
-        18432000, // Set an Mclk such that max sampling freq is 192000 for 24 bits for mclk_bclk_ratio=2
-        16934400
-};
-#endif
-
 
 int32_t tx_data[MAX_CHANNELS][8] = {
         {  1,   2,   3,   4,   5,   6,   7,   8},
@@ -205,16 +202,8 @@ void setup_bclock()
     mclock_freq_index=0;
     ratio_log2 = 1;
     current_mode = I2S_MODE_I2S;
+    mclk_bclk_ratio = (1 << ratio_log2);
 
-    if (IS_POWER_OF_2(DATA_BITS))
-    {
-        unsigned base_ratio = 1 << (clz(DATA_BITS) - 26);
-        mclk_bclk_ratio = (base_ratio << ratio_log2);
-    }
-    else
-    {
-        mclk_bclk_ratio = (1 << ratio_log2);
-    }
     broadcast(mclock_freq[mclock_freq_index],
             mclk_bclk_ratio, NUM_IN, NUM_OUT,
             current_mode == I2S_MODE_I2S, DATA_BITS);

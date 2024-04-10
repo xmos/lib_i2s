@@ -5,6 +5,8 @@ from pathlib import Path
 import Pyxsim
 import pytest
 
+DEBUG = False
+
 num_in_out_args = {"4ch_in,4ch_out": (4, 4),
                    "1ch_in,1ch_out": (1, 1),
                    "4ch_in,0ch_out": (4, 0),
@@ -24,9 +26,6 @@ def test_i2s_basic_frame_master(capfd, request, nightly, bitdepth, num_in, num_o
     testlevel = '0' if nightly else '1'
     if (num_in in (0,1,2,3) or num_out in (0,1,2,3)) and not nightly:
         pytest.skip("Only test 4ch modes if not nightly")
-
-    if (bitdepth == 24 and mclk_fam == "mclk_fam_44"):
-        pytest.skip("24 bit only tested with frequencies for the 48KHz family") # TODO JIRA
 
     if mclk_fam == "mclk_fam_48":
         mclk_fam = 48
@@ -62,12 +61,28 @@ def test_i2s_basic_frame_master(capfd, request, nightly, bitdepth, num_in, num_o
         ignore=["CONFIG:.*"]
     )
 
-    Pyxsim.run_on_simulator(
-        binary,
-        tester=tester,
-        clean_before_build=True,
-        simthreads=[clk, checker],
-        build_env = {"BITDEPTHS":f"{bitdepth}", "NUMS_IN_OUT":f'{num_in};{num_out}', "SMOKE":testlevel, "MCLK_FAMILY":f'{mclk_fam}'},
-        simargs=[],
-        capfd=capfd
-    )
+    if DEBUG:
+        Pyxsim.run_on_simulator(
+            binary,
+            tester=tester,
+            clean_before_build=True,
+            simthreads=[clk, checker],
+            build_env = {"BITDEPTHS":f"{bitdepth}", "NUMS_IN_OUT":f'{num_in};{num_out}', "SMOKE":testlevel, "MCLK_FAMILY":f'{mclk_fam}'},
+            simargs=[
+                    "--vcd-tracing",
+                    f"-o i2s_trace_{num_in}_{num_out}.vcd -tile tile[0] -cycles -ports -ports-detailed -cores -instructions -clock-blocks",
+                    "--trace-to",
+                    f"i2s_trace_{num_in}_{num_out}.txt",
+                ],
+            capfd=capfd
+        )
+    else:
+        Pyxsim.run_on_simulator(
+            binary,
+            tester=tester,
+            clean_before_build=True,
+            simthreads=[clk, checker],
+            build_env = {"BITDEPTHS":f"{bitdepth}", "NUMS_IN_OUT":f'{num_in};{num_out}', "SMOKE":testlevel, "MCLK_FAMILY":f'{mclk_fam}'},
+            simargs=[],
+            capfd=capfd
+        )
