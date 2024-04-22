@@ -29,7 +29,7 @@ USED_MODULES = lib_i2s
 # If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
 # xcc for the final link (mapping) stage.
 
-COMMON_FLAGS = -O2 -g -save-temps
+COMMON_FLAGS = -O3 -g -save-temps
 
 BITDEPTHS ?= 8 16 24 32
 NUMS_IN_OUT ?= 4;4 1;1 4;0 0;4

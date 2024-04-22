@@ -1,4 +1,4 @@
-# Copyright 2015-2022 XMOS LIMITED.
+# Copyright 2015-2024 XMOS LIMITED.
 # This Software is subject to the terms of the XMOS Public Licence: Version 1.
 from i2s_master_checker import I2SMasterChecker, Clock
 from pathlib import Path
@@ -50,6 +50,7 @@ def test_i2s_basic_frame_master_external_clock(capfd, request, nightly, bitdepth
     Pyxsim.run_on_simulator(
         binary,
         tester=tester,
+        clean_before_build=True,
         simthreads=[clk, checker],
         build_env = {"BITDEPTHS":f"{bitdepth}", "NUMS_IN_OUT":f'{num_in};{num_out}', "SMOKE":testlevel},
         simargs=[],

@@ -1,4 +1,4 @@
-# Copyright 2015-2022 XMOS LIMITED.
+# Copyright 2015-2024 XMOS LIMITED.
 # This Software is subject to the terms of the XMOS Public Licence: Version 1.
 from i2s_master_checker import Clock
 from i2s_slave_checker import I2SSlaveChecker
@@ -7,6 +7,7 @@ import Pyxsim
 import pytest
 
 num_in_out_args = {"4ch_in,4ch_out": (4, 4),
+                   "2ch_in,2ch_out": (2, 2),
                    "1ch_in,1ch_out": (1, 1),
                    "4ch_in,0ch_out": (4, 0),
                    "0ch_in,4ch_out": (0, 4)}

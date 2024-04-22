@@ -1,4 +1,4 @@
-# Copyright 2015-2022 XMOS LIMITED.
+# Copyright 2015-2024 XMOS LIMITED.
 # This Software is subject to the terms of the XMOS Public Licence: Version 1.
 from i2s_master_checker import Clock
 from i2s_slave_checker import I2SSlaveChecker
@@ -6,7 +6,10 @@ from pathlib import Path
 import Pyxsim
 import pytest
 
+DEBUG = False
+
 num_in_out_args = {"4ch_in,4ch_out": (4, 4),
+                   "2ch_in,2ch_out": (2, 2),
                    "1ch_in,1ch_out": (1, 1),
                    "4ch_in,0ch_out": (4, 0),
                    "0ch_in,4ch_out": (0, 4)}
@@ -46,11 +49,28 @@ def test_i2s_basic_frame_slave(capfd, request, nightly, bitdepth, num_in, num_ou
         ignore=["CONFIG:.*"]
     )
 
-    Pyxsim.run_on_simulator(
-        binary,
-        tester=tester,
-        simthreads=[clk, checker],
-        build_env = {"BITDEPTHS":f"{bitdepth}", "NUMS_IN_OUT":f'{num_in};{num_out}', "SMOKE":testlevel},
-        simargs=[],
-        capfd=capfd
-    )
+    if DEBUG:
+        Pyxsim.run_on_simulator(
+            binary,
+            tester=tester,
+            simthreads=[clk, checker],
+            build_env = {"BITDEPTHS":f"{bitdepth}", "NUMS_IN_OUT":f'{num_in};{num_out}', "SMOKE":testlevel},
+            #clean_before_build=True,
+            simargs=[
+                "--vcd-tracing",
+                f"-o i2s_trace_{num_in}_{num_out}.vcd -tile tile[0] -cycles -ports -ports-detailed -cores -instructions",
+                "--trace-to",
+                f"i2s_trace_{num_in}_{num_out}.txt",
+            ],
+            capfd=capfd
+        )
+    else:
+        Pyxsim.run_on_simulator(
+            binary,
+            tester=tester,
+            simthreads=[clk, checker],
+            #clean_before_build=True,
+            build_env = {"BITDEPTHS":f"{bitdepth}", "NUMS_IN_OUT":f'{num_in};{num_out}', "SMOKE":testlevel},
+            simargs=[],
+            capfd=capfd
+        )
