@@ -1,9 +1,17 @@
-@Library('xmos_jenkins_shared_library@v0.20.0') _
+@Library('xmos_jenkins_shared_library@v0.31.0') _
 
 getApproval()
 
 pipeline {
   agent none
+
+  parameters {
+    string(
+      name: 'TOOLS_VERSION',
+      defaultValue: '15.3.1002',
+      description: 'The XTC tools version'
+    )
+  } // parameters
 
   stages {
     stage("Main") {
@@ -42,7 +50,10 @@ pipeline {
               steps {
                 dir("${REPO}/tests") {
                   viewEnv {
-                    runPytest()
+                    // reactivating the tools with the newer version
+                    withTools(params.TOOLS_VERSION) {
+                      runPytest()
+                    }
                   }
                 }
               }
@@ -84,7 +95,10 @@ pipeline {
               steps {
                 dir("${REPO}/tests") {
                   viewEnv {
-                    runPytest()
+                    // reactivating the tools with the newer version
+                    withTools(params.TOOLS_VERSION) {
+                      runPytest()
+                    }
                   }
                 }
               }
