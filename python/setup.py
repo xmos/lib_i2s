@@ -13,7 +13,7 @@ setuptools.setup(
     name='lib_i2s',
     packages=setuptools.find_packages(),
     install_requires=[
-        'flake8~=3.8',
+        'flake8~=7.0',
     ],
     dependency_links=[
     ],
