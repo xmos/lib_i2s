@@ -5,6 +5,7 @@ UNRELEASED
 ----------
 
   * CHANGED: Uses XCommon Cmake for examples
+  * CHANGED: Examples ported to XU316_MC board (was XU216_MC)
 
 
 5.1.0
