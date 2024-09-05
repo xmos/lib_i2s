@@ -1,6 +1,12 @@
 I2S library change log
 ======================
 
+UNRELEASED
+----------
+
+  * CHANGED: Uses XCommon Cmake for examples
+
+
 5.1.0
 -----
 
