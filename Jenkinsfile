@@ -31,6 +31,8 @@ pipeline {
             stage('Get view') {
               steps {
                 xcorePrepareSandbox("${VIEW}", "${REPO}")
+                // git@github.com:xmos/test_support
+                
               }
             }
             stage('Library checks') {
