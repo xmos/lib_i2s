@@ -39,7 +39,7 @@ foreach(i RANGE 0 ${NUM_BITDEPTHS})
 
                 project(${project_name})
 
-                set(APP_HW_TARGET           XCORE-AI-EXPLORER)
+                set(APP_HW_TARGET           XCORE-200-EXPLORER)
 
                 set(APP_COMPILER_FLAGS      -O3
                                             -report
