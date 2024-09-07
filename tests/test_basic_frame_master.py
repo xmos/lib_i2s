@@ -10,7 +10,6 @@ DEBUG = False
 
 with open(Path(__file__).parent / "i2s_frame_master_test/test_params.json") as f:
     params = json.load(f)
-    print(params["I2S_LINES"])
 
 num_in_out_args = {}
 for item in params["I2S_LINES"]:
