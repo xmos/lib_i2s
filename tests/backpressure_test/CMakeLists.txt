@@ -49,7 +49,10 @@ foreach(i RANGE 0 ${NUM_BITDEPTHS})
                                             -DDATA_BITS=${BITDEPTH}
                                             -DNUM_I2S_LINES=${I2S_LINES}
                                             -DRECEIVE_DELAY_INCREMENT=${RX}
-                                            -DSEND_DELAY_INCREMENT=${TX})
+                                            -DSEND_DELAY_INCREMENT=${TX}
+                                            -GENERATE_MCLK=1
+                                            -DSIM=1
+                                            -DDEBUG_PRINT_ENABLE=1)
 
                 set(XMOS_SANDBOX_DIR        ${CMAKE_CURRENT_LIST_DIR}/../../..)
 
