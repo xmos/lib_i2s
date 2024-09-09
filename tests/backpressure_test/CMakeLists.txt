@@ -23,6 +23,11 @@ math(EXPR NUM_SAMPLE_RATES "${NUM_SAMPLE_RATES} - 1")
 math(EXPR NUM_I2S_LINES "${NUM_I2S_LINES} - 1")
 math(EXPR NUM_RX_TX_INCS "${NUM_RX_TX_INCS} - 1")
 
+project(test_i2s_backpressure)
+set(APP_HW_TARGET           XCORE-200-EXPLORER)
+set(APP_PCA_ENABLE          ON)
+set(XMOS_SANDBOX_DIR        ${CMAKE_CURRENT_LIST_DIR}/../../..)
+
 # Iterate through combinations
 foreach(i RANGE 0 ${NUM_BITDEPTHS})
     string(JSON BITDEPTH GET ${BITDEPTHS_LIST} ${i})
@@ -35,17 +40,11 @@ foreach(i RANGE 0 ${NUM_BITDEPTHS})
                 string(JSON RX GET ${RX_TX} RX) # Extract out the pair of values
                 string(JSON TX GET ${RX_TX} TX)
 
-                set(project_name "test_i2s_backpressure_${BITDEPTH}_${SAMPLE_RATE}_${I2S_LINES}_${RX}_${TX}")
-                message(STATUS "Building project_name: ${project_name}")
+                set(cfg_name "${BITDEPTH}_${SAMPLE_RATE}_${I2S_LINES}_${RX}_${TX}")
+                message(STATUS "Building cfg_name: ${cfg_name}")
 
-                project(${project_name})
-
-                set(APP_HW_TARGET           XCORE-200-EXPLORER)
-
-                # This causes a cmake error currently
-                # set(APP_PCA_ENABLE          ON)
-
-                set(APP_COMPILER_FLAGS      -O3
+                set(APP_COMPILER_FLAGS_${cfg_name}   
+                                            -O3
                                             -report
                                             -g
                                             -DSAMPLE_FREQUENCY=${SAMPLE_RATE}
@@ -57,11 +56,9 @@ foreach(i RANGE 0 ${NUM_BITDEPTHS})
                                             -DSIM=1
                                             -DDEBUG_PRINT_ENABLE=1)
 
-                set(XMOS_SANDBOX_DIR        ${CMAKE_CURRENT_LIST_DIR}/../../..)
-
-                XMOS_REGISTER_APP()
-
             endforeach()
         endforeach()
     endforeach()
 endforeach()
+
+XMOS_REGISTER_APP()

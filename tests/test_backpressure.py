@@ -30,7 +30,9 @@ def test_backpressure(nightly, capfd, request, sample_rate, num_channels, receiv
 
     cwd = Path(request.fspath).parent
 
-    binary = f'{cwd}/backpressure_test/bin/test_i2s_backpressure_{bitdepth}_{sample_rate}_{num_channels}_{receive_increment}_{send_increment}.xe'
+    cfg = f"{bitdepth}_{sample_rate}_{num_channels}_{receive_increment}_{send_increment}"
+    binary = f'{cwd}/backpressure_test/bin/{cfg}/test_i2s_backpressure_{cfg}.xe'
+    assert Path(binary).exists(), f"Cannot find {binary}"
 
     loopback = XsiLoopbackPlugin(tile="tile[0]", from_port="XS1_PORT_1G", to_port="XS1_PORT_1A")
 

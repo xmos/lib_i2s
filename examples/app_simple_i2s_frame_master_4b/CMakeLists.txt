@@ -11,6 +11,8 @@ set(APP_COMPILER_FLAGS      -Os
                             -report
                             )
 
+set(APP_PCA_ENABLE          ON)
+
 set(XMOS_SANDBOX_DIR        ${CMAKE_CURRENT_LIST_DIR}/../../..)
 
 XMOS_REGISTER_APP()
