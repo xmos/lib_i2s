@@ -65,7 +65,7 @@ pipeline {
                 dir("${REPO}/tests") {
                   withTools(params.TOOLS_VERSION) {
                     sh 'cmake -B build -G "Unix Makefiles"'
-                    sh 'xmake -j 20 -C build'
+                    sh 'xmake -j 16 -C build'
                   // xcoreAllAppNotesBuild('examples')
                   }
                 }
@@ -90,7 +90,7 @@ pipeline {
             }
           }
         } // Library Checks and XS2 Tests
-        stage("XS3 Tests and xdoc") {
+        stage("XS3 Build and docs") {
           agent {
             label 'x86_64&&linux'
           }
@@ -114,7 +114,7 @@ pipeline {
                 dir("${REPO}/examples") {
                   withTools(params.TOOLS_VERSION) {
                     sh 'cmake -B build -G "Unix Makefiles"'
-                    sh 'xmake -j 20 -C build'
+                    sh 'xmake -j 16 -C build'
                     // xcoreAllAppNotesBuild('examples')
                   }
                 }
@@ -142,8 +142,8 @@ pipeline {
                       ghcr.io/xmos/xmosdoc:$XMOSDOC_VERSION -v html latex"""
 
                   // Zip and archive doc files
-                  zip dir: "doc/_build/", zipFile: "sw_pll_docs.zip"
-                  archiveArtifacts artifacts: "sw_pll_docs.zip"
+                  zip dir: "doc/_build/", zipFile: "lib_i2s_docs.zip"
+                  archiveArtifacts artifacts: "lib_i2s_docs.zip"
                 }
               }
             }
@@ -156,16 +156,5 @@ pipeline {
         } // XS3 Tests and xdoc
       } // Parallel
     } // Main
-    stage('Update view files') {
-      agent {
-        label 'x86_64&&linux'
-      }
-      when {
-        expression { return currentBuild.currentResult == "SUCCESS" }
-      }
-      steps {
-        updateViewfiles()
-      }
-    } // Update view files
   } // stages
 } // pipeline
