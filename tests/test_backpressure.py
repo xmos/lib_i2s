@@ -22,8 +22,8 @@ def uncollect_if(bitdepth, sample_rate, num_channels, receive_increment, send_in
 
 @pytest.mark.uncollect_if(func=uncollect_if)
 @pytest.mark.parametrize("bitdepth", params["BITDEPTHS"], ids=[f"{bd}b" for bd in params["BITDEPTHS"]])
-@pytest.mark.parametrize("sample_rate", params["SAMPLE_RATES"], ids=[f"{sr}Hz" for sr in params["SAMPLE_RATES"]])
-@pytest.mark.parametrize("num_channels", params["I2S_LINES"])
+@pytest.mark.parametrize("sample_rate", params["SAMPLE_RATES"], ids=[f"{sr//1000}kbps" for sr in params["SAMPLE_RATES"]])
+@pytest.mark.parametrize("num_channels", params["I2S_LINES"], ids=[f"{sr}ch" for sr in params["I2S_LINES"]])
 @pytest.mark.parametrize(("receive_increment", "send_increment"), rx_tx_inc_args.values(), ids=rx_tx_inc_args.keys())
 def test_backpressure(nightly, capfd, request, sample_rate, num_channels, receive_increment, send_increment, bitdepth):
     id_string = f"{bitdepth}_{sample_rate}_{num_channels}_{receive_increment}_{send_increment}"

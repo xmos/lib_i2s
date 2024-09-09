@@ -1,7 +1,7 @@
 {
-    "BITDEPTHS": [8, 16, 24, 32],
-    "SAMPLE_RATES": [768000, 384000, 192000],
-    "I2S_LINES": [1, 4],
+    "BITDEPTHS": [8, 16, 32],
+    "SAMPLE_RATES": [384000, 192000],
+    "I2S_LINES": [1, 2, 3],
     "RX_TX_INCS": [
         {"RX":5, "TX":5},
         {"RX":10, "TX":0},

@@ -44,6 +44,7 @@ pipeline {
             stage('Get view') {
               steps {
                 // sh 'mkdir ${REPO}'
+                sh 'git clone git@github.com:xmos/test_support'
                 dir("${REPO}") {
                   checkout scm
                   installPipfile(false)
@@ -53,7 +54,6 @@ pipeline {
                     }
                   }
                 }
-                sh 'git clone git@github.com:xmos/test_support'
               }
             }
             stage('Library checks') {

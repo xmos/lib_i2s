@@ -42,7 +42,7 @@ foreach(i RANGE 0 ${NUM_BITDEPTHS})
 
                 set(APP_HW_TARGET           XCORE-200-EXPLORER)
 
-                set(APP_COMPILER_FLAGS      -O3
+                set(APP_COMPILER_FLAGS      -O2
                                             -report
                                             -g
                                             -DSAMPLE_FREQUENCY=${SAMPLE_RATE}
@@ -50,7 +50,7 @@ foreach(i RANGE 0 ${NUM_BITDEPTHS})
                                             -DNUM_I2S_LINES=${I2S_LINES}
                                             -DRECEIVE_DELAY_INCREMENT=${RX}
                                             -DSEND_DELAY_INCREMENT=${TX}
-                                            -GENERATE_MCLK=1
+                                            -DGENERATE_MCLK=1
                                             -DSIM=1
                                             -DDEBUG_PRINT_ENABLE=1)
 
