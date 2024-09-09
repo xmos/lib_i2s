@@ -77,7 +77,7 @@ pipeline {
                   viewEnv {
                     // reactivating the tools with the newer version
                     withTools(params.TOOLS_VERSION) {
-                      runPytest()
+                      runPytest('--numprocesses=auto')
                     }
                   }
                 }
