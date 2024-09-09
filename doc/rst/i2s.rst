@@ -809,4 +809,4 @@ Known Issues
 
 No known issues.
 
-.. include:: ../../../CHANGELOG.rst
+.. include:: ../../CHANGELOG.rst

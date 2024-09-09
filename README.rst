@@ -1,7 +1,8 @@
 .. |I2S| replace:: I\ :sup:`2`\ S
 
+###############
 I2S/TDM Library
-===============
+###############
 
 Summary
 -------
@@ -48,3 +49,5 @@ Related application notes
 The following application notes use this library:
 
   * AN00162 - Using the |I2S| library
+  * `AN02016: Integrating Audio Weaver (AWE) Core into USB Audio <https://www.xmos.com/file/an02016>`_
+  * `AN02003: SPDIF/ADAT/I2S Receive to |I2S| Slave Bridge with ASRC <https://www.xmos.com/file/an02003>`_
