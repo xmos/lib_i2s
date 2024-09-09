@@ -42,7 +42,8 @@ foreach(i RANGE 0 ${NUM_BITDEPTHS})
 
                 set(APP_HW_TARGET           XCORE-200-EXPLORER)
 
-                set(APP_PCA_ENABLE          ON)
+                # This causes a cmake error currently
+                # set(APP_PCA_ENABLE          ON)
 
                 set(APP_COMPILER_FLAGS      -O3
                                             -report
