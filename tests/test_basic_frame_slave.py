@@ -9,7 +9,7 @@ import json
 
 DEBUG = False
 
-with open(Path(__file__).parent / "i2s_frame_master_test/test_params.json") as f:
+with open(Path(__file__).parent / "i2s_frame_slave_test/test_params.json") as f:
     params = json.load(f)
 
 num_in_out_args = {}
@@ -21,15 +21,17 @@ for item in params["I2S_LINES"]:
 
 @pytest.mark.parametrize("bitdepth", params["BITDEPTHS"], ids=[f"{bd}b" for bd in params["BITDEPTHS"]])
 @pytest.mark.parametrize(("num_in", "num_out"), num_in_out_args.values(), ids=num_in_out_args.keys())
-def test_i2s_basic_frame_slave(capfd, request, nightly, bitdepth, num_in, num_out):
+@pytest.mark.parametrize(("invert"), params["INVERT"], ids=[f"INVERT{i}" for i in params["INVERT"]])
+def test_i2s_basic_frame_slave(capfd, request, nightly, bitdepth, num_in, num_out, invert):
     testlevel = '0' if nightly else '1'
-    id_string = f"{bitdepth}_{num_in}_{num_out}"
-    id_string += "_smoke" if testlevel == '1' else ""
 
-    invert = 0
+    # invert = 0
 
     cwd = Path(request.fspath).parent
-    binary = f'{cwd}/i2s_frame_slave_test/bin/test_i2s_frame_slave_{bitdepth}_{invert}_{num_in}_{num_out}_{testlevel}.xe'
+
+    cfg = f"{bitdepth}_{invert}_{num_in}_{num_out}_{testlevel}"
+    binary = f'{cwd}/i2s_frame_slave_test/bin/{cfg}/test_i2s_frame_slave_{cfg}.xe'
+    assert Path(binary).exists(), f"Cannot find {binary}"
 
     clk = Clock("tile[0]:XS1_PORT_1A")
 
