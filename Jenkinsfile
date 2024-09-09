@@ -43,7 +43,6 @@ pipeline {
           stages {
             stage('Get view') {
               steps {
-                // sh 'mkdir ${REPO}'
                 sh 'git clone git@github.com:xmos/test_support'
                 dir("${REPO}") {
                   checkout scm
@@ -61,12 +60,12 @@ pipeline {
                 runLibraryChecks("${WORKSPACE}/${REPO}", "lib_checks")
               }
             }
-            stage("Build Examples - XS2") {
+            stage("Build Tests - XS2") {
               steps {
-                dir("${REPO}/examples") {
+                dir("${REPO}/tests") {
                   withTools(params.TOOLS_VERSION) {
                     sh 'cmake -B build -G "Unix Makefiles"'
-                    sh 'xmake -j 6 -C build'
+                    sh 'xmake -j 20 -C build'
                   // xcoreAllAppNotesBuild('examples')
                   }
                 }
@@ -95,44 +94,56 @@ pipeline {
           agent {
             label 'x86_64&&linux'
           }
-          environment {
-            REPO = 'lib_i2s'
-            VIEW = getViewName(REPO)
-            XCORE_AI = 1
-          }
-          options {
-            skipDefaultCheckout()
-          }
           stages {
             stage('Get view') {
               steps {
-                xcorePrepareSandbox("${VIEW}", "${REPO}")
-              }
-            }
-            stage("Build Examples - XS3") {
-              steps {
+                sh 'git clone git@github.com:xmos/test_support'
                 dir("${REPO}") {
-                  xcoreAllAppsBuild('examples')
-                  xcoreAllAppNotesBuild('examples')
-                }
-              }
-            }
-            stage("Test - XS3") {
-              steps {
-                dir("${REPO}/tests") {
-                  viewEnv {
-                    // reactivating the tools with the newer version
+                  checkout scm
+                  installPipfile(false)
+                  withVenv {
                     withTools(params.TOOLS_VERSION) {
-                      runPytest()
+                      sh 'cmake -B build -G "Unix Makefiles"'
                     }
                   }
                 }
               }
             }
+            stage("Build Examples - XS3") {
+              steps {
+                dir("${REPO}/examples") {
+                  withTools(params.TOOLS_VERSION) {
+                    sh 'cmake -B build -G "Unix Makefiles"'
+                    sh 'xmake -j 6 -C build'
+                    // xcoreAllAppNotesBuild('examples')
+                  }
+                }
+              }
+            }
+            // stage("Test - XS3") {
+            //   steps {
+            //     dir("${REPO}/tests") {
+            //       viewEnv {
+            //         // reactivating the tools with the newer version
+            //         withTools(params.TOOLS_VERSION) {
+            //           runPytest()
+            //         }
+            //       }
+            //     }
+            //   }
+            // }
             stage('Run xdoc') {
               steps {
                 dir("${REPO}") {
-                  runXdoc('lib_i2s/doc')
+                  sh "docker pull ghcr.io/xmos/xmosdoc:$XMOSDOC_VERSION"
+                  sh """docker run -u "\$(id -u):\$(id -g)" \
+                      --rm \
+                      -v \$(pwd):/build \
+                      ghcr.io/xmos/xmosdoc:$XMOSDOC_VERSION -v html latex"""
+
+                  // Zip and archive doc files
+                  zip dir: "doc/_build/", zipFile: "sw_pll_docs.zip"
+                  archiveArtifacts artifacts: "sw_pll_docs.zip"
                 }
               }
             }
