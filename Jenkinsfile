@@ -114,7 +114,7 @@ pipeline {
                 dir("${REPO}/examples") {
                   withTools(params.TOOLS_VERSION) {
                     sh 'cmake -B build -G "Unix Makefiles"'
-                    sh 'xmake -j 6 -C build'
+                    sh 'xmake -j 20 -C build'
                     // xcoreAllAppNotesBuild('examples')
                   }
                 }

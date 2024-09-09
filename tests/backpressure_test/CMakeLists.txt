@@ -36,13 +36,15 @@ foreach(i RANGE 0 ${NUM_BITDEPTHS})
                 string(JSON TX GET ${RX_TX} TX)
 
                 set(project_name "test_i2s_backpressure_${BITDEPTH}_${SAMPLE_RATE}_${I2S_LINES}_${RX}_${TX}")
-                message(STATUS "project_name: ${project_name}")
+                message(STATUS "Building project_name: ${project_name}")
 
                 project(${project_name})
 
                 set(APP_HW_TARGET           XCORE-200-EXPLORER)
 
-                set(APP_COMPILER_FLAGS      -O2
+                set(APP_PCA_ENABLE          ON)
+
+                set(APP_COMPILER_FLAGS      -O3
                                             -report
                                             -g
                                             -DSAMPLE_FREQUENCY=${SAMPLE_RATE}
