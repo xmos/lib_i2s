@@ -1,9 +1,22 @@
-@Library('xmos_jenkins_shared_library@v0.32.0') _
+@Library('xmos_jenkins_shared_library@infr_apps_checks') _
+// New lib checks fn - will be merged into mainline soon so will need to update this tag
+
+// @Library('xmos_jenkins_shared_library@v0.32.0') _
 
 getApproval()
 
 pipeline {
   agent none
+
+  options {
+    skipDefaultCheckout()
+    timestamps()
+    // on develop discard builds after a certain number else keep forever
+    buildDiscarder(logRotator(
+        numToKeepStr:         env.BRANCH_NAME ==~ /develop/ ? '25' : '',
+        artifactNumToKeepStr: env.BRANCH_NAME ==~ /develop/ ? '25' : ''
+    ))
+  }
 
   parameters {
     string(
@@ -13,6 +26,13 @@ pipeline {
     )
   } // parameters
 
+  environment {
+    REPO = 'lib_i2s'
+    PIP_VERSION = "24.0"
+    PYTHON_VERSION = "3.11"
+    XMOSDOC_VERSION = "v5.5.2"          
+  }
+
   stages {
     stage("Main") {
       parallel {
@@ -20,25 +40,10 @@ pipeline {
           agent {
             label 'x86_64&&linux'
           }
-          environment {
-            REPO = 'lib_i2s'
-            PIP_VERSION = "24.0"
-            PYTHON_VERSION = "3.11"
-            XMOSDOC_VERSION = "v5.5.2"          
-          }
-          options {
-            skipDefaultCheckout()
-            timestamps()
-            // on develop discard builds after a certain number else keep forever
-            buildDiscarder(logRotator(
-                numToKeepStr:         env.BRANCH_NAME ==~ /develop/ ? '25' : '',
-                artifactNumToKeepStr: env.BRANCH_NAME ==~ /develop/ ? '25' : ''
-            ))
-          }
           stages {
             stage('Get view') {
               steps {
-                sh 'mkdir ${REPO}'
+                // sh 'mkdir ${REPO}'
                 dir("${REPO}") {
                   checkout scm
                   installPipfile(false)
@@ -48,7 +53,7 @@ pipeline {
                     }
                   }
                 }
-                sh "git clone git@github.com:xmos/test_support"
+                sh 'git clone git@github.com:xmos/test_support'
               }
             }
             stage('Library checks') {
@@ -58,9 +63,12 @@ pipeline {
             }
             stage("Build Examples - XS2") {
               steps {
-                dir("${REPO}") {
-                  xcoreAllAppsBuild('examples')
-                  xcoreAllAppNotesBuild('examples')
+                dir("${REPO}/examples") {
+                  withTools(params.TOOLS_VERSION) {
+                    sh 'cmake -B build -G "Unix Makefiles"'
+                    sh 'xmake -j 6 -C build'
+                  // xcoreAllAppNotesBuild('examples')
+                  }
                 }
               }
             }
