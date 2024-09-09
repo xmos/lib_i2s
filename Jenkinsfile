@@ -57,7 +57,7 @@ pipeline {
             }
             stage('Library checks') {
               steps {
-                runLibraryChecks("${WORKSPACE}/${REPO}", "lib_checks")
+                runLibraryChecks("${WORKSPACE}/${REPO}", "develop")
               }
             }
             stage("Build Tests - XS2") {
