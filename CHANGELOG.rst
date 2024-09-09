@@ -1,5 +1,5 @@
-I2S library change log
-======================
+lib_i2s change log
+==================
 
 UNRELEASED
 ----------
