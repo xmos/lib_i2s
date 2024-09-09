@@ -23,6 +23,11 @@ math(EXPR NUM_SMOKES "${NUM_SMOKES} - 1")
 math(EXPR NUM_MCLK_FAMILIES "${NUM_MCLK_FAMILIES} - 1")
 math(EXPR NUM_I2S_LINES "${NUM_I2S_LINES} - 1")
 
+set(APP_PCA_ENABLE          ON)
+project(test_i2s_frame_master)
+set(XMOS_SANDBOX_DIR        ${CMAKE_CURRENT_LIST_DIR}/../../..)
+set(APP_HW_TARGET           XCORE-200-EXPLORER)
+
 # Iterate through combinations
 foreach(i RANGE 0 ${NUM_BITDEPTHS})
     string(JSON BITDEPTH GET ${BITDEPTHS_LIST} ${i})
@@ -34,14 +39,11 @@ foreach(i RANGE 0 ${NUM_BITDEPTHS})
                 string(JSON INPUT_OUTPUT GET ${I2S_LINES_LIST} ${l})
                 string(JSON INPUT GET ${INPUT_OUTPUT} INPUT) # Extract out the pair of values for input and output
                 string(JSON OUTPUT GET ${INPUT_OUTPUT} OUTPUT)
-                set(project_name "test_i2s_frame_master_${BITDEPTH}_${MCLK_FAMILY}_${INPUT}_${OUTPUT}_${SMOKE}")
-                message(STATUS "project_name: ${project_name}")
+                set(config "${BITDEPTH}_${MCLK_FAMILY}_${INPUT}_${OUTPUT}_${SMOKE}")
+                message(STATUS "Building config: ${config}")
 
-                project(${project_name})
-
-                set(APP_HW_TARGET           XCORE-200-EXPLORER)
-
-                set(APP_COMPILER_FLAGS      -O3
+                set(APP_COMPILER_FLAGS_${config}
+                                            -O3
                                             -report
                                             -g
                                             -DMCLK_FAMILY=${MCLK_FAMILY}
@@ -50,14 +52,11 @@ foreach(i RANGE 0 ${NUM_BITDEPTHS})
                                             -DNUM_IN=${INPUT})
 
                 if(${SMOKE} MATCHES 1)
-                    list(APPEND APP_COMPILER_FLAGS -DSMOKE=1)
+                    list(APPEND APP_COMPILER_FLAGS_${config} -DSMOKE=1)
                 endif()
-
-                set(XMOS_SANDBOX_DIR        ${CMAKE_CURRENT_LIST_DIR}/../../..)
-
-                XMOS_REGISTER_APP()
-
             endforeach()
         endforeach()
     endforeach()
 endforeach()
+
+XMOS_REGISTER_APP()

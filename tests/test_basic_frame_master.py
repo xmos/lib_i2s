@@ -32,7 +32,10 @@ def test_i2s_basic_frame_master(capfd, request, nightly, bitdepth, num_in, num_o
 
 
     cwd = Path(request.fspath).parent
-    binary = f'{cwd}/i2s_frame_master_test/bin/test_i2s_frame_master_{bitdepth}_{mclk_fam}_{num_in}_{num_out}_{testlevel}.xe'
+
+    cfg = f"{bitdepth}_{mclk_fam}_{num_in}_{num_out}_{testlevel}"
+    binary = f'{cwd}/i2s_frame_master_test/bin/{cfg}/test_i2s_frame_master_{cfg}.xe'
+    assert Path(binary).exists(), f"Cannot find {binary}"
 
     clk = Clock("tile[0]:XS1_PORT_1A")
 
