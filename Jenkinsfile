@@ -22,22 +22,38 @@ pipeline {
           }
           environment {
             REPO = 'lib_i2s'
-            VIEW = getViewName(REPO)
+            PIP_VERSION = "24.0"
+            PYTHON_VERSION = "3.11"
+            XMOSDOC_VERSION = "v5.5.2"          
           }
           options {
             skipDefaultCheckout()
+            timestamps()
+            // on develop discard builds after a certain number else keep forever
+            buildDiscarder(logRotator(
+                numToKeepStr:         env.BRANCH_NAME ==~ /develop/ ? '25' : '',
+                artifactNumToKeepStr: env.BRANCH_NAME ==~ /develop/ ? '25' : ''
+            ))
           }
           stages {
             stage('Get view') {
               steps {
-                xcorePrepareSandbox("${VIEW}", "${REPO}")
-                // git@github.com:xmos/test_support
-                
+                sh 'mkdir ${REPO}'
+                dir("${REPO}") {
+                  checkout scm
+                  installPipfile(false)
+                  withVenv {
+                    withTools(params.TOOLS_VERSION) {
+                      sh 'cmake -B build -G "Unix Makefiles"'
+                    }
+                  }
+                }
+                sh "git clone git@github.com:xmos/test_support"
               }
             }
             stage('Library checks') {
               steps {
-                xcoreLibraryChecks("${REPO}")
+                runLibraryChecks("${WORKSPACE}/${REPO}", "lib_checks")
               }
             }
             stage("Build Examples - XS2") {
