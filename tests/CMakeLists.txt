@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.21)
+include($ENV{XMOS_CMAKE_PATH}/xcommon.cmake)
+project(lib_i2s_tests)
+add_subdirectory(backpressure_test)
+add_subdirectory(i2s_frame_master_test)
+add_subdirectory(i2s_frame_slave_test)
