@@ -17,9 +17,6 @@ for item in params["I2S_LINES"]:
     num_out = item["OUTPUT"]
     num_in_out_args[f"{num_in}ch_in,{num_out}"] = [num_in, num_out]
 
-
-mclk_family = ["mclk_fam_48", "mclk_fam_44"] # The base sampling rate needs to be configured differently for 48KHz vs 44.1KHz family
-
 @pytest.mark.parametrize("mclk_fam", params["MCLK_FAMILIES"], ids=[f"mclk_fam_{mc}" for mc in params["MCLK_FAMILIES"]])
 @pytest.mark.parametrize("bitdepth", params["BITDEPTHS"], ids=[f"{bd}b" for bd in params["BITDEPTHS"]])
 @pytest.mark.parametrize(("num_in", "num_out"), num_in_out_args.values(), ids=num_in_out_args.keys())
