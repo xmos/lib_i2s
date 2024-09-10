@@ -23,9 +23,9 @@ math(EXPR NUM_SMOKES "${NUM_SMOKES} - 1")
 math(EXPR NUM_INVERTS "${NUM_INVERTS} - 1")
 math(EXPR NUM_I2S_LINES "${NUM_I2S_LINES} - 1")
 
-                set(APP_HW_TARGET           XCORE-200-EXPLORER)
-                project(test_i2s_frame_slave)
-                set(XMOS_SANDBOX_DIR        ${CMAKE_CURRENT_LIST_DIR}/../../..)
+set(APP_HW_TARGET           XCORE-200-EXPLORER)
+project(test_i2s_frame_slave)
+set(XMOS_SANDBOX_DIR        ${CMAKE_CURRENT_LIST_DIR}/../../..)
 
 
 # Iterate through combinations
