@@ -6,7 +6,7 @@ import Pyxsim
 import pytest
 import json
 
-with open(Path(__file__).parent / "i2s_frame_slave_test/test_params.json") as f:
+with open(Path(__file__).parent / "tdm_master_cb_test/test_params.json") as f:
     params = json.load(f)
 
 num_in_out_args = {}
