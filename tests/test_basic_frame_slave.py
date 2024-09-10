@@ -25,8 +25,6 @@ for item in params["I2S_LINES"]:
 def test_i2s_basic_frame_slave(capfd, request, nightly, bitdepth, num_in, num_out, invert):
     testlevel = '0' if nightly else '1'
 
-    # invert = 0
-
     cwd = Path(request.fspath).parent
 
     cfg = f"{bitdepth}_{invert}_{num_in}_{num_out}_{testlevel}"

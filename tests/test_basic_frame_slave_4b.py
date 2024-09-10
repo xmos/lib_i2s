@@ -14,7 +14,7 @@ num_in_out_args = {}
 for item in params["I2S_LINES"]:
     num_in = item["INPUT"]
     num_out = item["OUTPUT"]
-    num_in_out_args[f"{num_in}ch_in,{num_out}"] = [num_in, num_out]
+    num_in_out_args[f"{num_in}ch_in,{num_out}ch_out"] = [num_in, num_out]
 
 
 @pytest.mark.parametrize(("num_in", "num_out"), num_in_out_args.values(), ids=num_in_out_args.keys())
@@ -38,10 +38,13 @@ def test_i2s_basic_frame_slave_4b(capfd, request, nightly, invert, num_in, num_o
         "tile[0]:XS1_PORT_16A",
         "tile[0]:XS1_PORT_1M",
          clk,
+         invert_bclk=True if invert == 1 else False,
          frame_based=True)  # We're running the frame-based master, so can have variable data widths
 
+    expected = "slave_test_invert.expect" if invert else "slave_test.expect" 
+
     tester = Pyxsim.testers.AssertiveComparisonTester(
-        f'{cwd}/expected/slave_test.expect',
+        f'{cwd}/expected/{expected}',
         regexp = True,
         ordered = True,
         suppress_multidrive_messages=True,

@@ -26,6 +26,7 @@ math(EXPR NUM_I2S_LINES "${NUM_I2S_LINES} - 1")
 set(APP_HW_TARGET           XCORE-200-EXPLORER)
 project(test_i2s_frame_slave)
 set(XMOS_SANDBOX_DIR        ${CMAKE_CURRENT_LIST_DIR}/../../..)
+set(APP_PCA_ENABLE          ON)
 
 
 # Iterate through combinations
