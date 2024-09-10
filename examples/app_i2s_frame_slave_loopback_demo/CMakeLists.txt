@@ -9,7 +9,8 @@ include(${CMAKE_CURRENT_LIST_DIR}/../../deps.cmake)
 set(APP_COMPILER_FLAGS      -O2
                             -report
                             -g
-                            -DBOARD_SUPPORT_BOARD=XK_AUDIO_316_MC_AB)
+                            -DBOARD_SUPPORT_BOARD=XK_AUDIO_316_MC_AB
+                            -DDEBUG_PRINT_ENABLE=1)
 
 set(APP_PCA_ENABLE          ON)
 
