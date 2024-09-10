@@ -49,7 +49,7 @@ pipeline {
                   withVenv {
                     withTools(params.TOOLS_VERSION) {
                       dir("examples") {
-                       // Fetch deps  
+                       // Fetch deps
                        sh 'cmake -B build -G "Unix Makefiles"'
                       }
                     }
@@ -103,11 +103,6 @@ pipeline {
                 dir("${REPO}") {
                   checkout scm
                   installPipfile(false)
-                  withVenv {
-                    withTools(params.TOOLS_VERSION) {
-                      sh 'cmake -B build -G "Unix Makefiles"'
-                    }
-                  }
                 }
               }
             }
