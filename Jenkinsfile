@@ -139,8 +139,9 @@ pipeline {
                       ghcr.io/xmos/xmosdoc:$XMOSDOC_VERSION -v html latex"""
 
                   // Zip and archive doc files
-                  zip dir: "doc/_build/", zipFile: "lib_i2s_docs.zip"
-                  archiveArtifacts artifacts: "lib_i2s_docs.zip"
+                  zip dir: "doc/_build/html", zipFile: "lib_i2s_docs_html.zip"
+                  archiveArtifacts artifacts: "lib_i2s_docs_html.zip"
+                  archiveArtifacts artifacts: "doc/_build/pdf/lib_i2s*.pdf"
                 }
               }
             }
