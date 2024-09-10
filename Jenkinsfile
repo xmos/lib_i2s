@@ -48,7 +48,9 @@ pipeline {
                   installPipfile(false)
                   withVenv {
                     withTools(params.TOOLS_VERSION) {
-                      sh 'cmake -B build -G "Unix Makefiles"'
+                      dir("examples")
+                       sh 'cmake -B build -G "Unix Makefiles"'
+                      }
                     }
                   }
                 }
