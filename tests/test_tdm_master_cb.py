@@ -4,20 +4,26 @@ from tdm_checker import TDMMasterChecker
 from pathlib import Path
 import Pyxsim
 import pytest
+import json
 
-num_in_out_args = {"4ch_in,4ch_out": (4, 4),
-                   "2ch_in,2ch_out": (2, 2),
-                   "4ch_in,0ch_out": (4, 0),
-                   "0ch_in,4ch_out": (0, 4)}
+with open(Path(__file__).parent / "i2s_frame_slave_test/test_params.json") as f:
+    params = json.load(f)
+
+num_in_out_args = {}
+for item in params["I2S_LINES"]:
+    num_in = item["INPUT"]
+    num_out = item["OUTPUT"]
+    num_in_out_args[f"{num_in}ch_in,{num_out}"] = [num_in, num_out]
 
 @pytest.mark.parametrize(("num_in", "num_out"), num_in_out_args.values(), ids=num_in_out_args.keys())
 def test_tdm_master_cb(capfd, request, nightly, num_in, num_out):
     testlevel = '0' if nightly else '1'
-    id_string = f"{num_in}_{num_out}"
-    id_string += "_smoke" if testlevel == '1' else ""
 
     cwd = Path(request.fspath).parent
-    binary = f'{cwd}/tdm_master_cb_test/bin/{id_string}/tdm_master_cb_test_{id_string}.xe'
+
+    cfg = f"{num_in}_{num_out}_{testlevel}"
+    binary = f'{cwd}/tdm_master_cb_test/bin/{cfg}/test_tdm_master_cb_{cfg}.xe'
+    assert Path(binary).exists(), f"Cannot find {binary}"
 
     checker = TDMMasterChecker(
         "tile[0]:XS1_PORT_1A",
@@ -36,11 +42,11 @@ def test_tdm_master_cb(capfd, request, nightly, num_in, num_out):
         ignore=["CONFIG:.*"]
     )
 
-    Pyxsim.run_on_simulator(
+    Pyxsim.run_on_simulator_(
         binary,
         tester=tester,
         simthreads=[checker],
-        build_env = {"NUMS_IN_OUT":f'{num_in};{num_out}', "SMOKE":testlevel},
+        do_xe_prebuild=False,
         simargs=[],
         capfd=capfd
     )
