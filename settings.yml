@@ -1,8 +1,8 @@
 ---
-lib_name: lib_board_support
+lib_name: lib_i2s
 project: '{{lib_name}}'
 title: '{{lib_name}}: XMOS board support'
-version: 1.0.0
+version: 6.0.0
 
 documentation:
   exclude_patterns_path: doc/exclude_patterns.inc

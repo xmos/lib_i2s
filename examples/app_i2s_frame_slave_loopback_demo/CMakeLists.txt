@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 include($ENV{XMOS_CMAKE_PATH}/xcommon.cmake)
-project(app_i2s_frame_skave_loopback_demo)
+project(app_i2s_frame_slave_loopback_demo)
 
 set(APP_HW_TARGET           xk-audio-316-mc.xn)
 

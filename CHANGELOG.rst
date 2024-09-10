@@ -1,9 +1,11 @@
 lib_i2s change log
 ==================
 
-UNRELEASED
-----------
+6.0.0
+-----
 
+  * REMOVED: Support for XS1
+  * REMOVED: I2S non "frame" API (supersceded by more efficient frame versions)
   * CHANGED: Uses XCommon Cmake for examples
   * CHANGED: Examples ported to XU316_MC board (was XU216_MC)
 
