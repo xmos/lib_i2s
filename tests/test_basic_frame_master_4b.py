@@ -9,10 +9,11 @@ import json
 with open(Path(__file__).parent / "i2s_frame_master_test/test_params.json") as f:
     params = json.load(f)
 
-num_in_out_args = {"4ch_in,4ch_out": (4, 4),
-                   "1ch_in,1ch_out": (1, 1),
-                   "4ch_in,0ch_out": (4, 0),
-                   "0ch_in,4ch_out": (0, 4)}
+num_in_out_args = {}
+for item in params["I2S_LINES"]:
+    num_in = item["INPUT"]
+    num_out = item["OUTPUT"]
+    num_in_out_args[f"{num_in}ch_in,{num_out}"] = [num_in, num_out]
 
 
 @pytest.mark.parametrize("mclk_fam", params["MCLK_FAMILIES"], ids=[f"mclk_fam_{mc}" for mc in params["MCLK_FAMILIES"]])

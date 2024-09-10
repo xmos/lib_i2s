@@ -4,26 +4,27 @@ from i2s_master_checker import I2SMasterChecker, Clock
 from pathlib import Path
 import Pyxsim
 import pytest
+import json
 
-num_in_out_args = {"4ch_in,4ch_out": (4, 4),
-                   "1ch_in,1ch_out": (1, 1),
-                   "4ch_in,0ch_out": (4, 0),
-                   "0ch_in,4ch_out": (0, 4)}
+with open(Path(__file__).parent / "i2s_frame_master_test/test_params.json") as f:
+    params = json.load(f)
 
-bitdepth_args = {"8b": 8,
-                 "16b": 16,
-                 "24b": 24,
-                 "32b": 32}
+num_in_out_args = {}
+for item in params["I2S_LINES"]:
+    num_in = item["INPUT"]
+    num_out = item["OUTPUT"]
+    num_in_out_args[f"{num_in}ch_in,{num_out}"] = [num_in, num_out]
 
-@pytest.mark.parametrize("bitdepth", bitdepth_args.values(), ids=bitdepth_args.keys())
+
+@pytest.mark.parametrize("bitdepth", params["BITDEPTHS"], ids=[f"{bd}b" for bd in params["BITDEPTHS"]])
 @pytest.mark.parametrize(("num_in", "num_out"), num_in_out_args.values(), ids=num_in_out_args.keys())
 def test_i2s_basic_frame_master_external_clock(capfd, request, nightly, bitdepth, num_in, num_out):
     testlevel = '0' if nightly else '1'
-    id_string = f"{bitdepth}_{num_in}_{num_out}"
-    id_string += "_smoke" if testlevel == '1' else ""
-
+       
     cwd = Path(request.fspath).parent
-    binary = f'{cwd}/i2s_frame_master_external_clock_test/bin/{id_string}/i2s_frame_master_external_clock_test_{id_string}.xe'
+    cfg = f"{bitdepth}_{num_in}_{num_out}_{testlevel}"
+    binary = f'{cwd}/i2s_frame_master_external_clock_test/bin/{cfg}/test_i2s_frame_master_external_clock_{cfg}.xe'
+    assert Path(binary).exists(), f"Cannot find {binary}"
 
     clk = Clock("tile[0]:XS1_PORT_1A")
 
@@ -47,12 +48,11 @@ def test_i2s_basic_frame_master_external_clock(capfd, request, nightly, bitdepth
         ignore=["CONFIG:.*"]
     )
 
-    Pyxsim.run_on_simulator(
+    Pyxsim.run_on_simulator_(
         binary,
         tester=tester,
-        clean_before_build=True,
+        do_xe_prebuild=False,
         simthreads=[clk, checker],
-        build_env = {"BITDEPTHS":f"{bitdepth}", "NUMS_IN_OUT":f'{num_in};{num_out}', "SMOKE":testlevel},
         simargs=[],
         capfd=capfd
     )
