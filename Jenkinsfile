@@ -68,7 +68,6 @@ pipeline {
                   withTools(params.TOOLS_VERSION) {
                     sh 'cmake -B build -G "Unix Makefiles"'
                     sh 'xmake -j 16 -C build'
-                  // xcoreAllAppNotesBuild('examples')
                   }
                 }
               }
@@ -77,7 +76,6 @@ pipeline {
               steps {
                 dir("${REPO}/tests") {
                   viewEnv {
-                    // reactivating the tools with the newer version
                     withTools(params.TOOLS_VERSION) {
                       runPytest('--numprocesses=auto -vv')
                     }
@@ -106,29 +104,6 @@ pipeline {
                 }
               }
             }
-            stage("Build Examples - XS3") {
-              steps {
-                dir("${REPO}/examples") {
-                  withTools(params.TOOLS_VERSION) {
-                    sh 'cmake -B build -G "Unix Makefiles"'
-                    sh 'xmake -j 16 -C build'
-                    // xcoreAllAppNotesBuild('examples')
-                  }
-                }
-              }
-            }
-            // stage("Test - XS3") {
-            //   steps {
-            //     dir("${REPO}/tests") {
-            //       viewEnv {
-            //         // reactivating the tools with the newer version
-            //         withTools(params.TOOLS_VERSION) {
-            //           runPytest()
-            //         }
-            //       }
-            //     }
-            //   }
-            // }
             stage('Run xdoc') {
               steps {
                 dir("${REPO}") {
@@ -142,6 +117,18 @@ pipeline {
                   zip dir: "doc/_build/html", zipFile: "lib_i2s_docs_html.zip"
                   archiveArtifacts artifacts: "lib_i2s_docs_html.zip"
                   archiveArtifacts artifacts: "doc/_build/pdf/lib_i2s*.pdf"
+                }
+              }
+            }
+            stage("Build Examples - XS3") {
+              steps {
+                dir("${REPO}/examples") {
+                  withTools(params.TOOLS_VERSION) {
+                    sh 'cmake -B build -G "Unix Makefiles"'
+                    sh 'xmake -j 16 -C build'
+                    // xcoreAllAppNotesBuild('examples')
+                    // TODO ADD BUILD FOR APPNOTE
+                  }
                 }
               }
             }
