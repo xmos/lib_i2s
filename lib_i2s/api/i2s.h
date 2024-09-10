@@ -57,64 +57,6 @@ typedef enum i2s_restart_t {
   I2S_SHUTDOWN             ///< Shutdown. This will cause the I2S/TDM component to exit.
 } i2s_restart_t;
 
-/** Interface representing callback events that can occur during the
- *   operation of the I2S task
- */
-typedef interface i2s_callback_if {
-
-  /**  I2S initialization event callback.
-   *
-   *   The I2S component will call this
-   *   when it first initializes on first run of after a restart.
-   *
-   *   \param i2s_config        This structure is provided if the connected
-   *                            component drives an I2S bus. The members
-   *                            of the structure should be set to the
-   *                            required configuration.
-   *   \param tdm_config        This structure is provided if the connected
-   *                            component drives an TDM bus. The members
-   *                            of the structure should be set to the
-   *                            required configuration.
-   */
-  void init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config);
-
-  /**  I2S restart check callback.
-   *
-   *   This callback is called once per frame. The application must return the
-   *   required restart behaviour.
-   *
-   *   \return          The return value should be set to
-   *                    ``I2S_NO_RESTART``, ``I2S_RESTART`` or
-   *                    ``I2S_SHUTDOWN``.
-   */
-  i2s_restart_t restart_check();
-
-  /**  Receive an incoming sample.
-   *
-   *   This callback will be called when a new sample is read in by the I2S
-   *   component.
-   *
-   *   \param index     The index of the sample in the frame.
-   *   \param sample    The sample data as a signed 32-bit value. The component
-   *                    may not use all 32 bits of the value (for example, many
-   *                    I2S codecs are 24-bit), in which case the bottom bits
-   *                    are ignored.
-   */
-  void receive(size_t index, int32_t sample);
-
-  /** Request an outgoing sample.
-   *
-   *  This callback will be called when the I2S component needs a new sample.
-   *
-   *  \param index      The index of the requested sample in the frame.
-   *  \returns          The sample data as a signed 32-bit value.  The component
-   *                    may not have 32-bits of accuracy (for example, many
-   *                    I2S codecs are 24-bit), in which case the bottom bits
-   *                    will be arbitrary values.
-   */
-  int32_t send(size_t index);
-
-} i2s_callback_if;
 
 
 /** Interface representing callback events that can occur during the

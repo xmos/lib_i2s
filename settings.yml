@@ -1,7 +1,7 @@
 ---
 lib_name: lib_i2s
 project: '{{lib_name}}'
-title: '{{lib_name}}: XMOS board support'
+title: '{{lib_name}}: XMOS I2S Library'
 version: 6.0.0
 
 documentation:

@@ -126,63 +126,12 @@ The speed and number of data wires that can be driven by the |I2S|
 library running as |I2S| master
 depends on the speed of the logical core that runs the code
 and the amount of processing that occurs in the user callbacks for
-handling the data from the library. :ref:`i2s_master_62_5_speeds` shows 
-configurations that are known to work for small amounts of callback processing. 
-Other speeds will be achievable depending on the amount of processing in the 
-application and the logical core speed.
+handling the data from the library.
 
-.. _i2s_master_62_5_speeds:
-
-.. list-table:: Known working |I2S| master configurations on a 62.5MHz core
-    :class: vertical-borders horizontal-borders
-    :header-rows: 1
-    :widths: 15 15 15 25 30
-
-    * - **MCLK FREQ**
-      - **MCLK/BCLK RATIO**
-      - **SAMPLE FREQ**
-      - **MAX NUM IN (max num channels)**
-      - **MAX NUM OUT (max num channels)**
-    * - 12.288 MHz
-      - 16
-      - 12000 Hz
-      - 4 (8)
-      - 4 (8)
-    * - 12.288 MHz
-      - 8
-      - 24000 Hz
-      - 4 (8)
-      - 4 (8)
-    * - 12.288 MHz
-      - 4
-      - 48000 Hz
-      - 4 (8)
-      - 4 (8)
-    * - 12.288 MHz
-      - 2
-      - 96000 Hz
-      - 4 (8)
-      - 4 (8)
-    * - 24.576 MHz
-      - 16
-      - 24000 Hz
-      - 1 (2)
-      - 1 (2)
-    * - 24.576 MHz
-      - 8
-      - 48000 Hz
-      - 1 (2)
-      - 1 (2)
-    * - 24.576 MHz
-      - 2
-      - 192000 Hz
-      - 1 (2)
-      - 1 (2)
-
-On the xCORE-200 and xcore.ai the frame-based |I2S| master can be used. This uses hardware
-clock dividers only available in the the xCORE-200 and xcore.ai and a more efficient callback
-interface to achieve much higher throughputs. This also permits the use of 
-non-32bit data word lengths. :ref:`i2s_frame_master_62_5_speeds` shows the known
+On the xCORE-200 and xcore.ai the frame-based |I2S| master uses hardware
+clock dividers and an efficient callback
+interface to achieve high throughputs. This also permits the use of 
+non-32bit data word lengths if needed. :ref:`i2s_frame_master_62_5_speeds` shows the known
 working configurations:
 
 .. _i2s_frame_master_62_5_speeds:
@@ -272,6 +221,10 @@ working configurations:
        - 1 (2)
        - 1 (2)
 
+.. tip::
+   |I2S| "frame-master" is capable of running at higher rates such as 768kHz within a 62.5MIPS logical core using one bit ports for I/O. However, it may be necessary to modify the port timing delays to ensure proper sampling of the data and LRCLK lines. There are methods for doing this using pad and/or sample delays however this is beyond the scope of this document. Please consult `I/O timings for xCORE200` available on xmos.com for further information. 
+
+
 
 |I2S| slave speeds and performance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -280,32 +233,13 @@ The speed and number of data wires that can be driven by the |I2S|
 library running as slave depends on the speed of the logical core
 that runs the code
 and the amount of processing that occurs in the user callbacks for
-handling the data from the library. :ref:`i2s_slave_62_5_speeds`
-shows configurations that are known to
-work for small amounts of callback processing. Other speeds will be
-achievable depending on the amount of processing in the application
-and the logical core speed. Note that the when acting as slave the
-performance of the library only depends on the bit clock frequency,
-not the underlying master clock frequency.
+handling the data from the library. 
 
-.. _i2s_slave_62_5_speeds:
-
-.. list-table:: Known working |I2S| slave configurations on a 62.5MHz core
-     :class: vertical-borders horizontal-borders
-     :header-rows: 1
-
-     * - **BCLK FREQ**
-       - **SAMPLE FREQ**
-       - **NUM IN (num channels)**
-       - **NUM OUT (num channels)**
-     * - 12.288MHz
-       - 192000
-       - 4 (8)
-       - 4 (8)
-
-Frame-based |I2S| master can be used. This uses a more efficient callback
-interface to achieve much higher throughputs by transferring a frame (all channels in one sample period)
+The frame-based |I2S| slave uses an efficient callback
+interface to achieve high throughputs by transferring a frame (all channels in one sample period)
 at a time and re-ordered callbacks and I/O operations so that maximum back pressure tolerance is achieved.
+This allows significant processing to be carried out by the callbacks.
+
 The table :ref:`i2s_frame_slave_62_5_speeds` shows the known working configurations. Other configurations may be possible depending on performance:
 
 .. _i2s_frame_slave_62_5_speeds:
@@ -336,6 +270,9 @@ The table :ref:`i2s_frame_slave_62_5_speeds` shows the known working configurati
        - 4 (8)
        - 4 (8)
 
+Note that the when acting as slave the performance of the library only depends on the bit clock frequency,
+not the underlying master clock frequency.
+
 .. list-table:: Known working |I2S| frame-based master configurations on a 62.5MHz core using four bit ports for I/O
      :class: vertical-borders horizontal-borders
      :header-rows: 1
@@ -351,10 +288,6 @@ The table :ref:`i2s_frame_slave_62_5_speeds` shows the known working configurati
        - 192000
        - 4 (8)
        - 4 (8)
-
-.. tip::
-   |I2S| "frame-master" is capable of running at higher rates such as 768kHz within a 62.5MIPS logical core using one bit ports for I/O. However, it may be necessary to modify the port timing delays to ensure proper sampling of the data and LRCLK lines. There are methods for doing this using pad and/or sample delays however this is beyond the scope of this document. Please consult `I/O timings for xCORE200` available on xmos.com for further information. 
-
 
 |newpage|
 
@@ -530,7 +463,7 @@ of the bus (*MCLK/BCLK* ratio, *LRCLK* alignment etc.) at this point.
 |I2S| frame-based master usage
 ..............................
 
-The |I2S| frame-based master task (only supported on xCORE-200) is
+The |I2S| frame-based master task is
 instantiated as a parallel task that run in a ``par`` statement. The application
 can connect via the ``i2s_frame_callback_if`` interface connection. For example,
 the following code instantiates an |I2S| frame-based master component and
@@ -540,17 +473,6 @@ connects to it.
    :start-on: out buffered
    :end-before: // end
 
-|I2S| master usage
-..................
-
-The |I2S| master task is instantiated as a parallel task that run in a
-``par`` statement. The application can connect via the
-``i2s_callback_if``  interface connection. For example,
-the following code instantiates an |I2S| master component and connects to it.
-
-.. literalinclude:: simple_i2s_master.xc
-   :start-on: out buffered
-   :end-before: // end
 
 |I2S| frame-based slave usage
 .............................
@@ -564,17 +486,6 @@ the following code instantiates an |I2S| slave component and connects to it.
    :start-on: out buffered
    :end-before: // end
 
-|I2S| slave usage
-.................
-
-The |I2S| slave task is instantiated as a parallel task that run in a
-``par`` statement. The application can connect via the
-``i2s_callback_if``  interface connection. For example,
-the following code instantiates an |I2S| slave component and connects to it.
-
-.. literalinclude:: simple_i2s_slave.xc
-   :start-on: out buffered
-   :end-before: // end
 
 Slave has an additional config option to sample data and word clock on falling
 edge of bit clock, instead of rising edge. Data is then output on rising edge
@@ -598,37 +509,10 @@ the following code instantiates an TDM master component and connects to it.
 Channel numbering
 .................
 
-The callback interface numbers the channels being sent/received for
+The callback interface for TDM numbers the channels being sent/received for
 the send and receive callbacks. There is a fixed mapping from these
 channel indices to the physical interface begin used.
 
-|I2S| channel numbering
-~~~~~~~~~~~~~~~~~~~~~~~
-
-The data words within |I2S| frames have even channel numbers
-assigned to the left samples (first within the frame)
-and odd numbers assigned to the right (second within the frame)
-samples.
-
-The actual sample number will be given with respect to the order that
-the ports are provided in the data in and data out array
-arguments to the component.
-
-For example, in a system with 4 data out ports and 4 data in ports declared as::
-
-  out buffered port:32 p_dout[4] = {XS1_PORT_1A, XS1_PORT_1B, XS1_PORT_1C, XS1_PORT_1D};
-  in buffered port:32 p_din[4] = {XS1_PORT_1E, XS1_PORT_1F, XS1_PORT_1G, XS1_PORT_1H};
-
-The channels wil be numbered as indicated in :ref:`i2s_chan_diag`:
-
-.. _i2s_chan_diag:
-
-.. figure:: images/chan_num.png
-   :width: 100%
-
-   |I2S| channel numbering
-
-|newpage|
 
 TDM channel numbering
 ~~~~~~~~~~~~~~~~~~~~~
@@ -657,36 +541,8 @@ numbered as indicated in :ref:`tdm_chan_diag`:
 Callback sequences
 ..................
 
-The send/receive callbacks of "sample-based" |I2S| callbacks occur in a
-pre-determined order. The sequence consists of receipt of all even
-channel, sending of all even channels, receipt of all odd channels
-and then sending of all odd channels.
 
-Since the hardware port buffers within the xCORE device there is an
-initial sequences of sends after initialization. Similarly there is a
-final sequences of receives after a restart/shutdown request.
-:ref:`i2s_callback_seq` shows an example sequence of callbacks for two
-output lines and two input lines (four channels in and four channels out).
-
-.. _i2s_callback_seq:
-
-.. list-table:: Sample-based |I2S| callback sequence
-
- * - Initial send:
-   - S0 S2 S1 S3
- * - Frame:
-   - R0 R2 S0 S2 R1 R3 S1 S3
- * - Frame:
-   - R0 R2 S0 S2 R1 R3 S1 S3
- * - ...
-   - ...
- * - Frame:
-   - R0 R2 S0 S2 R1 R3 S1 S3
- * - Final receive:
-   - R0 R2 R1 R3
-
-
-For "frame-based" |I2S| implementations the callback sequence is much simpler. :ref:`i2s_frame_callback_seq` shows an example sequence.
+The "frame-based" |I2S| implementations have a simple sequence. :ref:`i2s_frame_callback_seq` shows an example sequence.
 
 .. _i2s_frame_callback_seq:
 
@@ -771,22 +627,7 @@ Creating an |I2S| instance
 
 |newpage|
 
-.. doxygenfunction:: i2s_master
-
-|newpage|
-
 .. doxygenfunction:: i2s_frame_slave
-
-|newpage|
-
-.. doxygenfunction:: i2s_slave
-
-|newpage|
-
-Creating an TDM instance
-........................
-
-.. doxygenfunction:: tdm_master
 
 |newpage|
 
@@ -795,12 +636,14 @@ The |I2S| frame-based callback interface
 
 .. doxygeninterface:: i2s_frame_callback_if
 
+
 |newpage|
 
-The |I2S| callback interface
-............................
+Creating an TDM instance
+........................
 
-.. doxygeninterface:: i2s_callback_if
+.. doxygenfunction:: tdm_master
+
 
 |appendix|
 
