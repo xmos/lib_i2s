@@ -57,16 +57,16 @@ All xC files which declare the application ``main()`` function need
 to include ``platform.h``. XMOS xCORE specific defines for declaring
 and initialising hardware are defined in ``xs1.h``.
 
-.. literalinclude:: main.xc
-   :start-on: include <platform.h>
-   :end-on: include <xs1.h>
+.. literalinclude:: ../../src/main.xc
+   :start-at: include <platform.h>
+   :end-at: include <xs1.h>
 
 The |I2S| library functions are defined in ``i2s.h``. This header must
 be included in your code to use the library.
 
-.. literalinclude:: main.xc
-   :start-on: include "i2s.h"
-   :end-on: include "gpio.h"
+.. literalinclude:: ../../src/main.xc
+   :start-at: include "i2s.h"
+   :end-at: include "gpio.h"
 
 The other two includes give access to the |I2C| and GPIO library functions
 which this application note relies on.
@@ -82,25 +82,25 @@ library are declared on the tile they reside and with their
 direction and buffered nature. This loopback application uses
 four 1-bit ports for input and four more for output:
 
-.. literalinclude:: main.xc
-   :start-on: out buffered port:32 p_lrclk
-   :end-on: in buffered port:32 p_din
+.. literalinclude:: ../../src/main.xc
+   :start-at: out buffered port:32 p_lrclk
+   :end-at: in buffered port:32 p_din
 
 The xCORE also provides ``clock block`` hardware to efficiently generate
 clock signal that can either be driven out on a port or used
 to control a port. In this application two clocks blocks are used:
 
-.. literalinclude:: main.xc
-   :start-on: clock mclk
-   :end-on: clock bclk
+.. literalinclude:: ../../src/main.xc
+   :start-at: clock mclk
+   :end-at: clock bclk
 
 The other ports declared are used by the |I2C| library to configure
 the audio CODECs and by the application to control reset and
 chip select:
 
-.. literalinclude:: main.xc
-   :start-on: port p_i2c
-   :end-on: port p_gpio
+.. literalinclude:: ../../src/main.xc
+   :start-at: port p_i2c
+   :end-at: port p_gpio
 
 The application main() function
 ...............................
@@ -112,15 +112,15 @@ means of concurrent tasks communicating with each other. In this
 application there is an interface for the |I2S| master, an interface
 for the |I2C| master and one for the GPIO output.
 
-.. literalinclude:: main.xc
-   :start-on: interface i2s
-   :end-on: interface output
+.. literalinclude:: ../../src/main.xc
+   :start-at: interface i2s
+   :end-at: interface output
 
 The rest of the ``main`` function starts all the tasks in parallel
 using the xC ``par`` construct:
 
-.. literalinclude:: main.xc
-   :start-on: par {
+.. literalinclude:: ../../src/main.xc
+   :start-at: par {
    :end-before: return 0
 
 This code starts the |I2S| master, the |I2C| master, the GPIO control
@@ -148,8 +148,8 @@ CODECs have to be configured before they can be used. The
 ``reset_codecs()`` function writes to the appropriate CODEC registers
 to configure them:
 
-.. literalinclude:: main.xc
-   :start-on: void reset_codecs
+.. literalinclude:: ../../src/main.xc
+   :start-at: void reset_codecs
    :end-before: [[distributable]]
 
 If porting this application to a different xCORE development board
@@ -177,9 +177,9 @@ is an xC feature that can be enabled for any task that is of the form::
 
 The function takes a number of arguments:
 
-.. literalinclude:: main.xc
-   :start-on: [[distributable]]
-   :end-on: mclk_select
+.. literalinclude:: ../../src/main.xc
+   :start-at: [[distributable]]
+   :end-at: mclk_select
 
 The interface to the |I2S| master is a callback interface that the
 |I2S| master will call over when it has received a frame data or requires a
@@ -193,8 +193,8 @@ port.
 
 The body of the loopback task handles the |I2S| interface calls:
 
-.. literalinclude:: main.xc
-   :start-on: int32_t samples
+.. literalinclude:: ../../src/main.xc
+   :start-at: int32_t samples
    :end-before: static char
 
 The |I2S| master library calls the ``init()`` method before it starts
@@ -269,8 +269,6 @@ doing a call to ``xmake``. Running the application is then done using
 References
 ----------
 
-.. nopoints::
-
  * XMOS Tools User Guide
 
    http://www.xmos.com/published/xtimecomposer-user-guide
@@ -287,10 +285,6 @@ References
 
    http://www.xmos.com/support/libraries/lib_i2c
 
- * XMOS GPIO Library
-
-   http://www.xmos.com/support/libraries/lib_gpio
-
  * |I2S| Protocol
 
    https://en.wikipedia.org/wiki/I%C2%B2S
@@ -303,7 +297,7 @@ Full source code listing
 Source code for main.xc
 .......................
 
-.. literalinclude:: main.xc
+.. literalinclude:: ../../src/main.xc
    :largelisting:
 
 |newpage|

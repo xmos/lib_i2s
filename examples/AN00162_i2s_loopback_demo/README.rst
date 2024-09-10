@@ -23,7 +23,6 @@ Required tools and libraries
 
  * xTIMEcomposer Tools - Version 14.3.2
  * XMOS |I2S|/TDM library - Version 2.4.0
- * XMOS GPIO library - Version 1.1.0
  * XMOS |I2C| library - Version 5.0.0
 
 Required hardware

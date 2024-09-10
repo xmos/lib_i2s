@@ -435,33 +435,22 @@ or needs to send a sample.
 
 .. figure:: images/i2s_generic_task_diag.*
 
-   |I2S| callback usage
 
-The callbacks are implemented by the application providing a task
-which receives requests on the ``i2s_callback_if`` xC interface. The
-application tasks can run the callbacks on the same logical core by
-implementing a *distributable* task. More information on interfaces
-and tasks can be be found
-in the  :ref:`XMOS Programming Guide<programming_guide>`.
+|I2S| frame-based master usage
+..............................
 
 A template application task is shown below. The specific contents of
 each callback will depend on the application.
 
-.. literalinclude:: simple_i2s_master.xc
-   :start-on: [[distributable]]
+.. literalinclude:: ../../examples/app_simple_i2s_frame_master/src/simple_i2s_frame_master.xc
+   :start-at: [[distributable]]
    :end-before: out buffered
-
-The send/receive callbacks pass a channel index parameter to the
-application. This channel maps to the data signals as shown in
-:ref:`i2s_channel_map`.
 
 The initialization callback will provide configuration structures
 relevant to the communication bus being used.
 The application can set the parameters
 of the bus (*MCLK/BCLK* ratio, *LRCLK* alignment etc.) at this point.
 
-|I2S| frame-based master usage
-..............................
 
 The |I2S| frame-based master task is
 instantiated as a parallel task that run in a ``par`` statement. The application
@@ -469,8 +458,8 @@ can connect via the ``i2s_frame_callback_if`` interface connection. For example,
 the following code instantiates an |I2S| frame-based master component and
 connects to it.
 
-.. literalinclude:: simple_i2s_frame_master.xc
-   :start-on: out buffered
+.. literalinclude:: ../../examples/app_simple_i2s_frame_master/src/simple_i2s_frame_master.xc
+   :start-at: out buffered
    :end-before: // end
 
 
@@ -483,7 +472,7 @@ The |I2S| frame slave task is instantiated as a parallel task that run in a
 the following code instantiates an |I2S| slave component and connects to it.
 
 .. literalinclude:: simple_i2s_frame_slave.xc
-   :start-on: out buffered
+   :start-at: out buffered
    :end-before: // end
 
 
@@ -501,7 +490,7 @@ The TDM master task is instantiated as a parallel task that run in a
 the following code instantiates an TDM master component and connects to it.
 
 .. literalinclude:: simple_tdm_master.xc
-   :start-on: out buffered
+   :start-at: out buffered
    :end-before: // end
 
 .. _i2s_channel_map:
