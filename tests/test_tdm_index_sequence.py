@@ -3,6 +3,17 @@
 from pathlib import Path
 import Pyxsim
 import pytest
+import json
+
+with open(Path(__file__).parent / "test_tdm_callback_sequence/test_params.json") as f:
+    params = json.load(f)
+
+num_in_out_args = {}
+for item in params["NUMS_IN_OUT"]:
+    num_in = item["INPUT"]
+    num_out = item["OUTPUT"]
+    num_chan = item["TDM_CHANS_PER_FRAME"]
+    num_in_out_args[f"{num_in}ch_in,{num_out}ch_out,{num_chan}chans"] = [num_in, num_out, num_chan]
 
 num_in_out_args = {"1ch_in,1ch_out,8ch": (1, 1, 8),
                    "1ch_in,0ch_out,8ch": (1, 0, 8),
@@ -11,15 +22,15 @@ num_in_out_args = {"1ch_in,1ch_out,8ch": (1, 1, 8),
 
 @pytest.mark.parametrize(("num_in", "num_out", "num_chan"), num_in_out_args.values(), ids=num_in_out_args.keys())
 def test_tdm_index_sequence(capfd, request, nightly, num_in, num_out, num_chan):
+    testlevel = '0' if nightly else '1'
+    
     if (num_chan == 4) and not nightly:
         pytest.skip("Only test non-8chan modes if nightly")
 
-    testlevel = '0' if nightly else '1'
-    id_string = f"{num_in}_{num_out}_{num_chan}"
-    id_string += "_smoke" if testlevel == '1' else ""
-
+    cfg = f"{num_in}_{num_out}_{num_chan}_{testlevel}"
     cwd = Path(request.fspath).parent
-    binary = f'{cwd}/test_i2s_callback_sequence/bin/tdm_{id_string}/test_i2s_callback_sequence_tdm_{id_string}.xe'
+    binary = f'{cwd}/test_tdm_callback_sequence/bin/{cfg}/test_tdm_callback_sequence_{cfg}.xe'
+    assert Path(binary).exists(), f"Cannot find {binary}"
 
     tester = Pyxsim.testers.AssertiveComparisonTester(
         f'{cwd}/expected/tdm_sequence_check_{num_out}{num_in}{num_chan}.expect',
@@ -29,10 +40,10 @@ def test_tdm_index_sequence(capfd, request, nightly, num_in, num_out, num_chan):
         ignore=["CONFIG:.*"]
     )
 
-    Pyxsim.run_on_simulator(
+    Pyxsim.run_on_simulator_(
         binary,
         tester=tester,
-        build_env = {"NUMS_IN_OUT":f'{num_in};{num_out}', "TDM_CHANS_PER_FRAME":f"{num_chan}", "SMOKE":testlevel, "TDM":"1"},
+        do_xe_prebuild=False,
         simargs=[],
         capfd=capfd
     )
