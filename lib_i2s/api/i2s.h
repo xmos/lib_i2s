@@ -12,7 +12,6 @@
 #define static_const_size_t static const size_t
 #define in_port_t in port
 #define out_port_t out port
-#define interface struct
 #endif
 
 /** I2S mode.
@@ -72,7 +71,13 @@ typedef enum i2s_restart_t {
  *  operation of the I2S task. This is a more efficient interface
  *  and reccomended for new designs.
  */
+#ifndef __DOXYGEN__
 typedef interface i2s_frame_callback_if {
+#endif
+  /**
+   * \addtogroup i2s_frame_callback_if
+   * @{
+   */
 
   /**  I2S frame-based initialization event callback.
    *
@@ -88,7 +93,7 @@ typedef interface i2s_frame_callback_if {
    *                            of the structure should be set to the
    *                            required configuration.
    */
-  void init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config);
+  void init(NULLABLE_REFERENCE_PARAM(i2s_config_t, i2s_config), NULLABLE_REFERENCE_PARAM(tdm_config_t, tdm_config));
 
   /**  I2S frame-based restart check callback.
    *
@@ -127,13 +132,23 @@ typedef interface i2s_frame_callback_if {
    */
   void send(size_t num_out, int32_t samples[num_out]);
 
-} i2s_frame_callback_if;
 
+/**@}*/ // END: addtogroup i2s_frame_callback_if
+
+#ifndef __DOXYGEN__
+} i2s_frame_callback_if;
 
 /** Interface representing callback events that can occur during the
  *   operation of the TDM task
  */
 typedef interface tdm_callback_if {
+#endif // __DOXYGEN__
+
+
+  /**
+   * \addtogroup tdm_callback_if
+   * @{
+   */
 
   /**  TDM initialization event callback.
    *
@@ -149,7 +164,7 @@ typedef interface tdm_callback_if {
    *                            of the structure should be set to the
    *                            required configuration.
    */
-  void init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config);
+  void init(NULLABLE_REFERENCE_PARAM(i2s_config_t, i2s_config), NULLABLE_REFERENCE_PARAM(tdm_config_t, tdm_config));
 
   /**  TDM restart check callback.
    *
@@ -181,7 +196,12 @@ typedef interface tdm_callback_if {
    */
   int32_t send(size_t index);
 
+/**@}*/ // END: addtogroup tdm_callback_if
+
+
+#ifndef __DOXYGEN__
 } tdm_callback_if;
+#endif // __DOXYGEN__
 
 
 /** I2S frame-based master component **for xCORE200 and xcore.ai only**
