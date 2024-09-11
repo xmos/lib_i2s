@@ -5,6 +5,14 @@
 #include <xs1.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <xccompat.h>
+
+// These are needed for DOXYGEN to render properly
+#ifndef __DOXYGEN__
+#define static_const_size_t static const size_t
+#define in_port_t in port
+#define out_port_t out port
+#endif
 
 /** I2S mode.
  *
@@ -175,8 +183,6 @@ typedef interface tdm_callback_if {
 } tdm_callback_if;
 
 
-#if defined(__XS2A__) || defined(__XS3A__) || defined(__DOXYGEN__)
-
 /** I2S frame-based master component **for xCORE200 and xcore.ai only**
  *
  *  This task performs I2S on the provided pins. It will perform callbacks over
@@ -204,15 +210,16 @@ typedef interface tdm_callback_if {
  *  \param bclk           A clock that will get configured for use with
  *                        the bit clock
  */
-void i2s_frame_master(client i2s_frame_callback_if i2s_i,
-                out buffered port:32 (&?p_dout)[num_out],
-                static const size_t num_out,
-                in buffered port:32 (&?p_din)[num_in],
-                static const size_t num_in,
-                static const size_t num_data_bits,
-                out port p_bclk,
-                out buffered port:32 p_lrclk,
-                in port p_mclk,
+void i2s_frame_master(
+                CLIENT_INTERFACE(i2s_frame_callback_if, i2s_i),
+                NULLABLE_ARRAY_OF_SIZE(out_buffered_port_32_t, p_dout, num_out),
+                static_const_size_t num_out,
+                NULLABLE_ARRAY_OF_SIZE(in_buffered_port_32_t, p_din, num_in),
+                static_const_size_t num_in,
+                static_const_size_t num_data_bits,
+                out_port_t p_bclk,
+                out_buffered_port_32_t p_lrclk,
+                in_port_t p_mclk,
                 clock bclk);
 
 /** I2S frame-based master component with 4-bit ports **for xCORE200 and xcore.ai only**
@@ -243,14 +250,14 @@ void i2s_frame_master(client i2s_frame_callback_if i2s_i,
  *  \param bclk           A clock that will get configured for use with
  *                        the bit clock
  */
-void i2s_frame_master_4b(client i2s_frame_callback_if i2s_i,
-                out buffered port:32 ?p_dout,
-                static const size_t num_out,
-                in buffered port:32 ?p_din,
-                static const size_t num_in,
-                out port p_bclk,
-                out buffered port:32 p_lrclk,
-                in port p_mclk,
+void i2s_frame_master_4b(CLIENT_INTERFACE(i2s_frame_callback_if, i2s_i),
+                NULLABLE_ARRAY_OF_SIZE(out_buffered_port_32_t, p_dout, num_out),
+                static_const_size_t num_out,
+                NULLABLE_ARRAY_OF_SIZE(in_buffered_port_32_t, p_din, num_in),
+                static_const_size_t num_in,
+                out_port_t p_bclk,
+                out_buffered_port_32_t p_lrclk,
+                in_port_t p_mclk,
                 clock bclk);
 
 /** I2S frame-based master component **for xCORE200 and xcore.ai only**
@@ -324,8 +331,6 @@ void i2s_frame_master_external_clock_4b(client i2s_frame_callback_if i2s_i,
                 out port p_bclk,
                 out buffered port:32 p_lrclk,
                 clock bclk);
-#endif // __XS2A__
-
 
 /** I2S High Efficiency slave component.
  *

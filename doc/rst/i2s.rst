@@ -616,6 +616,18 @@ Creating an |I2S| instance
 
 |newpage|
 
+.. doxygenfunction:: i2s_frame_master_4b
+
+|newpage|
+
+.. doxygenfunction:: i2s_frame_master_external_clock
+
+|newpage|
+
+.. doxygenfunction:: i2s_frame_master_external_clock_4b
+
+|newpage|
+
 .. doxygenfunction:: i2s_frame_slave
 
 |newpage|
