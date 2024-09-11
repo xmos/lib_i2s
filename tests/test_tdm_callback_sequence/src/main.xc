@@ -68,33 +68,31 @@ static int request_response(){
 
 [[distributable]]
 #pragma unsafe arrays
-void app(server interface i2s_callback_if i2s){
+void app(server interface tdm_callback_if tdm){
   int fcount = 0;
   i2s_mode_t mode = I2S_MODE_I2S;
   int first_time = 1;
   while(1) {
     select {
-    case i2s.receive(size_t index, int32_t sample):
+    case tdm.receive(size_t index, int32_t sample):
       printstr(" R");
       printint(index);
       break;
-    case i2s.send(size_t index) -> int32_t r:
+    case tdm.send(size_t index) -> int32_t r:
       printstr(" S");
       printint(index);
       break;
-    case i2s.restart_check() -> i2s_restart_t restart:
+    case tdm.restart_check() -> i2s_restart_t restart:
       fcount++;
       if (fcount % 4 == 0)
         restart = I2S_RESTART;
       else
         restart = I2S_NO_RESTART;
       break;
-    case i2s.init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config):
-#if defined(TDM)
+    case tdm.init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config):
       tdm_config.offset = 0;
       tdm_config.sync_len = 1;
       tdm_config.channels_per_frame = TDM_CHANS_PER_FRAME;
-#endif
 
       if (!isnull(i2s_config)) {
         i2s_config.mclk_bclk_ratio = RATIO;
@@ -122,22 +120,15 @@ void app(server interface i2s_callback_if i2s){
 }
 
 int main(){
-    interface i2s_callback_if i_i2s;
+    interface tdm_callback_if i_tdm;
 #if !defined(SLAVE)
     configure_clock_ref(mclk, 32);
     start_clock(mclk);
 #endif
     par {
-      app(i_i2s);
-#if defined(TDM)
-      tdm_master(i_i2s, p_fsync, p_dout, NUM_OUT, p_din, NUM_IN, mclk);
-#elif defined(MASTER)
-      i2s_master(i_i2s, p_dout, NUM_OUT, p_din, NUM_IN,
-                 p_bclk, p_lrclk, bclk, mclk);
-#else
-      i2s_slave(i_i2s, p_dout, NUM_OUT, p_din, NUM_IN,
-                p_bclk, p_lrclk, bclk);
-#endif
+      app(i_tdm);
+      tdm_master(i_tdm, p_fsync, p_dout, NUM_OUT, p_din, NUM_IN, mclk);
+
     }
     return 0;
 }

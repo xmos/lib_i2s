@@ -106,7 +106,7 @@ static int request_response(
 
 [[distributable]]
 #pragma unsafe arrays
-void app(server interface i2s_callback_if tdm_i){
+void app(server interface tdm_callback_if tdm_i){
 
 
     int error=0;
@@ -169,7 +169,7 @@ void app(server interface i2s_callback_if tdm_i){
 }
 
 int main(){
-    interface i2s_callback_if tdm_i;
+    interface tdm_callback_if tdm_i;
 
     stop_clock(sclk);
     configure_clock_src(sclk, p_sclk);
