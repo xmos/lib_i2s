@@ -612,7 +612,10 @@ Supporting types
 The |I2S| frame-based callback interface
 ........................................
 
-.. doxygenstruct:: i2s_frame_callback_if
+.. doxygentypedef:: i2s_frame_callback_if
+
+.. doxygengroup:: i2s_frame_callback_if_members
+
 
 |newpage|
 
@@ -646,7 +649,7 @@ Creating an |I2S| instance
 The TDM callback interface
 ........................................
 
-.. doxygenstruct:: tdm_callback_if
+.. doxygentypedef:: tdm_callback_if
 
 |newpage|
 

@@ -3,7 +3,6 @@
 #include <i2s.h>
 
 
-
 #undef i2s_frame_master
 void i2s_frame_master(
                 CLIENT_INTERFACE(i2s_frame_callback_if, i2s_i),
@@ -21,11 +20,10 @@ void i2s_frame_master(
                 // unsigned p_bclk,
                 out_port_t p_bclk,
                 out_buffered_port_32_t p_lrclk,
-                // out buffered port:32 p_lrclk,
-                // unsigned p_mclk,
                 in_port_t p_mclk,
                 clock bclk)
-{}
+{
+}
 
 #undef i2s_frame_slave
 void i2s_frame_slave(CLIENT_INTERFACE(i2s_frame_callback_if, i2s_i),
