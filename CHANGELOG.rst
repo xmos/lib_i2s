@@ -8,6 +8,7 @@ lib_i2s change log
   * REMOVED: I2S non "frame" API (superseded by more efficient frame versions)
   * CHANGED: Support for XCommon-C<ke and use in examples/tests
   * CHANGED: Examples ported to XU316_MC board (was XU216_MC)
+  * CHANGED: Examples use lib_board_support instead of custom hardware setup
 
 5.1.0
 -----

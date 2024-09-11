@@ -37,7 +37,7 @@ static const xk_audio_316_mc_ab_config_t hw_config = {
 
 
 [[distributable]]
-void tdm_loopback(server i2s_callback_if i2s,
+void tdm_loopback(server tdm_callback_if tdm,
                   client i2c_master_if i2c)
 {
 
@@ -48,7 +48,7 @@ void tdm_loopback(server i2s_callback_if i2s,
 
   while (1) {
     select {
-    case i2s.init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config):
+    case tdm.init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config):
       tdm_config.offset = 0;
       tdm_config.sync_len = DATA_BITS;
       tdm_config.channels_per_frame = CHANS_PER_FRAME;
@@ -56,15 +56,15 @@ void tdm_loopback(server i2s_callback_if i2s,
       xk_audio_316_mc_ab_AudioHwConfig(i2c, hw_config, SAMPLE_FREQUENCY, MASTER_CLOCK_FREQUENCY, 0, DATA_BITS, DATA_BITS);
       break;
 
-    case i2s.restart_check() -> i2s_restart_t restart:
+    case tdm.restart_check() -> i2s_restart_t restart:
       restart = I2S_NO_RESTART;
       break;
 
-    case i2s.receive(size_t index, int32_t sample):
+    case tdm.receive(size_t index, int32_t sample):
       samples[index] = sample;
       break;
 
-    case i2s.send(size_t index) -> int32_t sample:
+    case tdm.send(size_t index) -> int32_t sample:
       sample = samples[index];
       break;
     }
@@ -72,17 +72,17 @@ void tdm_loopback(server i2s_callback_if i2s,
 }
 
 int main() {
-  interface i2s_callback_if i_i2s;
+  interface tdm_callback_if i_tdm;
   interface i2c_master_if i_i2c[1];
   par {
     on tile[1]: {
       configure_clock_src_divide(bclk, p_mclk, 1);
       configure_port_clock_output(p_bclk, bclk); 
-      tdm_master(i_i2s, p_fsync, p_dac, NUM_TDM_LINES, p_adc, NUM_TDM_LINES, bclk);
+      tdm_master(i_tdm, p_fsync, p_dac, NUM_TDM_LINES, p_adc, NUM_TDM_LINES, bclk);
     }
 
     on tile[1]: [[distribute]]
-      tdm_loopback(i_i2s, i_i2c[0]);
+      tdm_loopback(i_tdm, i_i2c[0]);
 
     on tile[1]: par(int i=0;i<7;i++) while(1);
 

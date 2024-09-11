@@ -634,6 +634,14 @@ Creating an TDM instance
 .. doxygenfunction:: tdm_master
 
 
+The TDM callback interface
+........................................
+
+.. doxygeninterface:: tdm_frame_callback_if
+
+
+
+
 |appendix|
 
 Known Issues

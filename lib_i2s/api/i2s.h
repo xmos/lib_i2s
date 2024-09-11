@@ -121,6 +121,60 @@ typedef interface i2s_frame_callback_if {
 } i2s_frame_callback_if;
 
 
+/** Interface representing callback events that can occur during the
+ *   operation of the TDM task
+ */
+typedef interface tdm_callback_if {
+
+  /**  TDM initialization event callback.
+   *
+   *   The TDM component will call this
+   *   when it first initializes on first run of after a restart.
+   *
+   *   \param i2s_config        This structure is provided if the connected
+   *                            component drives an I2S bus. The members
+   *                            of the structure should be set to the
+   *                            required configuration.
+   *   \param tdm_config        This structure is provided if the connected
+   *                            component drives an TDM bus. The members
+   *                            of the structure should be set to the
+   *                            required configuration.
+   */
+  void init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config);
+
+  /**  TDM restart check callback.
+   *
+   *   This callback is called once per frame. The application must return the
+   *   required restart behaviour.
+   *
+   *   \return          The return value should be set to
+   *                    ``I2S_NO_RESTART``, ``I2S_RESTART`` or
+   *                    ``I2S_SHUTDOWN``.
+   */
+  i2s_restart_t restart_check();
+
+  /**  Receive an incoming sample.
+   *
+   *   This callback will be called when a new sample is read in by the TDM
+   *   component.
+   *
+   *   \param index     The index of the sample in the frame.
+   *   \param sample    The sample data as a signed 32-bit value. 
+   */
+  void receive(size_t index, int32_t sample);
+
+  /** Request an outgoing sample.
+   *
+   *  This callback will be called when the TDM component needs a new sample.
+   *
+   *  \param index      The index of the requested sample in the frame.
+   *  \returns          The sample data as a signed 32-bit value.
+   */
+  int32_t send(size_t index);
+
+} tdm_callback_if;
+
+
 #if defined(__XS2A__) || defined(__XS3A__) || defined(__DOXYGEN__)
 
 /** I2S frame-based master component **for xCORE200 and xcore.ai only**
@@ -336,7 +390,7 @@ void i2s_frame_slave_4b(client i2s_frame_callback_if i2s_i,
 /** TDM master component.
  *
  *  This task performs TDM on the provided pins. It will perform callbacks over
- *  the i2s_callback_if interface to get/receive data from the application
+ *  the tdm_callback_if interface to get/receive data from the application
  *  using this component.
  *
  *  The component performs as TDM master so will drive the fsync signal.
@@ -352,7 +406,7 @@ void i2s_frame_slave_4b(client i2s_frame_callback_if i2s_i,
  *                        Usually this should be configured to be driven by
  *                        an incoming master system clock.
  */
-void tdm_master(client interface i2s_callback_if tdm_i,
+void tdm_master(client interface tdm_callback_if tdm_i,
         out buffered port:32 p_fsync,
         out buffered port:32 (&?p_dout)[num_out],
         size_t num_out,

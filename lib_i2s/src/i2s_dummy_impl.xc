@@ -35,7 +35,7 @@ void i2s_frame_slave(client i2s_frame_callback_if i2s_i,
 }
 
 #undef tdm_master
-void tdm_master(client interface i2s_callback_if tdm_i,
+void tdm_master(client interface tdm_callback_if tdm_i,
         out buffered port:32 p_fsync,
         out buffered port:32 (&?p_dout)[num_out],
         size_t num_out,
