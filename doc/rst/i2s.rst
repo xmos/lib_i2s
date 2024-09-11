@@ -609,6 +609,13 @@ Supporting types
 
 |newpage|
 
+The |I2S| frame-based callback interface
+........................................
+
+.. doxygenstruct:: i2s_frame_callback_if
+
+|newpage|
+
 Creating an |I2S| instance
 ..........................
 
@@ -632,11 +639,14 @@ Creating an |I2S| instance
 
 |newpage|
 
-The |I2S| frame-based callback interface
+.. doxygenfunction:: i2s_frame_slave_4b
+
+|newpage|
+
+The TDM callback interface
 ........................................
 
-.. doxygeninterface:: i2s_frame_callback_if
-
+.. doxygenstruct:: tdm_callback_if
 
 |newpage|
 
@@ -646,10 +656,7 @@ Creating an TDM instance
 .. doxygenfunction:: tdm_master
 
 
-The TDM callback interface
-........................................
 
-.. doxygeninterface:: tdm_callback_if
 
 
 

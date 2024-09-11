@@ -12,6 +12,7 @@
 #define static_const_size_t static const size_t
 #define in_port_t in port
 #define out_port_t out port
+#define interface struct
 #endif
 
 /** I2S mode.
@@ -286,14 +287,15 @@ void i2s_frame_master_4b(CLIENT_INTERFACE(i2s_frame_callback_if, i2s_i),
  *  \param bclk           A clock that is configured externally to be used as the bit clock
  *                        
  */
-void i2s_frame_master_external_clock(client i2s_frame_callback_if i2s_i,
-                out buffered port:32 (&?p_dout)[num_out],
-                static const size_t num_out,
-                in buffered port:32 (&?p_din)[num_in],
-                static const size_t num_in,
-                static const size_t num_data_bits,
-                out port p_bclk,
-                out buffered port:32 p_lrclk,
+void i2s_frame_master_external_clock(CLIENT_INTERFACE(i2s_frame_callback_if, i2s_i),
+                NULLABLE_ARRAY_OF_SIZE(out_buffered_port_32_t, p_dout, num_out),
+                static_const_size_t num_out,
+                NULLABLE_ARRAY_OF_SIZE(in_buffered_port_32_t, p_din, num_in),
+                static_const_size_t num_in,
+                static_const_size_t num_data_bits,
+                out_port_t p_bclk,
+                out_buffered_port_32_t p_lrclk,
+                in_port_t p_mclk,
                 clock bclk);
 
 /** I2S frame-based master component with 4-bit ports **for xCORE200 amd xcore.ai only**
@@ -323,13 +325,14 @@ void i2s_frame_master_external_clock(client i2s_frame_callback_if i2s_i,
  *  \param bclk           A clock that will get configured for use with
  *                        the bit clock
  */
-void i2s_frame_master_external_clock_4b(client i2s_frame_callback_if i2s_i,
-                out buffered port:32 (&?p_dout)[num_out],
-                static const size_t num_out,
-                in buffered port:32 (&?p_din)[num_in],
-                static const size_t num_in,
-                out port p_bclk,
-                out buffered port:32 p_lrclk,
+void i2s_frame_master_external_clock_4b(CLIENT_INTERFACE(i2s_frame_callback_if, i2s_i),
+                NULLABLE_ARRAY_OF_SIZE(out_buffered_port_32_t, p_dout, num_out),
+                static_const_size_t num_out,
+                NULLABLE_ARRAY_OF_SIZE(in_buffered_port_32_t, p_din, num_in),
+                static_const_size_t num_in,
+                out_port_t p_bclk,
+                out_buffered_port_32_t p_lrclk,
+                in_port_t p_mclk,
                 clock bclk);
 
 /** I2S High Efficiency slave component.
@@ -353,15 +356,15 @@ void i2s_frame_master_external_clock_4b(client i2s_frame_callback_if i2s_i,
  *  \param bclk           A clock that will get configured for use with
  *                        the bit clock
  */
-void i2s_frame_slave(client i2s_frame_callback_if i2s_i,
-        out buffered port:32 (&?p_dout)[num_out],
-        static const size_t num_out,
-        in buffered port:32 (&?p_din)[num_in],
-        static const size_t num_in,
-        static const size_t num_data_bits,
-        in port p_bclk,
-        in buffered port:32 p_lrclk,
-        clock bclk);
+void i2s_frame_slave(CLIENT_INTERFACE(i2s_frame_callback_if, i2s_i),
+                NULLABLE_ARRAY_OF_SIZE(out_buffered_port_32_t, p_dout, num_out),
+                static_const_size_t num_out,
+                NULLABLE_ARRAY_OF_SIZE(in_buffered_port_32_t, p_din, num_in),
+                static_const_size_t num_in,
+                static_const_size_t num_data_bits,
+                in_port_t p_bclk,
+                in_buffered_port_32_t p_lrclk,
+                clock bclk);
 
 /** I2S High Efficiency slave component.
  *
@@ -383,14 +386,14 @@ void i2s_frame_slave(client i2s_frame_callback_if i2s_i,
  *  \param bclk           A clock that will get configured for use with
  *                        the bit clock
  */
-void i2s_frame_slave_4b(client i2s_frame_callback_if i2s_i,
-        out buffered port:32 (&?p_dout)[num_out],
-        static const size_t num_out,
-        in buffered port:32 (&?p_din)[num_in],
-        static const size_t num_in,
-        in port p_bclk,
-        in buffered port:32 p_lrclk,
-        clock bclk);
+void i2s_frame_slave_4b(CLIENT_INTERFACE(i2s_frame_callback_if, i2s_i),
+                NULLABLE_ARRAY_OF_SIZE(out_buffered_port_32_t, p_dout, num_out),
+                static_const_size_t num_out,
+                NULLABLE_ARRAY_OF_SIZE(in_buffered_port_32_t, p_din, num_in),
+                static_const_size_t num_in,
+                out_port_t p_bclk,
+                out_buffered_port_32_t p_lrclk,
+                clock bclk);
 
 /** TDM master component.
  *
@@ -411,13 +414,13 @@ void i2s_frame_slave_4b(client i2s_frame_callback_if i2s_i,
  *                        Usually this should be configured to be driven by
  *                        an incoming master system clock.
  */
-void tdm_master(client interface tdm_callback_if tdm_i,
-        out buffered port:32 p_fsync,
-        out buffered port:32 (&?p_dout)[num_out],
-        size_t num_out,
-        in buffered port:32 (&?p_din)[num_in],
-        size_t num_in,
-        clock clk);
+void tdm_master(CLIENT_INTERFACE(tdm_callback_if, tdm_i),
+                out_buffered_port_32_t p_fsync,
+                NULLABLE_ARRAY_OF_SIZE(out_buffered_port_32_t, p_dout, num_out),
+                static_const_size_t num_out,
+                NULLABLE_ARRAY_OF_SIZE(in_buffered_port_32_t, p_din, num_in),
+                static_const_size_t num_in,
+                clock clk);
 
 
 #include <i2s_frame_master_impl.h>
