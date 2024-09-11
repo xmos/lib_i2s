@@ -1,4 +1,4 @@
-.. include:: ../../../README.rst
+.. include:: ../../README.rst
 
 External signal description
 ---------------------------
@@ -471,7 +471,7 @@ The |I2S| frame slave task is instantiated as a parallel task that run in a
 ``i2s_frame_callback_if``  interface connection. For example,
 the following code instantiates an |I2S| slave component and connects to it.
 
-.. literalinclude:: simple_i2s_frame_slave.xc
+.. literalinclude:: ../../examples/app_simple_i2s_frame_slave/src/simple_i2s_frame_slave.xc
    :start-at: out buffered
    :end-before: // end
 
@@ -486,10 +486,10 @@ TDM usage
 
 The TDM master task is instantiated as a parallel task that run in a
 ``par`` statement. The application can connect via the
-``i2s_callback_if``  interface connection. For example,
+``tdm_callback_if``  interface connection. For example,
 the following code instantiates an TDM master component and connects to it.
 
-.. literalinclude:: simple_tdm_master.xc
+.. literalinclude:: ../../examples/app_simple_tdm_master/src/simple_tdm_master.xc
    :start-at: out buffered
    :end-before: // end
 
@@ -637,16 +637,18 @@ Creating an TDM instance
 The TDM callback interface
 ........................................
 
-.. doxygeninterface:: tdm_frame_callback_if
+.. doxygeninterface:: tdm_callback_if
 
 
 
-
-|appendix|
 
 Known Issues
 ------------
 
 No known issues.
 
-.. include:: ../../CHANGELOG.rst
+
+Changelog
+---------
+
+Please see ``CHANGELOG.rst`` in the root of `lib_i2s <https://github.com/xmos/lib_i2s>`_ for details of versions and changes to the library.

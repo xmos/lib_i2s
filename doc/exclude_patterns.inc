@@ -1,3 +1,8 @@
 # The following patterns are to be excluded from the documentation build
-*CHANGELOG.rst
-*LICENSE.rst
+examples
+test
+.pytest_cache
+CHANGELOG.rst
+LICENSE.rst
+README.rst
+README.md
