@@ -64,7 +64,7 @@ void i2s_loopback(server i2s_frame_callback_if i_i2s, client i2c_master_if i_i2c
             break;
         }
     }
-}
+} // End i2s_loopback
 
 
 int main(void)

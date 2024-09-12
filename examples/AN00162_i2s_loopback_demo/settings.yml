@@ -1,0 +1,25 @@
+# This file relates to internal XMOS infrastructure and should be ignored by users
+
+an_number: AN00162
+project: '{{an_number}}'
+title: '{{an_number}}: Using the I2S library'
+version: 2.0.0
+
+documentation:
+  substitutions_path: ../../doc/substitutions.inc
+  exclude_patterns_path: doc/exclude_patterns.inc
+  linkcheck_ignore_regex: ['.*lib_board_support.*']
+  root_doc: doc/rst/AN00162.rst
+  cognidox_part_number: XM-010239-AN
+  pdfs:
+    doc/rst/AN00162.rst:
+      pdf_title: '{{title}}'
+      pdf_filename: '{{an_number}}_v{{version}}'
+      pdf_short: yes
+    README.rst:
+      pdf_title: '{{title}} (README)'
+      pdf_filename: '{{an_number}}_v{{version}}_readme'
+      pdf_short: yes
+
+software:
+  cognidox_part_number: XM-010242-SM

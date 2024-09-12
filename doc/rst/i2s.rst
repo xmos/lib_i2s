@@ -487,7 +487,7 @@ TDM usage
 The TDM master task is instantiated as a parallel task that run in a
 ``par`` statement. The application can connect via the
 ``tdm_callback_if``  interface connection. For example,
-the following code instantiates an TDM master component and connects to it.
+the following code instantiates a TDM master component and connects to it.
 
 .. literalinclude:: ../../examples/app_simple_tdm_master/src/simple_tdm_master.xc
    :start-at: out buffered
@@ -617,8 +617,8 @@ The |I2S| frame-based callback interface
 
 |newpage|
 
-Creating an |I2S| instance
-..........................
+The |I2S| task instance
+.......................
 
 .. doxygenfunction:: i2s_frame_master
 
@@ -645,14 +645,14 @@ Creating an |I2S| instance
 |newpage|
 
 The TDM callback interface
-........................................
+..........................
 
 .. doxygengroup:: tdm_callback_if
 
 |newpage|
 
-Creating an TDM instance
-........................
+The TDM task instance
+.....................
 
 .. doxygenfunction:: tdm_master
 

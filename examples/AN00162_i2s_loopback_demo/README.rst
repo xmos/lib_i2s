@@ -1,6 +1,3 @@
-.. |I2S| replace:: I\ :sup:`2`\ S
-.. |I2C| replace:: I\ :sup:`2`\ C
-
 Using the I2S library
 =====================
 
@@ -21,15 +18,15 @@ loopback all 8 channels.
 Required tools and libraries
 ............................
 
- * xTIMEcomposer Tools - Version 14.3.2
- * XMOS |I2S|/TDM library - Version 2.4.0
- * XMOS |I2C| library - Version 5.0.0
+ * xTIMEcomposer Tools - Version 15.3.0
+ * XMOS |I2S|/TDM library - Version 6.0.0
+ * XMOS Board Support library - Version 1.0.0
 
 Required hardware
 .................
 
 The example code provided with the application has been implemented
-and tested on the xCORE-200 Multichannel Audio Platform.
+and tested on the XU316 Multichannel Audio board.
 
 Prerequisites
 ..............
@@ -38,8 +35,3 @@ Prerequisites
    architecture, the XMOS tool chain and the xC language. Documentation related
    to these aspects which are not specific to this application note are linked
    to in the references appendix.
-
- * For a description of XMOS related terms found in this document
-   please see the XMOS Glossary [#]_.
-
-.. [#] http://www.xmos.com/published/glossary
