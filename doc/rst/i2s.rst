@@ -20,7 +20,7 @@ in :ref:`i2s_wire_table`.
      * - *BCLK*
        - Bit clock. This is a fixed divide of the *MCLK* and is driven
          by the master.
-     * - *LRCLK* (or *WCLK*)
+     * - *LRCLK*/*WCLK*
        - Word clock (or word select). This is driven by the master.
      * - *DATA*
        - Data line, driven by one of the slave or master depending on
@@ -222,7 +222,7 @@ working configurations:
        - 1 (2)
 
 .. tip::
-   |I2S| "frame-master" is capable of running at higher rates such as 768kHz within a 62.5MIPS logical core using one bit ports for I/O. However, it may be necessary to modify the port timing delays to ensure proper sampling of the data and LRCLK lines. There are methods for doing this using pad and/or sample delays however this is beyond the scope of this document. Please consult `I/O timings for xCORE200` available on xmos.com for further information. 
+   If running at higher rates such as 768kHz, it may be necessary to modify the port timing delays to ensure proper sampling of the data and LRCLK lines. There are methods for doing this using pad and/or sample delays however this is beyond the scope of this document. Please consult `I/O timings for xCORE200 / xcore.ai` available on xmos.com for further information. 
 
 
 
@@ -423,7 +423,7 @@ All |I2S| functions can be accessed via the ``i2s.h`` header::
   #include <i2s.h>
 
 You will also have to add ``lib_i2s`` to the
-``USED_MODULES`` field of your application Makefile.
+``USED_MODULES`` or ``APP_DEPENDENT_MODULES`` field of your application Makefile.
 
 The |I2S| callback interface
 ............................
@@ -580,7 +580,7 @@ application to request a restart/shutdown of the data bus.
 Clock configuration
 ...................
 
-For the |I2S| master and TDM components is it the application's
+For the TDM components is it the application's
 responsibility to set up and start the internal clock used for the master clock
 before calling the component.
 

@@ -23,7 +23,7 @@ Block Diagram
 .............
 
 .. figure:: images/block_diagram.drawio.*
-   :width: 80%
+   :width: 60%
 
    Application block diagram
 
@@ -128,7 +128,7 @@ master clock is connected from the input port to the clock block and
 then started. The |I2S| master task then starts and consumes a logical
 core on the xCORE device.
 
-The remaining  ``i2s_loopback``task in the ``par`` is marked with the
+The remaining ``i2s_loopback`` task in the ``par`` is marked with the
 ``[[distribute]]`` attribute. This means they will run on an existing
 logical core if possible. In this case they will all share the
 one logical core with the |I2S| master.
