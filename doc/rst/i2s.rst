@@ -244,7 +244,7 @@ The table :ref:`i2s_frame_slave_62_5_speeds` shows the known working configurati
 
 .. _i2s_frame_slave_62_5_speeds:
 
-.. list-table:: Known working |I2S| frame-based master configurations on a 62.5MHz core using one bit ports for I/O
+.. list-table:: Known working |I2S| frame-based slave configurations on a 62.5MHz core using one bit ports for I/O
      :class: vertical-borders horizontal-borders
      :header-rows: 1
      :widths: 20 20 20 20 20
@@ -273,7 +273,7 @@ The table :ref:`i2s_frame_slave_62_5_speeds` shows the known working configurati
 Note that the when acting as slave the performance of the library only depends on the bit clock frequency,
 not the underlying master clock frequency.
 
-.. list-table:: Known working |I2S| frame-based master configurations on a 62.5MHz core using four bit ports for I/O
+.. list-table:: Known working |I2S| frame-based slave configurations on a 62.5MHz core using four bit ports for I/O
      :class: vertical-borders horizontal-borders
      :header-rows: 1
      :widths: 20 20 20 20 20
