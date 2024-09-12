@@ -6,7 +6,7 @@ title: '{{an_number}}: Using the I2S library'
 version: 2.0.0
 
 documentation:
-  substitutions_path: ../../doc/substitutions.inc
+  substitutions_path: doc/substitutions.inc
   exclude_patterns_path: doc/exclude_patterns.inc
   linkcheck_ignore_regex: ['.*lib_board_support.*']
   root_doc: doc/rst/AN00162.rst
