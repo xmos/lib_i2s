@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 include($ENV{XMOS_CMAKE_PATH}/xcommon.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/../../deps.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/../test_deps.cmake)
 
 # Get JSON lists
 file(READ ${CMAKE_CURRENT_LIST_DIR}/test_params.json JSON_CONTENT)
