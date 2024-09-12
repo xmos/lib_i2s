@@ -1,3 +1,5 @@
+.. |I2S| replace:: I\ :sup:`2`\ S
+
 Using the I2S library
 =====================
 
