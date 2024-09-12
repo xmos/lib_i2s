@@ -104,7 +104,7 @@ pipeline {
                 }
               }
             }
-            stage('Run xdoc') {
+            stage('Run xmosdoc') {
               steps {
                 dir("${REPO}") {
                   sh "docker pull ghcr.io/xmos/xmosdoc:$XMOSDOC_VERSION"
@@ -117,6 +117,19 @@ pipeline {
                   zip dir: "doc/_build/html", zipFile: "lib_i2s_docs_html.zip"
                   archiveArtifacts artifacts: "lib_i2s_docs_html.zip"
                   archiveArtifacts artifacts: "doc/_build/pdf/lib_i2s*.pdf"
+
+                  dir("examples/AN00162_i2s_loopback_demo") {
+                    sh """docker run -u "\$(id -u):\$(id -g)" \
+                          --rm \
+                          -v \$(pwd):/build \
+                          ghcr.io/xmos/xmosdoc:$XMOSDOC_VERSION -v html latex"""
+
+                    // Zip and archive doc files
+                    sh 'tree'
+                    zip dir: "doc/_build/html", zipFile: "AN00162_docs_html.zip"
+                    archiveArtifacts artifacts: "AN00162_docs_html.zip"
+                    archiveArtifacts artifacts: "doc/_build/pdf/AN00162*.pdf"
+                  }
                 }
               }
             }
@@ -126,8 +139,6 @@ pipeline {
                   withTools(params.TOOLS_VERSION) {
                     sh 'cmake -B build -G "Unix Makefiles"'
                     sh 'xmake -j 16 -C build'
-                    // xcoreAllAppNotesBuild('examples')
-                    // TODO ADD BUILD FOR APPNOTE
                   }
                 }
               }
@@ -138,7 +149,7 @@ pipeline {
               xcoreCleanSandbox()
             }
           }
-        } // XS3 Tests and xdoc
+        } // XS3 Build and xdoc
       } // Parallel
     } // Main
   } // stages
