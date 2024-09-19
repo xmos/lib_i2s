@@ -45,8 +45,8 @@ To start using the |I2S|, you need to add ``lib_i2s`` to your CMake Makefile::
   set(APP_DEPENDENT_MODULES   "lib_i2s")
 
 This demo also uses the |I2C| library (``lib_i2c``) and which is brought in
-automatically as a dependancy of ``lib_board_support`` and is used to configure the
-audio CODECs. So the Makefile also should also include::
+automatically as a dependency of ``lib_board_support`` and is used to configure the
+audio CODECs. So CMakeLists.txt also should also include::
 
   set(APP_DEPENDENT_MODULES     "lib_i2s"
                                 "lib_board_support")
@@ -246,7 +246,7 @@ Finally, the application binaries can be built using ``xmake``::
 
     xmake -j -C build
 
-The application uses approximately 3 kB on Tile[0] and 7 kB on Tile[1] of 512 kB on each
+The application uses approximately 3 kB on Tile[0] and 7 kB on Tile[1] of 512 kB on each.
 
 Demo hardware setup
 -------------------
