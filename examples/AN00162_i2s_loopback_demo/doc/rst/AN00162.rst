@@ -243,7 +243,7 @@ Finally, the application binaries can be built using ``xmake``::
 
     xmake -j -C build
 
-The application uses approximately 3 kB on Tile[0] and 7 kB on Tile[1] of 512 kB on each
+The application uses approximately 3 kB on Tile[0] and 7 kB on Tile[1] of 512 kB on each.
 
 Demo hardware setup
 -------------------
