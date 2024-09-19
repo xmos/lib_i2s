@@ -1,3 +1,5 @@
+// This file relates to internal XMOS infrastructure and should be ignored by external users
+
 @Library('xmos_jenkins_shared_library@develop') _
 // New lib checks fn - will be merged into mainline soon so will need to update this tag
 // @Library('xmos_jenkins_shared_library@v0.34.0') _
