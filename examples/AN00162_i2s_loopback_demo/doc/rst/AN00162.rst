@@ -45,7 +45,7 @@ To start using the |I2S|, you need to add ``lib_i2s`` to your CMake Makefile::
   set(APP_DEPENDENT_MODULES   "lib_i2s")
 
 This demo also uses the |I2C| library (``lib_i2c``) and which is brought in
-automatically as a dependancy of ``lib_board_support`` and is used to configure the
+automatically as a dependency of ``lib_board_support`` and is used to configure the
 audio CODECs. So the Makefile also should also include::
 
   set(APP_DEPENDENT_MODULES     "lib_i2s"
