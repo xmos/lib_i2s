@@ -51,6 +51,9 @@ audio CODECs. So the Makefile also should also include::
   set(APP_DEPENDENT_MODULES     "lib_i2s"
                                 "lib_board_support")
 
+The dependancies for this example are specified by ``deps.cmake`` in the root of the ``lib_i2s`` repo
+and are included in the application ``CMakeLists.txt`` file. 
+
 
 Includes
 ........
