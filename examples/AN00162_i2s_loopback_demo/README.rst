@@ -20,9 +20,9 @@ loopback all 8 channels.
 Required tools and libraries
 ............................
 
- * xTIMEcomposer Tools - Version 15.3.0
- * XMOS |I2S|/TDM library - Version 6.0.0
- * XMOS Board Support library - Version 1.0.0
+ * xTIMEcomposer Tools
+ * XMOS |I2S|/TDM library
+ * XMOS Board Support library
 
 Required hardware
 .................
