@@ -1,0 +1,9 @@
+{
+    "MCLK_FAMILIES": [48, 44],
+    "I2S_LINES": [
+        {"INPUT":4, "OUTPUT":4},
+        {"INPUT":1, "OUTPUT":1},
+        {"INPUT":4, "OUTPUT":0},
+        {"INPUT":0, "OUTPUT":4}
+        ]
+}

@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define I2S_CHANS_PER_FRAME (2)
+
 static void i2s_frame_slave_init_ports(
         out buffered port:32 (&?p_dout)[num_out],
         size_t num_out,
