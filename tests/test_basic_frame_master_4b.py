@@ -4,26 +4,27 @@ from i2s_master_checker import I2SMasterChecker, Clock
 from pathlib import Path
 import Pyxsim
 import pytest
+import json
 
-num_in_out_args = {"4ch_in,4ch_out": (4, 4),
-                   "1ch_in,1ch_out": (1, 1),
-                   "4ch_in,0ch_out": (4, 0),
-                   "0ch_in,4ch_out": (0, 4)}
+with open(Path(__file__).parent / "i2s_frame_master_test/test_params.json") as f:
+    params = json.load(f)
 
-mclk_family = ["mclk_fam_48", "mclk_fam_44"] # The base sampling rate needs to be configured differently for 48KHz vs 44.1KHz family
+num_in_out_args = {}
+for item in params["I2S_LINES"]:
+    num_in = item["INPUT"]
+    num_out = item["OUTPUT"]
+    num_in_out_args[f"{num_in}ch_in,{num_out}"] = [num_in, num_out]
 
-@pytest.mark.parametrize("mclk_fam", mclk_family)
+
+@pytest.mark.parametrize("mclk_fam", params["MCLK_FAMILIES"], ids=[f"mclk_fam_{mc}" for mc in params["MCLK_FAMILIES"]])
 @pytest.mark.parametrize(("num_in", "num_out"), num_in_out_args.values(), ids=num_in_out_args.keys())
 def test_i2s_basic_frame_master_4b(capfd, request, nightly, num_in, num_out, mclk_fam):
-    if mclk_fam == "mclk_fam_48":
-        mclk_fam = 48
-    else:
-        mclk_fam = 44
-
-    id_string = f"{num_in}_{num_out}_{mclk_fam}"
 
     cwd = Path(request.fspath).parent
-    binary = f'{cwd}/i2s_frame_master_4b_test/bin/{id_string}/i2s_frame_master_4b_test_{id_string}.xe'
+
+    cfg = f"{num_in}_{num_out}_{mclk_fam}"
+    binary = f'{cwd}/i2s_frame_master_4b_test/bin/{cfg}/test_i2s_frame_master_4b_{cfg}.xe'
+    assert Path(binary).exists(), f"Cannot find {binary}"
 
     clk = Clock("tile[0]:XS1_PORT_1A")
 
@@ -47,12 +48,11 @@ def test_i2s_basic_frame_master_4b(capfd, request, nightly, num_in, num_out, mcl
         ignore=["CONFIG:.*"]
     )
 
-    Pyxsim.run_on_simulator(
+    Pyxsim.run_on_simulator_(
         binary,
         tester=tester,
         simthreads=[clk, checker],
-        clean_before_build=True,
-        build_env = {"NUMS_IN_OUT":f'{num_in};{num_out}', "MCLK_FAMILY":f'{mclk_fam}'},
+        do_xe_prebuild=False,
         simargs=[],
         capfd=capfd
     )

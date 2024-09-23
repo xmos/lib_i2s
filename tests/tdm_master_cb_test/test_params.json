@@ -1,0 +1,9 @@
+{
+    "SMOKE": [1, 0],
+    "I2S_LINES": [
+        {"INPUT":4, "OUTPUT":4},
+        {"INPUT":2, "OUTPUT":2},
+        {"INPUT":4, "OUTPUT":0},
+        {"INPUT":0, "OUTPUT":4}
+        ]
+}

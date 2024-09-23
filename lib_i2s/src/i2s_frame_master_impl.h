@@ -1,6 +1,6 @@
-// Copyright 2016-2021 XMOS LIMITED.
+// Copyright 2016-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#if defined(__XS2A__) || defined(__XS3A__)
+#if !defined(__DOXYGEN__)
 
 #include "limits.h"
 #include <xs1.h>
@@ -367,4 +367,4 @@ inline void i2s_frame_master1_external_clock(client interface i2s_frame_callback
                 i2s_bclk, i2s_lrclk, clk_bclk);
 }
 
-#endif // __XS2A__ || __XS3A__
+#endif // !__DOXYGEN__
