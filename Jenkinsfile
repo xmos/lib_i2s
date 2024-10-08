@@ -1,8 +1,6 @@
 // This file relates to internal XMOS infrastructure and should be ignored by external users
 
-@Library('xmos_jenkins_shared_library@develop') _
-// New lib checks fn - will be merged into mainline soon so will need to update this tag
-// @Library('xmos_jenkins_shared_library@v0.34.0') _
+@Library('xmos_jenkins_shared_library@v0.34.0') _
 
 getApproval()
 
@@ -30,8 +28,8 @@ pipeline {
   environment {
     REPO = 'lib_i2s'
     PIP_VERSION = "24.0"
-    PYTHON_VERSION = "3.11"
-    XMOSDOC_VERSION = "v5.5.2"          
+    PYTHON_VERSION = "3.12.1"
+    XMOSDOC_VERSION = "v6.1.0"          
   }
 
   stages {
@@ -61,7 +59,7 @@ pipeline {
             }
             stage('Library checks') {
               steps {
-                runLibraryChecks("${WORKSPACE}/${REPO}", "v2.0.0")
+                runLibraryChecks("${WORKSPACE}/${REPO}", "v2.0.1")
               }
             }
             stage("Build Tests - XS2") {
@@ -128,7 +126,6 @@ pipeline {
                               ghcr.io/xmos/xmosdoc:$XMOSDOC_VERSION -v html latex"""
 
                       // Zip and archive doc files
-                      sh 'tree'
                       zip dir: "doc/_build/html", zipFile: "AN00162_docs_html.zip"
                       archiveArtifacts artifacts: "AN00162_docs_html.zip"
                       archiveArtifacts artifacts: "doc/_build/pdf/AN00162*.pdf"
