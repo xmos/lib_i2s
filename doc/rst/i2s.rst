@@ -1,10 +1,27 @@
-.. include:: ../../README.rst
+#############################
+lib_i2s: XMOS I2S/TDM Library
+#############################
 
-External signal description
----------------------------
+************
+Introduction
+************
 
-|I2S|
-.....
+This is a software library that allows you to control an |I2S| or TDM (time
+division multiplexed) bus via xCORE ports. |I2S| and TDM are digital
+data streaming interfaces particularly appropriate for transmission of
+audio data. The components in the library
+are controlled via C using the XMOS multicore extensions (xC) and
+can either act as |I2S| master, TDM master or |I2S| slave.
+
+|newpage|
+
+
+*************
+|I2S| Library
+*************
+
+Operation
+=========
 
 |I2S| is a protocol between two devices where one is the *master* and
 one is the *slave* . The protocol is made up of four signals shown
@@ -14,6 +31,8 @@ in :ref:`i2s_wire_table`.
 
 .. list-table:: |I2S| data wires
      :class: vertical-borders horizontal-borders
+     :widths: 20,50
+
 
      * - *MCLK*
        - Clock line, driven by external oscillator
@@ -33,8 +52,10 @@ in :ref:`i2s_signal_params`.
 
 .. _i2s_signal_params:
 
+
 .. list-table:: |I2S| configuration parameters
      :class: vertical-borders horizontal-borders
+     :widths: 20,50
 
      * - *MCLK_BCLK_RATIO*
        - The fixed ratio between the master clock and the bit clock.
@@ -44,6 +65,7 @@ in :ref:`i2s_signal_params`.
        - The number of bits in a data word; this is usually 32, but can be 
          adjusted to any value below 32 if required when using one bit ports for
          I/O.
+
 
 The *MCLK_BCLK_RATIO* should be such that twice the number of data bits can be 
 output by the bit clock at the data rate of the |I2S| signal. For example, a
@@ -90,7 +112,7 @@ should be right shifted by the application before being passed to the
 library.
 
 Connecting |I2S| signals to the xCORE device
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+============================================
 
 
 The |I2S| wires need to be connected to the xCORE device as shown in
@@ -120,7 +142,7 @@ need not be connected.
 |newpage|
 
 |I2S| master speeds and performance
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+===================================
 
 The speed and number of data wires that can be driven by the |I2S|
 library running as |I2S| master
@@ -225,9 +247,8 @@ working configurations:
    If running at higher rates such as 768kHz, it may be necessary to modify the port timing delays to ensure proper sampling of the data and LRCLK lines. There are methods for doing this using pad and/or sample delays however this is beyond the scope of this document. Please consult `I/O timings for xCORE200 / xcore.ai` available on xmos.com for further information. 
 
 
-
 |I2S| slave speeds and performance
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+==================================
 
 The speed and number of data wires that can be driven by the |I2S|
 library running as slave depends on the speed of the logical core
@@ -291,8 +312,12 @@ not the underlying master clock frequency.
 
 |newpage|
 
-TDM
-...
+***********
+TDM Library
+***********
+
+Operation
+=========
 
 TDM is a protocol that multiplexes several signals onto one wire.
 It is a protocol between two devices where one is the *master* and
@@ -359,8 +384,10 @@ is no padding between frames).
 
 |newpage|
 
+
 Connecting TDM signals to the xCORE device
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+==========================================
+
 The TDM wires need to be connected to the xCORE device as shown in
 :ref:`tdm_xcore_connect`. The signals can be connected to any
 one bit ports on the device provide they do not overlap any other used
@@ -377,7 +404,7 @@ If only one data direction is required then the *DOUT* or *DIN* lines
 need not be connected.
 
 TDM speeds and performance
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+==========================
 
 The speed and number of data wires that can be driven by the |I2S|
 library running as TDM master
@@ -414,9 +441,9 @@ and the logical core speed.
 
 |newpage|
 
-
-Usage
------
+*********
+I2S Usage
+*********
 
 All |I2S| functions can be accessed via the ``i2s.h`` header::
 
@@ -426,7 +453,7 @@ You will also have to add ``lib_i2s`` to the
 ``USED_MODULES`` or ``APP_DEPENDENT_MODULES`` field of your application Makefile.
 
 The |I2S| callback interface
-............................
+============================
 
 All major functions in the |I2S| library work by controlling the |I2S|
 or TDM bus on its own logical core on an xCORE device. The library
@@ -437,7 +464,7 @@ or needs to send a sample.
 
 
 |I2S| frame-based master usage
-..............................
+==============================
 
 A template application task is shown below. The specific contents of
 each callback will depend on the application.
@@ -464,7 +491,7 @@ connects to it.
 
 
 |I2S| frame-based slave usage
-.............................
+=============================
 
 The |I2S| frame slave task is instantiated as a parallel task that run in a
 ``par`` statement. The application can connect via the
@@ -481,8 +508,9 @@ edge of bit clock, instead of rising edge. Data is then output on rising edge
 instead of falling edge. This option is useful with non-standard masters that
 invert their bit clock.
 
+*********
 TDM usage
-.........
+*********
 
 The TDM master task is instantiated as a parallel task that run in a
 ``par`` statement. The application can connect via the
@@ -495,16 +523,13 @@ the following code instantiates a TDM master component and connects to it.
 
 .. _i2s_channel_map:
 
-Channel numbering
-.................
-
 The callback interface for TDM numbers the channels being sent/received for
 the send and receive callbacks. There is a fixed mapping from these
 channel indices to the physical interface begin used.
 
 
 TDM channel numbering
-~~~~~~~~~~~~~~~~~~~~~
+=====================
 
 The data words within TDM frames are assigned sequentially from the
 start of the frame. Each data line will have its channel numbers
@@ -527,8 +552,9 @@ numbered as indicated in :ref:`tdm_chan_diag`:
    TDM channel numbering
 
 
+******************
 Callback sequences
-..................
+******************
 
 
 The "frame-based" |I2S| implementations have a simple sequence. :ref:`i2s_frame_callback_seq` shows an example sequence.
@@ -578,7 +604,7 @@ application to request a restart/shutdown of the data bus.
 
 
 Clock configuration
-...................
+===================
 
 For the TDM components is it the application's
 responsibility to set up and start the internal clock used for the master clock
@@ -593,11 +619,12 @@ of an incoming data wire and starts the clock::
 For more information on configuring clocks see the XMOS tools
 user guide.
 
+***
 API
----
+***
 
 Supporting types
-................
+================
 
 .. doxygenenum:: i2s_mode_t
 
@@ -610,7 +637,7 @@ Supporting types
 |newpage|
 
 The |I2S| frame-based callback interface
-........................................
+========================================
 
 .. doxygengroup:: i2s_frame_callback_if
 
@@ -618,7 +645,7 @@ The |I2S| frame-based callback interface
 |newpage|
 
 The |I2S| task instance
-.......................
+=======================
 
 .. doxygenfunction:: i2s_frame_master
 
@@ -645,30 +672,21 @@ The |I2S| task instance
 |newpage|
 
 The TDM callback interface
-..........................
+==========================
 
 .. doxygengroup:: tdm_callback_if
 
 |newpage|
 
 The TDM task instance
-.....................
+=====================
 
 .. doxygenfunction:: tdm_master
 
 
 
-
-
-
-
-Known Issues
-------------
-
-No known issues.
-
-
+*********
 Changelog
----------
+*********
 
 Please see ``CHANGELOG.rst`` in the root of `lib_i2s <https://github.com/xmos/lib_i2s>`_ for details of versions and changes to the library.
