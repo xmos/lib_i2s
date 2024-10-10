@@ -10,6 +10,10 @@ lib_i2s change log
   * CHANGED: Examples ported to XK-AUDIO-316-MC board (was XK-AUDIO-216-MC)
   * CHANGED: Examples use lib_board_support instead of custom hardware setup
 
+  * Changes to dependencies:
+
+    - lib_xassert: 4.2.0 -> 4.3.0
+
 5.1.0
 -----
 
