@@ -1,4 +1,4 @@
-// Copyright 2015-2021 XMOS LIMITED.
+// Copyright 2015-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 #include <xs1.h>
 #include <i2s.h>
@@ -26,17 +26,14 @@ in port  setup_resp_port = XS1_PORT_1M;
 #endif
 
 #if defined(SMOKE)
-#define NUM_BCLKS (1)
-#define NUM_BCLKS_TO_CHECK (1)
-static const unsigned bclk_freq_lut[NUM_BCLKS] = {
-  1228800
+#define NUM_LRCLKS_TO_CHECK 1
+static const unsigned lr_freq_lut[] = {
+  192000
 };
 #else
-#define NUM_BCLKS (10)
-#define NUM_BCLKS_TO_CHECK (3)
-static const unsigned bclk_freq_lut[NUM_BCLKS] = {
-  1228800, 614400, 384000, 192000, 44100,
-  22050, 96000, 176400, 88200, 48000, 24000, 352800
+#define NUM_LRCLKS_TO_CHECK 6
+static const unsigned lr_freq_lut[] = {
+  192000, 176400, 96000, 88200, 48000, 44100
 };
 #endif
 
@@ -100,7 +97,7 @@ static int request_response(
 [[distributable]]
 #pragma unsafe arrays
 void app(server interface i2s_frame_callback_if i2s_i){
-    unsigned bclk_freq_index = 0;
+    unsigned lr_freq_index = 0;
     unsigned frames_sent = 0;
     unsigned rx_data_counter[MAX_CHANNELS] = {0};
     unsigned tx_data_counter[MAX_CHANNELS] = {0};
@@ -155,15 +152,15 @@ void app(server interface i2s_frame_callback_if i2s_i){
                     printf("Error\n");
                 }
 
-                if (bclk_freq_index == NUM_BCLKS_TO_CHECK-1) {
+                if (lr_freq_index == NUM_LRCLKS_TO_CHECK-1) {
                     if (current_mode == I2S_MODE_I2S) {
                         current_mode = I2S_MODE_LEFT_JUSTIFIED;
-                        bclk_freq_index = 0;
+                        lr_freq_index = 0;
                     } else {
                         _Exit(1);
                     }
                 } else {
-                    bclk_freq_index++;
+                    lr_freq_index++;
                 }
             }
 
@@ -178,7 +175,8 @@ void app(server interface i2s_frame_callback_if i2s_i){
                 rx_data_counter[i] = 0;
             }
 
-            broadcast(bclk_freq_lut[bclk_freq_index],
+            unsigned bclk_freq = lr_freq_lut[lr_freq_index] * DATA_BITS * I2S_CHANS_PER_FRAME;
+            broadcast(bclk_freq,
                     NUM_IN, NUM_OUT, i2s_config.mode == I2S_MODE_I2S, DATA_BITS);
 
             break;
@@ -192,7 +190,7 @@ int main(){
 
     par {
       [[distribute]] app(i2s_i);
-      i2s_frame_slave(i2s_i, p_dout, NUM_OUT, p_din, NUM_IN, DATA_BITS, 
+      i2s_frame_slave(i2s_i, p_dout, NUM_OUT, p_din, NUM_IN, DATA_BITS,
                 p_bclk, p_lrclk, bclk);
       par(int i=0;i<7;i++){
         { set_core_fast_mode_on();

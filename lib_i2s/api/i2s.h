@@ -5,6 +5,14 @@
 #include <xs1.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <xccompat.h>
+
+// These are needed for DOXYGEN to render properly
+#ifndef __DOXYGEN__
+#define static_const_size_t static const size_t
+#define in_port_t in port
+#define out_port_t out port
+#endif
 
 /** I2S mode.
  *
@@ -57,71 +65,19 @@ typedef enum i2s_restart_t {
   I2S_SHUTDOWN             ///< Shutdown. This will cause the I2S/TDM component to exit.
 } i2s_restart_t;
 
-/** Interface representing callback events that can occur during the
- *   operation of the I2S task
- */
-typedef interface i2s_callback_if {
-
-  /**  I2S initialization event callback.
-   *
-   *   The I2S component will call this
-   *   when it first initializes on first run of after a restart.
-   *
-   *   \param i2s_config        This structure is provided if the connected
-   *                            component drives an I2S bus. The members
-   *                            of the structure should be set to the
-   *                            required configuration.
-   *   \param tdm_config        This structure is provided if the connected
-   *                            component drives an TDM bus. The members
-   *                            of the structure should be set to the
-   *                            required configuration.
-   */
-  void init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config);
-
-  /**  I2S restart check callback.
-   *
-   *   This callback is called once per frame. The application must return the
-   *   required restart behaviour.
-   *
-   *   \return          The return value should be set to
-   *                    ``I2S_NO_RESTART``, ``I2S_RESTART`` or
-   *                    ``I2S_SHUTDOWN``.
-   */
-  i2s_restart_t restart_check();
-
-  /**  Receive an incoming sample.
-   *
-   *   This callback will be called when a new sample is read in by the I2S
-   *   component.
-   *
-   *   \param index     The index of the sample in the frame.
-   *   \param sample    The sample data as a signed 32-bit value. The component
-   *                    may not use all 32 bits of the value (for example, many
-   *                    I2S codecs are 24-bit), in which case the bottom bits
-   *                    are ignored.
-   */
-  void receive(size_t index, int32_t sample);
-
-  /** Request an outgoing sample.
-   *
-   *  This callback will be called when the I2S component needs a new sample.
-   *
-   *  \param index      The index of the requested sample in the frame.
-   *  \returns          The sample data as a signed 32-bit value.  The component
-   *                    may not have 32-bits of accuracy (for example, many
-   *                    I2S codecs are 24-bit), in which case the bottom bits
-   *                    will be arbitrary values.
-   */
-  int32_t send(size_t index);
-
-} i2s_callback_if;
 
 
 /** Interface representing callback events that can occur during the
  *  operation of the I2S task. This is a more efficient interface
  *  and reccomended for new designs.
  */
+#ifndef __DOXYGEN__
 typedef interface i2s_frame_callback_if {
+#endif
+  /**
+   * \addtogroup i2s_frame_callback_if
+   * @{
+   */
 
   /**  I2S frame-based initialization event callback.
    *
@@ -137,7 +93,7 @@ typedef interface i2s_frame_callback_if {
    *                            of the structure should be set to the
    *                            required configuration.
    */
-  void init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config);
+  void init(NULLABLE_REFERENCE_PARAM(i2s_config_t, i2s_config), NULLABLE_REFERENCE_PARAM(tdm_config_t, tdm_config));
 
   /**  I2S frame-based restart check callback.
    *
@@ -176,42 +132,77 @@ typedef interface i2s_frame_callback_if {
    */
   void send(size_t num_out, int32_t samples[num_out]);
 
+
+/**@}*/ // END: addtogroup i2s_frame_callback_if
+
+#ifndef __DOXYGEN__
 } i2s_frame_callback_if;
 
-/** I2S master component.
- *
- *  This task performs I2S on the provided pins. It will perform callbacks over
- *  the i2s_callback_if interface to get/receive data from the application
- *  using this component.
- *
- *  The component performs I2S master so will drive the word clock and
- *  bit clock lines.
- *
- *  \param i2s_i          The I2S callback interface to connect to
- *                        the application
- *  \param p_dout         An array of data output ports
- *  \param num_out        The number of output data ports
- *  \param p_din          An array of data input ports
- *  \param num_in         The number of input data ports
- *  \param p_bclk         The bit clock output port
- *  \param p_lrclk        The word clock output port
- *  \param bclk           A clock that will get configured for use with
- *                        the bit clock
- *  \param mclk           The clock connected to the master clock frequency.
- *                        Usually this should be configured to be driven by
- *                        an incoming master system clock.
+/** Interface representing callback events that can occur during the
+ *   operation of the TDM task
  */
-void i2s_master(client i2s_callback_if i2s_i,
-                out buffered port:32 (&?p_dout)[num_out],
-                static const size_t num_out,
-                in buffered port:32 (&?p_din)[num_in],
-                static const size_t num_in,
-                out buffered port:32 p_bclk,
-                out buffered port:32 p_lrclk,
-                clock bclk,
-                const clock mclk);
+typedef interface tdm_callback_if {
+#endif // __DOXYGEN__
 
-#if defined(__XS2A__) || defined(__XS3A__) || defined(__DOXYGEN__)
+
+  /**
+   * \addtogroup tdm_callback_if
+   * @{
+   */
+
+  /**  TDM initialization event callback.
+   *
+   *   The TDM component will call this
+   *   when it first initializes on first run of after a restart.
+   *
+   *   \param i2s_config        This structure is provided if the connected
+   *                            component drives an I2S bus. The members
+   *                            of the structure should be set to the
+   *                            required configuration.
+   *   \param tdm_config        This structure is provided if the connected
+   *                            component drives an TDM bus. The members
+   *                            of the structure should be set to the
+   *                            required configuration.
+   */
+  void init(NULLABLE_REFERENCE_PARAM(i2s_config_t, i2s_config), NULLABLE_REFERENCE_PARAM(tdm_config_t, tdm_config));
+
+  /**  TDM restart check callback.
+   *
+   *   This callback is called once per frame. The application must return the
+   *   required restart behaviour.
+   *
+   *   \return          The return value should be set to
+   *                    ``I2S_NO_RESTART``, ``I2S_RESTART`` or
+   *                    ``I2S_SHUTDOWN``.
+   */
+  i2s_restart_t restart_check();
+
+  /**  Receive an incoming sample.
+   *
+   *   This callback will be called when a new sample is read in by the TDM
+   *   component.
+   *
+   *   \param index     The index of the sample in the frame.
+   *   \param sample    The sample data as a signed 32-bit value. 
+   */
+  void receive(size_t index, int32_t sample);
+
+  /** Request an outgoing sample.
+   *
+   *  This callback will be called when the TDM component needs a new sample.
+   *
+   *  \param index      The index of the requested sample in the frame.
+   *  \returns          The sample data as a signed 32-bit value.
+   */
+  int32_t send(size_t index);
+
+/**@}*/ // END: addtogroup tdm_callback_if
+
+
+#ifndef __DOXYGEN__
+} tdm_callback_if;
+#endif // __DOXYGEN__
+
 
 /** I2S frame-based master component **for xCORE200 and xcore.ai only**
  *
@@ -240,15 +231,16 @@ void i2s_master(client i2s_callback_if i2s_i,
  *  \param bclk           A clock that will get configured for use with
  *                        the bit clock
  */
-void i2s_frame_master(client i2s_frame_callback_if i2s_i,
-                out buffered port:32 (&?p_dout)[num_out],
-                static const size_t num_out,
-                in buffered port:32 (&?p_din)[num_in],
-                static const size_t num_in,
-                static const size_t num_data_bits,
-                out port p_bclk,
-                out buffered port:32 p_lrclk,
-                in port p_mclk,
+void i2s_frame_master(
+                CLIENT_INTERFACE(i2s_frame_callback_if, i2s_i),
+                NULLABLE_ARRAY_OF_SIZE(out_buffered_port_32_t, p_dout, num_out),
+                static_const_size_t num_out,
+                NULLABLE_ARRAY_OF_SIZE(in_buffered_port_32_t, p_din, num_in),
+                static_const_size_t num_in,
+                static_const_size_t num_data_bits,
+                out_port_t p_bclk,
+                out_buffered_port_32_t p_lrclk,
+                in_port_t p_mclk,
                 clock bclk);
 
 /** I2S frame-based master component with 4-bit ports **for xCORE200 and xcore.ai only**
@@ -279,14 +271,14 @@ void i2s_frame_master(client i2s_frame_callback_if i2s_i,
  *  \param bclk           A clock that will get configured for use with
  *                        the bit clock
  */
-void i2s_frame_master_4b(client i2s_frame_callback_if i2s_i,
-                out buffered port:32 ?p_dout,
-                static const size_t num_out,
-                in buffered port:32 ?p_din,
-                static const size_t num_in,
-                out port p_bclk,
-                out buffered port:32 p_lrclk,
-                in port p_mclk,
+void i2s_frame_master_4b(CLIENT_INTERFACE(i2s_frame_callback_if, i2s_i),
+                NULLABLE_ARRAY_OF_SIZE(out_buffered_port_32_t, p_dout, num_out),
+                static_const_size_t num_out,
+                NULLABLE_ARRAY_OF_SIZE(in_buffered_port_32_t, p_din, num_in),
+                static_const_size_t num_in,
+                out_port_t p_bclk,
+                out_buffered_port_32_t p_lrclk,
+                in_port_t p_mclk,
                 clock bclk);
 
 /** I2S frame-based master component **for xCORE200 and xcore.ai only**
@@ -315,14 +307,15 @@ void i2s_frame_master_4b(client i2s_frame_callback_if i2s_i,
  *  \param bclk           A clock that is configured externally to be used as the bit clock
  *                        
  */
-void i2s_frame_master_external_clock(client i2s_frame_callback_if i2s_i,
-                out buffered port:32 (&?p_dout)[num_out],
-                static const size_t num_out,
-                in buffered port:32 (&?p_din)[num_in],
-                static const size_t num_in,
-                static const size_t num_data_bits,
-                out port p_bclk,
-                out buffered port:32 p_lrclk,
+void i2s_frame_master_external_clock(CLIENT_INTERFACE(i2s_frame_callback_if, i2s_i),
+                NULLABLE_ARRAY_OF_SIZE(out_buffered_port_32_t, p_dout, num_out),
+                static_const_size_t num_out,
+                NULLABLE_ARRAY_OF_SIZE(in_buffered_port_32_t, p_din, num_in),
+                static_const_size_t num_in,
+                static_const_size_t num_data_bits,
+                out_port_t p_bclk,
+                out_buffered_port_32_t p_lrclk,
+                in_port_t p_mclk,
                 clock bclk);
 
 /** I2S frame-based master component with 4-bit ports **for xCORE200 amd xcore.ai only**
@@ -352,44 +345,15 @@ void i2s_frame_master_external_clock(client i2s_frame_callback_if i2s_i,
  *  \param bclk           A clock that will get configured for use with
  *                        the bit clock
  */
-void i2s_frame_master_external_clock_4b(client i2s_frame_callback_if i2s_i,
-                out buffered port:32 (&?p_dout)[num_out],
-                static const size_t num_out,
-                in buffered port:32 (&?p_din)[num_in],
-                static const size_t num_in,
-                out port p_bclk,
-                out buffered port:32 p_lrclk,
+void i2s_frame_master_external_clock_4b(CLIENT_INTERFACE(i2s_frame_callback_if, i2s_i),
+                NULLABLE_ARRAY_OF_SIZE(out_buffered_port_32_t, p_dout, num_out),
+                static_const_size_t num_out,
+                NULLABLE_ARRAY_OF_SIZE(in_buffered_port_32_t, p_din, num_in),
+                static_const_size_t num_in,
+                out_port_t p_bclk,
+                out_buffered_port_32_t p_lrclk,
+                in_port_t p_mclk,
                 clock bclk);
-#endif // __XS2A__
-
-/** I2S slave component.
- *
- *  This task performs I2S on the provided pins. It will perform callbacks over
- *  the i2s_callback_if interface to get/receive data from the application
- *  using this component.
- *
- *  The component performs I2S slave so will expect the word clock and
- *  bit clock to be driven externally.
- *
- *  \param i2s_i          The I2S callback interface to connect to
- *                        the application
- *  \param p_dout         An array of data output ports
- *  \param num_out        The number of output data ports
- *  \param p_din          An array of data input ports
- *  \param num_in         The number of input data ports
- *  \param p_bclk         The bit clock input port
- *  \param p_lrclk        The word clock input port
- *  \param bclk           A clock that will get configured for use with
- *                        the bit clock
- */
-void i2s_slave(client i2s_callback_if i2s_i,
-        out buffered port:32 (&?p_dout)[num_out],
-        static const size_t num_out,
-        in buffered port:32 (&?p_din)[num_in],
-        static const size_t num_in,
-        in port p_bclk,
-        in buffered port:32 p_lrclk,
-        clock bclk);
 
 /** I2S High Efficiency slave component.
  *
@@ -412,15 +376,15 @@ void i2s_slave(client i2s_callback_if i2s_i,
  *  \param bclk           A clock that will get configured for use with
  *                        the bit clock
  */
-void i2s_frame_slave(client i2s_frame_callback_if i2s_i,
-        out buffered port:32 (&?p_dout)[num_out],
-        static const size_t num_out,
-        in buffered port:32 (&?p_din)[num_in],
-        static const size_t num_in,
-        static const size_t num_data_bits,
-        in port p_bclk,
-        in buffered port:32 p_lrclk,
-        clock bclk);
+void i2s_frame_slave(CLIENT_INTERFACE(i2s_frame_callback_if, i2s_i),
+                NULLABLE_ARRAY_OF_SIZE(out_buffered_port_32_t, p_dout, num_out),
+                static_const_size_t num_out,
+                NULLABLE_ARRAY_OF_SIZE(in_buffered_port_32_t, p_din, num_in),
+                static_const_size_t num_in,
+                static_const_size_t num_data_bits,
+                in_port_t p_bclk,
+                in_buffered_port_32_t p_lrclk,
+                clock bclk);
 
 /** I2S High Efficiency slave component.
  *
@@ -442,19 +406,19 @@ void i2s_frame_slave(client i2s_frame_callback_if i2s_i,
  *  \param bclk           A clock that will get configured for use with
  *                        the bit clock
  */
-void i2s_frame_slave_4b(client i2s_frame_callback_if i2s_i,
-        out buffered port:32 (&?p_dout)[num_out],
-        static const size_t num_out,
-        in buffered port:32 (&?p_din)[num_in],
-        static const size_t num_in,
-        in port p_bclk,
-        in buffered port:32 p_lrclk,
-        clock bclk);
+void i2s_frame_slave_4b(CLIENT_INTERFACE(i2s_frame_callback_if, i2s_i),
+                NULLABLE_ARRAY_OF_SIZE(out_buffered_port_32_t, p_dout, num_out),
+                static_const_size_t num_out,
+                NULLABLE_ARRAY_OF_SIZE(in_buffered_port_32_t, p_din, num_in),
+                static_const_size_t num_in,
+                out_port_t p_bclk,
+                out_buffered_port_32_t p_lrclk,
+                clock bclk);
 
 /** TDM master component.
  *
  *  This task performs TDM on the provided pins. It will perform callbacks over
- *  the i2s_callback_if interface to get/receive data from the application
+ *  the tdm_callback_if interface to get/receive data from the application
  *  using this component.
  *
  *  The component performs as TDM master so will drive the fsync signal.
@@ -470,19 +434,17 @@ void i2s_frame_slave_4b(client i2s_frame_callback_if i2s_i,
  *                        Usually this should be configured to be driven by
  *                        an incoming master system clock.
  */
-void tdm_master(client interface i2s_callback_if tdm_i,
-        out buffered port:32 p_fsync,
-        out buffered port:32 (&?p_dout)[num_out],
-        size_t num_out,
-        in buffered port:32 (&?p_din)[num_in],
-        size_t num_in,
-        clock clk);
+void tdm_master(CLIENT_INTERFACE(tdm_callback_if, tdm_i),
+                out_buffered_port_32_t p_fsync,
+                NULLABLE_ARRAY_OF_SIZE(out_buffered_port_32_t, p_dout, num_out),
+                static_const_size_t num_out,
+                NULLABLE_ARRAY_OF_SIZE(in_buffered_port_32_t, p_din, num_in),
+                static_const_size_t num_in,
+                clock clk);
 
 
-#include <i2s_master_impl.h>
 #include <i2s_frame_master_impl.h>
 #include <i2s_frame_master_4b_impl.h>
-#include <i2s_slave_impl.h>
 #include <i2s_frame_slave_impl.h>
 #include <i2s_frame_slave_4b_impl.h>
 #include <tdm_master_impl.h>

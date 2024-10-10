@@ -1,4 +1,4 @@
-// Copyright 2015-2021 XMOS LIMITED.
+// Copyright 2015-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 #include <i2s.h>
 #include <xs1.h>
@@ -22,7 +22,7 @@ static void tdm_init_ports(
 }
 
 [[always_inline]]
-static void tdm_send(client i2s_callback_if tdm_i,
+static void tdm_send(client tdm_callback_if tdm_i,
         out buffered port:32 (&?p_dout)[num_out],
         size_t num_out,
         unsigned channels_per_data_line,
@@ -33,7 +33,7 @@ static void tdm_send(client i2s_callback_if tdm_i,
 
 
 [[always_inline]]
-static void tdm_receive(client i2s_callback_if tdm_i,
+static void tdm_receive(client tdm_callback_if tdm_i,
         in buffered port:32 (&?p_din)[num_in],
         size_t num_in,
         unsigned channels_per_data_line,
@@ -46,7 +46,7 @@ static void tdm_receive(client i2s_callback_if tdm_i,
 }
 
 [[always_inline]]
-static i2s_restart_t do_tdm(client i2s_callback_if tdm_i,
+static i2s_restart_t do_tdm(client tdm_callback_if tdm_i,
         out buffered port:32 (&?p_dout)[num_out],
         size_t num_out,
         in buffered port:32 (&?p_din)[num_in],
@@ -122,7 +122,7 @@ static i2s_restart_t do_tdm(client i2s_callback_if tdm_i,
 
 #define tdm_master tdm_master0
 
-static void tdm_master0(client interface i2s_callback_if tdm_i,
+static void tdm_master0(client interface tdm_callback_if tdm_i,
         out buffered port:32 p_fsync,
         out buffered port:32 (&?p_dout)[num_out],
         size_t num_out,
@@ -156,7 +156,7 @@ static void tdm_master0(client interface i2s_callback_if tdm_i,
 
 // This function is just to avoid unused static function warnings for
 // tdm_master0,it should never be called.
-inline void tdm_master1(client interface i2s_callback_if tdm_i,
+inline void tdm_master1(client interface tdm_callback_if tdm_i,
         out buffered port:32 p_fsync,
         out buffered port:32 (&?p_dout)[num_out],
         size_t num_out,

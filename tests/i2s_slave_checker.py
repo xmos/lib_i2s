@@ -1,11 +1,11 @@
-# Copyright 2015-2022 XMOS LIMITED.
+# Copyright 2015-2024 XMOS LIMITED.
 # This Software is subject to the terms of the XMOS Public Licence: Version 1.
 from i2s_master_checker import Clock
 import Pyxsim as px
 from functools import partial
 
 # We need to disable output buffering for this test to work on MacOS; this has
-# no effect on Linux systems. Let's redefine print once to avoid putting the 
+# no effect on Linux systems. Let's redefine print once to avoid putting the
 # same argument everywhere.
 print = partial(print, flush=True)
 
@@ -141,7 +141,7 @@ class I2SSlaveChecker(px.SimThread):
             # there is one frame lead in for the slave to sync to
             # The logic of this section is slightly convoluted, but essentially
             #     we are counting samples in the /whole/ LR period:
-            # 
+            #
             # - Set lr_counter to db + db/2 + (0 or 1 depending on I2S mode)
             # - lr_counter may exist in the range 0:(2*db - 1)
             # - If it is <db, output 0 on lr_clock
@@ -151,6 +151,10 @@ class I2SSlaveChecker(px.SimThread):
             #       the range 32 - 63, lr_clock outputs 1, else it outputs 0.
 
             time = float(xsi.get_time())
+
+            time = self.wait_until_ret(
+                time + (clock_half_period * 64)
+            )  # Add extra delay to ensure that the i2s_slave device sees the LRCLK transitions in the first for loop below
 
             lr_counter = data_bits + (data_bits // 2) + (is_i2s_justified)
             lr_count_max = (2 * data_bits) - 1

@@ -1,0 +1,9 @@
+{
+    "SMOKE": [1, 0],
+    "NUMS_IN_OUT": [
+        {"INPUT":1, "OUTPUT":1, "TDM_CHANS_PER_FRAME":8},
+        {"INPUT":1, "OUTPUT":0, "TDM_CHANS_PER_FRAME":8},
+        {"INPUT":0, "OUTPUT":1, "TDM_CHANS_PER_FRAME":8},
+        {"INPUT":2, "OUTPUT":2, "TDM_CHANS_PER_FRAME":4}
+        ]
+}

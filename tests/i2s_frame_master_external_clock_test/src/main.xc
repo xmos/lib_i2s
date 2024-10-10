@@ -1,4 +1,4 @@
-// Copyright 2015-2021 XMOS LIMITED.
+// Copyright 2015-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 #include <xs1.h>
 #include <i2s.h>
@@ -21,43 +21,25 @@ out port setup_strobe_port = XS1_PORT_1L;
 out port setup_data_port = XS1_PORT_16A;
 in port  setup_resp_port = XS1_PORT_1M;
 
-#define MAX_RATIO (4)
 
 #define MAX_CHANNELS (8)
-
-#define MAX_NUM_RESTARTS (4)
 
 #ifndef DATA_BITS
 #define DATA_BITS (32)
 #endif
 
 
+#define MAX_BCLK_FREQ_192 (192000 * 2 * DATA_BITS)
+#define MAX_BCLK_FREQ_176 (176400 * 2 * DATA_BITS)
 
-#if defined(SMOKE)
-#if NUM_OUT > 1 || NUM_IN > 1
-#define NUM_MCLKS (1)
+#define MCLK_FREQUENCY_192 (MAX_BCLK_FREQ_192 * 2) // 2 times the bclk required for the maximum sampling frequency
+#define MCLK_FREQUENCY_176 (MAX_BCLK_FREQ_176 * 2)
+
+#define NUM_MCLKS (2)
 static const unsigned mclock_freq[NUM_MCLKS] = {
-        12288000,
+        MCLK_FREQUENCY_192,
+        MCLK_FREQUENCY_176
 };
-#else
-#define NUM_MCLKS (1)
-static const unsigned mclock_freq[NUM_MCLKS] = {
-        24576000,
-};
-#endif
-#else
-#if NUM_OUT > 1 || NUM_IN > 1
-#define NUM_MCLKS (1)
-static const unsigned mclock_freq[NUM_MCLKS] = {
-        12288000,
-};
-#else
-#define NUM_MCLKS (1)
-static const unsigned mclock_freq[NUM_MCLKS] = {
-        24576000,
-};
-#endif
-#endif
 
 int32_t tx_data[MAX_CHANNELS][8] = {
         {  1,   2,   3,   4,   5,   6,   7,   8},
@@ -122,13 +104,13 @@ i2s_mode_t current_mode;
 #pragma unsafe arrays
 void app(server interface i2s_frame_callback_if i2s_i){
 
+
     int error=0;
     unsigned frames_sent = 0;
     unsigned rx_data_counter[MAX_CHANNELS] = {0};
     unsigned tx_data_counter[MAX_CHANNELS] = {0};
 
     int first_time = 1;
-    uint32_t num_restarts = 0;
 
     while(1){
         select {
@@ -159,7 +141,6 @@ void app(server interface i2s_frame_callback_if i2s_i){
             if (frames_sent == 4)
             {
               restart = I2S_RESTART;
-              num_restarts += 1;
             }
             else
               restart = I2S_NO_RESTART;
@@ -169,7 +150,7 @@ void app(server interface i2s_frame_callback_if i2s_i){
             //bclock frequency is not changed in restart when using i2s_frame_master_external_clock.
             //The clock needs to be set externally once, before starting i2s_frame_master_external_clock.
 
-            if(!first_time) 
+            if(!first_time)
             {
                  unsigned x=request_response(setup_strobe_port, setup_resp_port);
                  error |= x;
@@ -180,12 +161,18 @@ void app(server interface i2s_frame_callback_if i2s_i){
                  }
                  else
                  {
+                    mclock_freq_index += 1;
                     current_mode = I2S_MODE_I2S;
+                    if(mclock_freq_index == NUM_MCLKS)
+                    {
+                        mclock_freq_index = 0;
+                        // Can't change mclk_bclk_ratio to test for smaller bclks (sampling freq 96 and 48KHz) since calling configure_clock_src_divide() after broadcast() below
+                        // gives an error, ../src/main.xc:250:9: error: use of `bclk' violates parallel usage rules.
+                        // We've tested for the highest sampling freq, so sampling_freq/2 and sampling_freq/4 should be fine anyway.
+                        _Exit(1);
+                    }
+
                  }
-                if(num_restarts >= MAX_NUM_RESTARTS)
-                {
-                    _Exit(1);
-                }
             }
 
             frames_sent = 0;
@@ -198,6 +185,7 @@ void app(server interface i2s_frame_callback_if i2s_i){
                 tx_data_counter[i] = 0;
                 rx_data_counter[i] = 0;
             }
+
             broadcast(mclock_freq[mclock_freq_index],
                       mclk_bclk_ratio, NUM_IN, NUM_OUT,
                       i2s_config.mode == I2S_MODE_I2S, DATA_BITS);
@@ -214,28 +202,19 @@ void setup_bclock()
     mclock_freq_index=0;
     ratio_log2 = 1;
     current_mode = I2S_MODE_I2S;
-
-    if (IS_POWER_OF_2(DATA_BITS))
-    {
-        unsigned base_ratio = 1 << (clz(DATA_BITS) - 26);
-        mclk_bclk_ratio = (base_ratio << ratio_log2);
-    }
-    else
-    {
-        mclk_bclk_ratio = (1 << ratio_log2);
-    }
+    mclk_bclk_ratio = (1 << ratio_log2);
 
     broadcast(mclock_freq[mclock_freq_index],
             mclk_bclk_ratio, NUM_IN, NUM_OUT,
             current_mode == I2S_MODE_I2S, DATA_BITS);
-    
+
     configure_clock_src_divide(bclk, p_mclk, mclk_bclk_ratio >> 1);
 }
 
 
 int main(){
     interface i2s_frame_callback_if i2s_i;
-    
+
     par {
     {
         setup_bclock();

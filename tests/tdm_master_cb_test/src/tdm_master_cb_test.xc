@@ -1,4 +1,4 @@
-// Copyright 2015-2021 XMOS LIMITED.
+// Copyright 2015-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 #include <xs1.h>
 #include <i2s.h>
@@ -106,7 +106,7 @@ static int request_response(
 
 [[distributable]]
 #pragma unsafe arrays
-void app(server interface i2s_callback_if tdm_i){
+void app(server interface tdm_callback_if tdm_i){
 
 
     int error=0;
@@ -169,7 +169,7 @@ void app(server interface i2s_callback_if tdm_i){
 }
 
 int main(){
-    interface i2s_callback_if tdm_i;
+    interface tdm_callback_if tdm_i;
 
     stop_clock(sclk);
     configure_clock_src(sclk, p_sclk);

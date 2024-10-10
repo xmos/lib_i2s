@@ -1,29 +1,38 @@
-# Copyright 2015-2022 XMOS LIMITED.
+# Copyright 2015-2024 XMOS LIMITED.
 # This Software is subject to the terms of the XMOS Public Licence: Version 1.
 from i2s_master_checker import I2SMasterChecker, Clock
 from pathlib import Path
 import Pyxsim
 import pytest
+import json
 
-num_in_out_args = {"4ch_in,4ch_out": (4, 4),
-                   "1ch_in,1ch_out": (1, 1),
-                   "4ch_in,0ch_out": (4, 0),
-                   "0ch_in,4ch_out": (0, 4)}
+DEBUG = False
 
-bitdepth_args = {"8b": 8,
-                 "16b": 16,
-                 "24b": 24,
-                 "32b": 32}
+with open(Path(__file__).parent / "i2s_frame_master_test/test_params.json") as f:
+    params = json.load(f)
 
-@pytest.mark.parametrize("bitdepth", bitdepth_args.values(), ids=bitdepth_args.keys())
+num_in_out_args = {}
+for item in params["I2S_LINES"]:
+    num_in = item["INPUT"]
+    num_out = item["OUTPUT"]
+    num_in_out_args[f"{num_in}ch_in,{num_out}"] = [num_in, num_out]
+
+@pytest.mark.parametrize("mclk_fam", params["MCLK_FAMILIES"], ids=[f"mclk_fam_{mc}" for mc in params["MCLK_FAMILIES"]])
+@pytest.mark.parametrize("bitdepth", params["BITDEPTHS"], ids=[f"{bd}b" for bd in params["BITDEPTHS"]])
 @pytest.mark.parametrize(("num_in", "num_out"), num_in_out_args.values(), ids=num_in_out_args.keys())
-def test_i2s_basic_frame_master(capfd, request, nightly, bitdepth, num_in, num_out):
+def test_i2s_basic_frame_master(capfd, request, nightly, bitdepth, num_in, num_out, mclk_fam):
     testlevel = '0' if nightly else '1'
-    id_string = f"{bitdepth}_{num_in}_{num_out}"
-    id_string += "_smoke" if testlevel == '1' else ""
+    if (num_in in (0,1,2,3) or num_out in (0,1,2,3)) and not nightly:
+        pytest.skip("Only test 4ch modes if not nightly")
+
+    # id_string += "_smoke" if testlevel == '1' else ""
+
 
     cwd = Path(request.fspath).parent
-    binary = f'{cwd}/i2s_frame_master_test/bin/{id_string}/i2s_frame_master_test_{id_string}.xe'
+
+    cfg = f"{bitdepth}_{mclk_fam}_{num_in}_{num_out}_{testlevel}"
+    binary = f'{cwd}/i2s_frame_master_test/bin/{cfg}/test_i2s_frame_master_{cfg}.xe'
+    assert Path(binary).exists(), f"Cannot find {binary}"
 
     clk = Clock("tile[0]:XS1_PORT_1A")
 
@@ -47,11 +56,26 @@ def test_i2s_basic_frame_master(capfd, request, nightly, bitdepth, num_in, num_o
         ignore=["CONFIG:.*"]
     )
 
-    Pyxsim.run_on_simulator(
-        binary,
-        tester=tester,
-        simthreads=[clk, checker],
-        build_env = {"BITDEPTHS":f"{bitdepth}", "NUMS_IN_OUT":f'{num_in};{num_out}', "SMOKE":testlevel},
-        simargs=[],
-        capfd=capfd
-    )
+    if DEBUG:
+        Pyxsim.run_on_simulator_(
+            binary,
+            tester=tester,
+            do_xe_prebuild=False,
+            simthreads=[clk, checker],
+            simargs=[
+                    "--vcd-tracing",
+                    f"-o i2s_trace_{num_in}_{num_out}.vcd -tile tile[0] -cycles -ports -ports-detailed -cores -instructions -clock-blocks",
+                    "--trace-to",
+                    f"i2s_trace_{num_in}_{num_out}.txt",
+                ],
+            capfd=capfd
+        )
+    else:
+        Pyxsim.run_on_simulator_(
+            binary,
+            tester=tester,
+            do_xe_prebuild=False,
+            simthreads=[clk, checker],
+            simargs=[],
+            capfd=capfd
+        )
