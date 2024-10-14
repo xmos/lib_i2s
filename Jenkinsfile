@@ -29,7 +29,7 @@ pipeline {
     REPO = 'lib_i2s'
     PIP_VERSION = "24.0"
     PYTHON_VERSION = "3.12.1"
-    XMOSDOC_VERSION = "v6.1.0"          
+    XMOSDOC_VERSION = "v6.1.2"          
   }
 
   stages {
