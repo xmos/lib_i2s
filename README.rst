@@ -47,7 +47,7 @@ Features
 Known issues
 ************
 
- * None
+ * I²S slave cannot support > 96 kHz on a 4-bit port (`#141 <https://github.com/xmos/lib_i2s/issues/141>`_)
 
 ****************
 Development repo

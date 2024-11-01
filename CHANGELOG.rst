@@ -1,6 +1,15 @@
 lib_i2s change log
 ==================
 
+UNRELEASED
+----------
+
+  * CHANGED: Documentation updated
+
+  * Changes to dependencies:
+
+    - lib_xassert: 4.3.0 -> 4.3.1
+
 6.0.0
 -----
 
