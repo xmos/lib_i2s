@@ -1,6 +1,6 @@
-#######################
+########################
 lib_i2s: I2S/TDM library
-#######################
+########################
 
 ************
 Introduction
@@ -123,7 +123,7 @@ Connecting |I2S| signals to the xCORE device
 
 The |I2S| wires need to be connected to the xCORE device as shown in
 :ref:`i2s_master_xcore_connect` and :ref:`i2s_slave_xcore_connect`. The signals
-can be connected to any one bit ports on the device provided that they do
+can be connected to any one bit port on the device provided that they do
 not overlap any other used ports and are all on the same tile.
 In addition, four bit ports may also be used to connect to up to four signals of
 input or output with the same constraints as above.
