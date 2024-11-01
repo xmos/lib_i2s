@@ -4,17 +4,13 @@
 #include <xs1.h>
 #include "i2s.h"
 #include "i2c.h"
-#include "xassert.h"
-#include <print.h>
-#include <stdlib.h>
 #include "xk_audio_316_mc_ab/board.h"
 
-
-#define SAMPLE_FREQUENCY        192000
-#define MASTER_CLOCK_FREQUENCY  24576000
-#define DATA_BITS               32
-#define CHANS_PER_FRAME         2
-#define NUM_I2S_LINES           4
+#define SAMPLE_FREQUENCY        (192000)
+#define MASTER_CLOCK_FREQUENCY  (24576000)
+#define DATA_BITS               (32)
+#define CHANS_PER_FRAME         (2)
+#define NUM_I2S_LINES           (4)
 
 // I2S resources
 on tile[1]: in port p_mclk =                                PORT_MCLK_IN;
@@ -41,41 +37,38 @@ void i2s_loopback(server i2s_frame_callback_if i2s,
                   client i2c_master_if i_i2c
                  )
 {
-  int32_t samples[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+  int32_t samples[8] = {0};
 
   // Config can be done remotely via i_i2c
   xk_audio_316_mc_ab_AudioHwInit(i_i2c, hw_config);
 
   while (1) {
     select {
-    case i2s.init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config):
-      i2s_config.mode = I2S_MODE_I2S;
-      i2s_config.mclk_bclk_ratio = (MASTER_CLOCK_FREQUENCY/SAMPLE_FREQUENCY)/64;
+      case i2s.init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config):
+        i2s_config.mode = I2S_MODE_I2S;
+        i2s_config.mclk_bclk_ratio = (MASTER_CLOCK_FREQUENCY/SAMPLE_FREQUENCY)/64;
 
-      xk_audio_316_mc_ab_AudioHwConfig(i_i2c, hw_config, SAMPLE_FREQUENCY, MASTER_CLOCK_FREQUENCY, 0, DATA_BITS, DATA_BITS);
+        xk_audio_316_mc_ab_AudioHwConfig(i_i2c, hw_config, SAMPLE_FREQUENCY, MASTER_CLOCK_FREQUENCY, 0, DATA_BITS, DATA_BITS);
+        break;
 
-      break;
-
-    case i2s.receive(size_t num_chan_in, int32_t sample[num_chan_in]):
-      for (size_t i=0; i<num_chan_in; i++) {
+      case i2s.receive(size_t num_chan_in, int32_t sample[num_chan_in]):
+        for (size_t i=0; i<num_chan_in; i++) {
           samples[i] = sample[i];
-      }
-      break;
+        }
+        break;
 
-    case i2s.send(size_t num_chan_out, int32_t sample[num_chan_out]):
-      for (size_t i=0; i<num_chan_out; i++){
-        sample[i] = samples[i];
-      }
-      break;
+      case i2s.send(size_t num_chan_out, int32_t sample[num_chan_out]):
+        for (size_t i=0; i<num_chan_out; i++){
+          sample[i] = samples[i];
+        }
+        break;
 
-
-    case i2s.restart_check() -> i2s_restart_t restart:
-      restart = I2S_NO_RESTART;
-      break;
+      case i2s.restart_check() -> i2s_restart_t restart:
+        restart = I2S_NO_RESTART;
+        break;
     }
   }
 }
-
 
 int main()
 {

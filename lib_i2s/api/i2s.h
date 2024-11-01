@@ -183,7 +183,7 @@ typedef interface tdm_callback_if {
    *   component.
    *
    *   \param index     The index of the sample in the frame.
-   *   \param sample    The sample data as a signed 32-bit value. 
+   *   \param sample    The sample data as a signed 32-bit value.
    */
   void receive(size_t index, int32_t sample);
 
@@ -305,7 +305,7 @@ void i2s_frame_master_4b(CLIENT_INTERFACE(i2s_frame_callback_if, i2s_i),
  *  \param p_bclk         The bit clock output port
  *  \param p_lrclk        The word clock output port
  *  \param bclk           A clock that is configured externally to be used as the bit clock
- *                        
+ *
  */
 void i2s_frame_master_external_clock(CLIENT_INTERFACE(i2s_frame_callback_if, i2s_i),
                 NULLABLE_ARRAY_OF_SIZE(out_buffered_port_32_t, p_dout, num_out),
@@ -441,7 +441,6 @@ void tdm_master(CLIENT_INTERFACE(tdm_callback_if, tdm_i),
                 NULLABLE_ARRAY_OF_SIZE(in_buffered_port_32_t, p_din, num_in),
                 static_const_size_t num_in,
                 clock clk);
-
 
 #include <i2s_frame_master_impl.h>
 #include <i2s_frame_master_4b_impl.h>

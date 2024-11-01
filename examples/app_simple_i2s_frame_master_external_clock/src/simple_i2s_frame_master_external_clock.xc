@@ -7,8 +7,6 @@
 #include <platform.h>
 #include <xs1.h>
 #include "i2s.h"
-#include <print.h>
-#include <stdlib.h>
 
 #define SAMPLE_FREQUENCY (192000)
 #define MASTER_CLOCK_FREQUENCY (24576000)
@@ -52,7 +50,7 @@ static void setup_bclock()
 
 int main(void) {
   i2s_frame_callback_if i_i2s;
-  
+
   par
   {
       {
@@ -66,4 +64,3 @@ int main(void) {
   return 0;
 }
 
-// end

@@ -2,20 +2,16 @@
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 #include <platform.h>
 #include <xs1.h>
+#include <string.h>
 #include "i2s.h"
 #include "i2c.h"
-#include "xassert.h"
-#include <stdlib.h>
-#include <debug_print.h>
-#include <string.h>
 #include "xk_audio_316_mc_ab/board.h"
 
-
-#define SAMPLE_FREQUENCY        192000
-#define MASTER_CLOCK_FREQUENCY  24576000
-#define DATA_BITS               32
-#define CHANS_PER_FRAME         2
-#define NUM_I2S_LINES           4
+#define SAMPLE_FREQUENCY        (192000)
+#define MASTER_CLOCK_FREQUENCY  (24576000)
+#define DATA_BITS               (32)
+#define CHANS_PER_FRAME         (2)
+#define NUM_I2S_LINES           (4)
 
 // I2S resources
 on tile[1]: in port p_mclk =                                PORT_MCLK_IN;
@@ -41,7 +37,6 @@ static const xk_audio_316_mc_ab_config_t hw_config = {
 #pragma unsafe arrays
 void i2s_handler(server i2s_frame_callback_if i_i2s, client i2c_master_if i_i2c)
 {
-
   int32_t loopback[NUM_I2S_LINES * 2] = {0};
 
   // Config can be done remotely via i_i2c
@@ -71,12 +66,10 @@ void i2s_handler(server i2s_frame_callback_if i_i2s, client i2c_master_if i_i2c)
   }
 }
 
-
 int main()
 {
   interface i2s_frame_callback_if i_i2s_slave;
   interface i2c_master_if i_i2c[1];
-
 
   par {
     on tile[1]: i2s_frame_slave(i_i2s_slave, p_dac, NUM_I2S_LINES, p_adc, NUM_I2S_LINES, DATA_BITS, p_bclk, p_lrclk, clk_bclk);
@@ -87,6 +80,6 @@ int main()
         xk_audio_316_mc_ab_board_setup(hw_config); // Setup must be done on tile[0]
         xk_audio_316_mc_ab_i2c_master(i_i2c);      // Run I2C master server task to allow control from tile[1]
     }
-  } 
+  }
   return 0;
 }
