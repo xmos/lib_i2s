@@ -1,80 +1,86 @@
-.. |I2S| replace:: I\ :sup:`2`\ S
+:orphan:
 
-###############
-I2S/TDM Library
-###############
-
+########################
+lib_i2s: I²S/TDM library
+########################
 
 :vendor: XMOS
-:version: 2.3.0
+:version: 6.0.0
 :scope: General Use
-:description: Arithmetic and DSP library
-:category: General Purpose
-:keywords: Arithmetic, DSP, VPU
-:devices: xcore.ai
+:description: I²S/TDM master and slave
+:category: Audio
+:keywords: Audio, PCM
+:devices: xcore-200, xcore.ai
 
-********
-Overview
-********
+*******
+Summary
+*******
 
-This is a software library that allows you to control an |I2S| or TDM (time
-division multiplexed) bus via xCORE ports. |I2S| and TDM are digital
-data streaming interfaces particularly appropriate for transmission of
-audio data. The components in the library
-are controlled via C using the XMOS multicore extensions (xC) and
-can either act as |I2S| master, TDM master or |I2S| slave.
+I²S (Inter-IC Sound) is a digital serial protocol developed for transmitting high-quality audio
+data between components, like microcontrollers, audio codecs, and DSPs. It’s commonly used for
+PCM (Pulse Code Modulation) audio, which is the standard form for digital audio representation.
+I²S has three main lines: Serial Data (SD), Serial Clock (`SCK`) [#]_, and Word Select (`WS`) [#]_,
+with separate channels for clock and data, reducing jitter and ensuring synchronisation.
+
+In TDM (Time-Division Multiplexing) mode, multiple audio channels can be sent over a single I²S data
+line, with each channel occupying specific time slots. This allows I²S to support multi-channel
+audio, useful for applications like surround sound.
+
+``lib_i2s`` allows interfacing to I²S or TDM (time division multiplexed) buses via `xcore` ports
+and can act either act as I²S master, TDM master or I²S slave.
+
+.. [#] sometimes refered to as Bit Clock (`BCLK`)
+.. [#] sometimes refered to as Left/Right(`LRCLK`)
 
 ********
 Features
 ********
 
- * |I2S| master, TDM master and |I2S| slave modes.
+ * I²S master, TDM master and I²S slave modes.
  * Handles multiple input and output data lines.
- * Support for standard |I2S|, left justified or right justified
-   data modes for |I2S|.
- * Support for multiple formats of TDM synchronization signal.
- * Efficient "frame-based" versions of |I2S| master and slave allowing use of processor cycles in between I2S signal handling.
- * Sample rate support up to 192kHz or 384kHz for |I2S|.
+ * Support for standard I²S, left justified or right justified data modes for I²S.
+ * Support for multiple formats of TDM synchronisation signal.
+ * Sample rate support up to 192kHz or 384kHz for I²S.
  * Up to 32 channels in/32 channels out (depending on sample rate and protocol).
 
+************
+Known issues
+************
+
+ * I²S slave cannot support > 96 kHz on a 4-bit port (`#141 <https://github.com/xmos/lib_i2s/issues/141>`_)
+
+****************
+Development repo
+****************
+
+ * `https://github.com/xmos/lib_i2s <https://github.com/xmos/lib_i2s>`_
+
 **************
-Resource Usage
+Required tools
 **************
 
-The |I2S| and TDM modules use one logical core and between 1.6 and 2.1kB of memory.
-There may be spare processing time available in the callbacks of |I2S| and TDM. 
-IO usage is 1 x 1b port for each signal or 4b ports for data in some cases.
+ * XMOS XTC Tools: 15.3.0
+
+*********************************
+Required libraries (dependencies)
+*********************************
+
+ * lib_xassert (www.github.com/xmos/lib_xassert)
 
 *************************
-Related Application Notes
+Related application notes
 *************************
 
 The following application notes use this library:
 
-  * AN00162 - Using the |I2S| library
-  * `AN02016: Integrating Audio Weaver (AWE) Core into USB Audio <https://www.xmos.com/file/an02016>`_
-  * `AN02003: SPDIF/ADAT/I2S Receive to |I2S| Slave Bridge with ASRC <https://www.xmos.com/file/an02003>`_
-
-************
-Known Issues
-************
-
-  * None
-
-**************
-Required Tools
-**************
-
-  * XMOS XTC Tools: 15.3.0
-
-*********************************
-Required Libraries (dependencies)
-*********************************
-
-  * lib_xassert (www.github.com/xmos/lib_xassert)
+ * AN00162 - Using the I²S library
+ * `AN02016: Integrating Audio Weaver (AWE) Core into USB Audio <https://www.xmos.com/file/an02016>`_
+ * `AN02003: SPDIF/ADAT/I2S Receive to I²S Slave Bridge with ASRC <https://www.xmos.com/file/an02003>`_
 
 *******
 Support
 *******
 
-This package is supported by XMOS Ltd. Issues can be raised against the software at www.xmos.com/support
+This package is supported by XMOS Ltd. Issues can be raised against the software at
+`www.xmos.com/support <https://www.xmos.com/support>`_
+
