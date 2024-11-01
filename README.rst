@@ -20,9 +20,9 @@ I²S (Inter-IC Sound) is a digital serial protocol developed for transmitting hi
 data between components, like microcontrollers, audio codecs, and DSPs. It’s commonly used for
 PCM (Pulse Code Modulation) audio, which is the standard form for digital audio representation.
 I²S has three main lines: Serial Data (SD), Serial Clock (`SCK`) [#]_, and Word Select (`WS`) [#]_,
-with separate channels for clock and data, reducing jitter and ensuring synchronization
+with separate channels for clock and data, reducing jitter and ensuring synchronisation.
 
-TDM (Time-Division Multiplexing) mode, multiple audio channels can be sent over a single I²S data
+In TDM (Time-Division Multiplexing) mode, multiple audio channels can be sent over a single I²S data
 line, with each channel occupying specific time slots. This allows I²S to support multi-channel
 audio, useful for applications like surround sound.
 
@@ -39,7 +39,7 @@ Features
  * I²S master, TDM master and I²S slave modes.
  * Handles multiple input and output data lines.
  * Support for standard I²S, left justified or right justified data modes for I²S.
- * Support for multiple formats of TDM synchronization signal.
+ * Support for multiple formats of TDM synchronisation signal.
  * Sample rate support up to 192kHz or 384kHz for I²S.
  * Up to 32 channels in/32 channels out (depending on sample rate and protocol).
 
