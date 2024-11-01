@@ -67,7 +67,6 @@ pipeline {
                                     checkout_shallow()
                                     withTools(params.TOOLS_VERSION) {
                                         dir("examples") {
-                                            // Fetch deps
                                             sh "cmake -G 'Unix Makefiles' -B build -DDEPS_CLONE_SHALLOW=TRUE"
                                             sh 'xmake -C build -j 8'
                                         }

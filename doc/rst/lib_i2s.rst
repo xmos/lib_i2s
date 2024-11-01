@@ -62,12 +62,12 @@ in :ref:`i2s_signal_params`.
      * - *MODE*
        - The mode - either |I2S| or left justified.
      * - *NUM_DATA_BITS*
-       - The number of bits in a data word; this is usually 32, but can be 
+       - The number of bits in a data word; this is usually 32, but can be
          adjusted to any value below 32 if required when using one bit ports for
          I/O.
 
 
-The *MCLK_BCLK_RATIO* should be such that twice the number of data bits can be 
+The *MCLK_BCLK_RATIO* should be such that twice the number of data bits can be
 output by the bit clock at the data rate of the |I2S| signal. For example, a
 24.576MHz master clock with a ratio of 8 gives a bit clock at
 3.072MHz. This bit clock can output 64 bits at a frequency of 48kHz -
@@ -111,13 +111,19 @@ mode; to attain this mode the library should be set to
 should be right shifted by the application before being passed to the
 library.
 
+Resource usage
+==============
+
+The I²S and TDM modules use one logical core and between 1.6 and 2.1kB of memory.
+There may be spare processing time available in the callbacks of I²S and TDM.
+IO usage is 1 x 1b port for each signal or 4b ports for data in some cases.
+
 Connecting |I2S| signals to the xCORE device
 ============================================
 
-
 The |I2S| wires need to be connected to the xCORE device as shown in
-:ref:`i2s_master_xcore_connect` and :ref:`i2s_slave_xcore_connect`. The signals 
-can be connected to any one bit ports on the device provided that they do 
+:ref:`i2s_master_xcore_connect` and :ref:`i2s_slave_xcore_connect`. The signals
+can be connected to any one bit ports on the device provided that they do
 not overlap any other used ports and are all on the same tile.
 In addition, four bit ports may also be used to connect to up to four signals of
 input or output with the same constraints as above.
@@ -152,7 +158,7 @@ handling the data from the library.
 
 On the xCORE-200 and xcore.ai the frame-based |I2S| master uses hardware
 clock dividers and an efficient callback
-interface to achieve high throughputs. This also permits the use of 
+interface to achieve high throughputs. This also permits the use of
 non-32bit data word lengths if needed. :ref:`i2s_frame_master_62_5_speeds` shows the known
 working configurations:
 
@@ -244,7 +250,7 @@ working configurations:
        - 1 (2)
 
 .. tip::
-   If running at higher rates such as 768kHz, it may be necessary to modify the port timing delays to ensure proper sampling of the data and LRCLK lines. There are methods for doing this using pad and/or sample delays however this is beyond the scope of this document. Please consult `I/O timings for xCORE200 / xcore.ai` available on xmos.com for further information. 
+   If running at higher rates such as 768kHz, it may be necessary to modify the port timing delays to ensure proper sampling of the data and LRCLK lines. There are methods for doing this using pad and/or sample delays however this is beyond the scope of this document. Please consult `I/O timings for xCORE200 / xcore.ai` available on xmos.com for further information.
 
 
 |I2S| slave speeds and performance
@@ -254,7 +260,7 @@ The speed and number of data wires that can be driven by the |I2S|
 library running as slave depends on the speed of the logical core
 that runs the code
 and the amount of processing that occurs in the user callbacks for
-handling the data from the library. 
+handling the data from the library.
 
 The frame-based |I2S| slave uses an efficient callback
 interface to achieve high throughputs by transferring a frame (all channels in one sample period)

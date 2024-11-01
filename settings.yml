@@ -1,20 +1,21 @@
+# This file relates to internal XMOS infrastructure and should be ignored by external users
 ---
 lib_name: lib_i2s
 project: '{{lib_name}}'
-title: '{{lib_name}}: XMOS I2S Library'
+title: '{{lib_name}}: I²S/TDM library'
 version: 6.0.0
 
 documentation:
   exclude_patterns_path: doc/exclude_patterns.inc
   substitutions_path: doc/substitutions.inc
-  root_doc: doc/rst/i2s.rst
+  root_doc: doc/rst/lib_i2s.rst
   linkcheck_ignore_regex: ['']
   cognidox_part_number: XM-007055-UG
   doxygen_projects:
     lib_i2s:
       doxyfile_path: doc/Doxyfile.inc
   pdfs:
-    doc/rst/i2s.rst:
+    doc/rst/lib_i2s.rst:
       pdf_title: '{{title}}'
       pdf_filename: '{{lib_name}}_v{{version}}'
     README.rst:
