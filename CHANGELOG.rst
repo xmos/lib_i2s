@@ -1,8 +1,8 @@
 lib_i2s change log
 ==================
 
-UNRELEASED
-----------
+6.0.1
+-----
 
   * CHANGED: Documentation updated
 

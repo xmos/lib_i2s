@@ -54,7 +54,7 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
         clock bclk,
         out buffered port:32 p_lrclk,
         i2s_mode_t mode){
-    
+
     const int offset = (mode == I2S_MODE_I2S) ? 1 : 0;
     int32_t in_samps[16];  // Workaround: should be (num_in << 1) but compiler thinks that isn't const,
     int32_t out_samps[16]; // so setting to 16 which should be big enough for most cases
@@ -66,7 +66,7 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
     const unsigned data_bit_offset = 32 - num_data_bits;
     const unsigned data_bit_mask = UINT_MAX >> data_bit_offset; // e.g. 00011111 for 5b data
 
-    if (num_out) 
+    if (num_out)
     {
         i2s_i.send(num_out << 1, out_samps);
     }
@@ -105,7 +105,7 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
         lr_mask = ~lr_mask;
         p_lrclk <: lr_mask;
 
-        for (size_t i = 0; i < num_in; i++) 
+        for (size_t i = 0; i < num_in; i++)
         {
             asm volatile("setpt res[%0], %1"
                         :
@@ -123,7 +123,7 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
         lr_mask = ~lr_mask;
         partout(p_lrclk, num_data_bits, lr_mask);
 
-        for (size_t i = 0; i < num_in; i++) 
+        for (size_t i = 0; i < num_in; i++)
         {
             asm volatile("setpt res[%0], %1"
                         :
@@ -132,14 +132,14 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
         }
     }
 
-    while (1) 
+    while (1)
     {
         // Check for restart
         i2s_restart_t restart = i2s_i.restart_check();
 
-        if (restart == I2S_NO_RESTART) 
+        if (restart == I2S_NO_RESTART)
         {
-            if (num_out) 
+            if (num_out)
             {
                 i2s_i.send(num_out << 1, out_samps);
             }
@@ -195,7 +195,7 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
             partout(p_lrclk, num_data_bits, lr_mask);
         }
 
-        if (restart == I2S_NO_RESTART) 
+        if (restart == I2S_NO_RESTART)
         {
             // Output i2s odds (1,3,5..)
             if (num_data_bits == 32)
@@ -251,14 +251,14 @@ static i2s_restart_t i2s_frame_ratio_n(client i2s_frame_callback_if i2s_i,
         }
 
 
-        if (num_in) 
+        if (num_in)
         {
             i2s_i.receive(num_in << 1, in_samps);
         }
 
-        if (restart != I2S_NO_RESTART) 
+        if (restart != I2S_NO_RESTART)
         {
-            if (!num_in) 
+            if (!num_in)
             {
                 // Prevent the clock from being stopped before the last word
                 // has been sent if there are no RX ports.
@@ -290,9 +290,11 @@ static void i2s_frame_master0(client i2s_frame_callback_if i2s_i,
         if (isnull(p_dout) && isnull(p_din)) {
             fail("Must provide non-null p_dout or p_din");
         }
-        
+
+        // Clock bclk clock-block from p_mclk port
         i2s_setup_bclk(bclk, p_mclk, config.mclk_bclk_ratio);
-        //This ensures that the port time on all the ports is at 0
+
+        // This ensures that the port time on all the ports is at 0
         i2s_frame_init_ports(p_dout, num_out, p_din, num_in, p_bclk, p_lrclk, bclk);
 
         i2s_restart_t restart =
@@ -323,7 +325,6 @@ static void i2s_frame_master0_external_clock(client i2s_frame_callback_if i2s_i,
         if (isnull(p_dout) && isnull(p_din)) {
             fail("Must provide non-null p_dout or p_din");
         }
-
 
         //This ensures that the port time on all the ports is at 0
         i2s_frame_init_ports(p_dout, num_out, p_din, num_in, p_bclk, p_lrclk, bclk);

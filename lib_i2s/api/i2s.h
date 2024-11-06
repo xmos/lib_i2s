@@ -203,8 +203,7 @@ typedef interface tdm_callback_if {
 } tdm_callback_if;
 #endif // __DOXYGEN__
 
-
-/** I2S frame-based master component **for xCORE200 and xcore.ai only**
+/** I2S master (controller) component
  *
  *  This task performs I2S on the provided pins. It will perform callbacks over
  *  the i2s_frame_callback_if interface to get/receive frames of data from the
@@ -212,11 +211,6 @@ typedef interface tdm_callback_if {
  *
  *  The component performs I2S master so will drive the word clock and
  *  bit clock lines.
- *
- *  This is a more efficient version of i2s master which reduces callback
- *  frequency and allows useful processing to be done in distributable i2s handler tasks.
- *  It also uses xCORE200 and xcore.ai specific features to remove the need for software
- *  BCLK generation which decreases processor overhead.
  *
  *  \param i2s_i          The I2S frame callback interface to connect to
  *                        the application
@@ -243,7 +237,7 @@ void i2s_frame_master(
                 in_port_t p_mclk,
                 clock bclk);
 
-/** I2S frame-based master component with 4-bit ports **for xCORE200 and xcore.ai only**
+/** I2S  master (controller) component with 4-bit ports
  *
  *  This task performs I2S on the provided 4-bit ports. It will perform callbacks over
  *  the i2s_frame_callback_if interface to get/receive frames of data from the
@@ -251,11 +245,6 @@ void i2s_frame_master(
  *
  *  The component performs I2S master so will drive the word clock and
  *  bit clock lines.
- *
- *  This is a more efficient version of i2s master which reduces callback
- *  frequency and allows useful processing to be done in distributable i2s handler tasks.
- *  It also uses xCORE200 and xcore.ai specific features to remove the need for software
- *  BCLK generation which decreases processor overhead.
  *
  *  This component can only operate with a 32-bit data word length.
  *
@@ -281,7 +270,7 @@ void i2s_frame_master_4b(CLIENT_INTERFACE(i2s_frame_callback_if, i2s_i),
                 in_port_t p_mclk,
                 clock bclk);
 
-/** I2S frame-based master component **for xCORE200 and xcore.ai only**
+/** I2S master (controller) component
  *
  *  This task performs I2S on the provided pins. It will perform callbacks over
  *  the i2s_frame_callback_if interface to get/receive frames of data from the
@@ -290,10 +279,8 @@ void i2s_frame_master_4b(CLIENT_INTERFACE(i2s_frame_callback_if, i2s_i),
  *  The component performs I2S master so will drive the word clock and
  *  bit clock lines.
  *
- *  This is a more efficient version of i2s master which reduces callback
- *  frequency and allows useful processing to be done in distributable i2s handler tasks.
- *  It also uses xCORE200 and xcore.ai specific features to remove the need for software
- *  BCLK generation which decreases processor overhead.
+ *  This "external_clock" version expects the application to configure the
+ *  bit-clock port to be clocked from the master clock outside of this call.
  *
  *  \param i2s_i          The I2S frame callback interface to connect to
  *                        the application
@@ -318,7 +305,7 @@ void i2s_frame_master_external_clock(CLIENT_INTERFACE(i2s_frame_callback_if, i2s
                 in_port_t p_mclk,
                 clock bclk);
 
-/** I2S frame-based master component with 4-bit ports **for xCORE200 amd xcore.ai only**
+/** I2S master (controller) component with 4-bit ports
  *
  *  This task performs I2S on the provided 4-bit ports. It will perform callbacks over
  *  the i2s_frame_callback_if interface to get/receive frames of data from the
@@ -327,10 +314,8 @@ void i2s_frame_master_external_clock(CLIENT_INTERFACE(i2s_frame_callback_if, i2s
  *  The component performs I2S master so will drive the word clock and
  *  bit clock lines.
  *
- *  This is a more efficient version of i2s master which reduces callback
- *  frequency and allows useful processing to be done in distributable i2s handler tasks.
- *  It also uses xCORE200 and xcore.ai specific features to remove the need for software
- *  BCLK generation which decreases processor overhead.
+ *  This "external_clock" version expects the application to configure the
+ *  bit-clock port to be clocked from the master clock outside of this call.
  *
  *  This component can only operate with a 32-bit data word length.
  *
@@ -355,14 +340,14 @@ void i2s_frame_master_external_clock_4b(CLIENT_INTERFACE(i2s_frame_callback_if, 
                 in_port_t p_mclk,
                 clock bclk);
 
-/** I2S High Efficiency slave component.
+/** I2S high efficiency slave (target) component.
  *
- *  This task performs I2S on the provided pins. It will perform callbacks over
- *  the i2s_callback_if interface to get/receive data from the application
+ *  This task performs I2S on the provided 1-bit ports. It will perform callbacks
+ *  over the i2s_callback_if interface to get/receive data from the application
  *  using this component.
  *
- *  The component performs I2S slave so will expect the word clock and
- *  bit clock to be driven externally.
+ *  The component performs I2S slave so expects the word clock and  bit clock
+ *  to be driven externally.
  *
  *  \param i2s_i          The I2S callback interface to connect to
  *                        the application
@@ -386,10 +371,10 @@ void i2s_frame_slave(CLIENT_INTERFACE(i2s_frame_callback_if, i2s_i),
                 in_buffered_port_32_t p_lrclk,
                 clock bclk);
 
-/** I2S High Efficiency slave component.
+/** I2S high efficiency slave (target) component.
  *
- *  This task performs I2S on the provided pins. It will perform callbacks over
- *  the i2s_callback_if interface to get/receive data from the application
+ *  This task performs I2S on the provided 4-bit ports. It will perform callbacks
+ *  over the i2s_callback_if interface to get/receive data from the application
  *  using this component.
  *
  *  The component performs I2S slave so will expect the word clock and
@@ -415,9 +400,9 @@ void i2s_frame_slave_4b(CLIENT_INTERFACE(i2s_frame_callback_if, i2s_i),
                 out_buffered_port_32_t p_lrclk,
                 clock bclk);
 
-/** TDM master component.
+/** TDM master (controller) component.
  *
- *  This task performs TDM on the provided pins. It will perform callbacks over
+ *  This task performs TDM on the provided ports. It will perform callbacks over
  *  the tdm_callback_if interface to get/receive data from the application
  *  using this component.
  *

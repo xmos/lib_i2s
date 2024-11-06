@@ -3,7 +3,6 @@
 #include <platform.h>
 #include <xs1.h>
 #include "i2s.h"
-#include "i2c.h"
 #include "xk_audio_316_mc_ab/board.h"
 
 #define SAMPLE_FREQUENCY        (192000)
@@ -16,8 +15,10 @@
 on tile[1]: in port p_mclk =                                PORT_MCLK_IN;
 on tile[1]: buffered out port:32 p_lrclk =                  PORT_I2S_LRCLK;
 on tile[1]: out port p_bclk =                               PORT_I2S_BCLK;
-on tile[1]: buffered out port:32 p_dac[NUM_I2S_LINES] =     {PORT_I2S_DAC0, PORT_I2S_DAC1, PORT_I2S_DAC2, PORT_I2S_DAC3};
-on tile[1]: buffered in port:32 p_adc[NUM_I2S_LINES] =      {PORT_I2S_ADC0 ,PORT_I2S_ADC1, PORT_I2S_ADC2, PORT_I2S_ADC3};
+on tile[1]: buffered out port:32 p_dac[NUM_I2S_LINES] =     {PORT_I2S_DAC0, PORT_I2S_DAC1,
+                                                                PORT_I2S_DAC2, PORT_I2S_DAC3};
+on tile[1]: buffered in port:32 p_adc[NUM_I2S_LINES] =      {PORT_I2S_ADC0 ,PORT_I2S_ADC1,
+                                                                PORT_I2S_ADC2, PORT_I2S_ADC3};
 on tile[1]: clock bclk =                                    XS1_CLKBLK_1;
 
 // Board configuration from lib_board_support
@@ -33,11 +34,9 @@ static const xk_audio_316_mc_ab_config_t hw_config = {
 
 
 [[distributable]]
-void i2s_loopback(server i2s_frame_callback_if i2s,
-                  client i2c_master_if i_i2c
-                 )
+void i2s_loopback(server i2s_frame_callback_if i2s, client i2c_master_if i_i2c)
 {
-  int32_t samples[8] = {0};
+  int32_t samples[NUM_I2S_LINES * CHANS_PER_FRAME] = {0};
 
   // Config can be done remotely via i_i2c
   xk_audio_316_mc_ab_AudioHwInit(i_i2c, hw_config);
@@ -46,9 +45,10 @@ void i2s_loopback(server i2s_frame_callback_if i2s,
     select {
       case i2s.init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config):
         i2s_config.mode = I2S_MODE_I2S;
-        i2s_config.mclk_bclk_ratio = (MASTER_CLOCK_FREQUENCY/SAMPLE_FREQUENCY)/64;
+        i2s_config.mclk_bclk_ratio = (MASTER_CLOCK_FREQUENCY/(SAMPLE_FREQUENCY * CHANS_PER_FRAME * DATA_BITS));
 
-        xk_audio_316_mc_ab_AudioHwConfig(i_i2c, hw_config, SAMPLE_FREQUENCY, MASTER_CLOCK_FREQUENCY, 0, DATA_BITS, DATA_BITS);
+        xk_audio_316_mc_ab_AudioHwConfig(i_i2c, hw_config, SAMPLE_FREQUENCY, MASTER_CLOCK_FREQUENCY,
+            0, DATA_BITS, DATA_BITS);
         break;
 
       case i2s.receive(size_t num_chan_in, int32_t sample[num_chan_in]):
@@ -70,11 +70,16 @@ void i2s_loopback(server i2s_frame_callback_if i2s,
   }
 }
 
-int main()
+int main(void)
 {
   interface i2c_master_if i_i2c[1];
 
   par {
+    on tile[0]: {
+        xk_audio_316_mc_ab_board_setup(hw_config); // Setup must be done on tile[0]
+        xk_audio_316_mc_ab_i2c_master(i_i2c);      // Run I2C master server task to allow control from tile[1]
+    }
+
     on tile[1]: {
         interface i2s_frame_callback_if i_i2s;
 
@@ -83,11 +88,6 @@ int main()
             [[distribute]] i2s_loopback(i_i2s, i_i2c[0]);
             i2s_frame_master(i_i2s, p_dac, NUM_I2S_LINES, p_adc, NUM_I2S_LINES, DATA_BITS, p_bclk, p_lrclk, p_mclk, bclk);
         }
-    }
-
-    on tile[0]: {
-        xk_audio_316_mc_ab_board_setup(hw_config); // Setup must be done on tile[0]
-        xk_audio_316_mc_ab_i2c_master(i_i2c);      // Run I2C master server task to allow control from tile[1]
     }
   }
   return 0;
