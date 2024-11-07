@@ -7,8 +7,6 @@
 #include <platform.h>
 #include <xs1.h>
 #include "i2s.h"
-#include <print.h>
-#include <stdlib.h>
 
 #define SAMPLE_FREQUENCY (192000)
 #define MASTER_CLOCK_FREQUENCY (24576000)
@@ -18,8 +16,9 @@ void my_application(server tdm_callback_if i_tdm) {
   while (1) {
     select {
       case i_tdm.init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config):
-        i2s_config.mclk_bclk_ratio = (MASTER_CLOCK_FREQUENCY/SAMPLE_FREQUENCY)/64;
-        i2s_config.mode = I2S_MODE_LEFT_JUSTIFIED;
+        tdm_config.offset = 0;
+        tdm_config.sync_len = 32;
+        tdm_config.channels_per_frame = 8;
         // Complete setup
         break;
       case i_tdm.restart_check() -> i2s_restart_t restart:
@@ -48,10 +47,8 @@ int main(void) {
   configure_clock_src(bclk, p_bclk);
 
   par {
-    tdm_master(i_tdm, p_fsync, p_dout, 2, p_din, 2, bclk);
+    tdm_master(i_tdm, p_fsync, p_dout, 1, p_din, 1, bclk);
     my_application(i_tdm);
   }
   return 0;
 }
-
-// end

@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 include($ENV{XMOS_CMAKE_PATH}/xcommon.cmake)
 project(lib_i2s_examples)
-add_subdirectory(AN00162_i2s_loopback_demo)
 add_subdirectory(app_i2s_frame_loopback_demo)
 add_subdirectory(app_i2s_frame_slave_loopback_demo)
 add_subdirectory(app_simple_i2s_frame_master)

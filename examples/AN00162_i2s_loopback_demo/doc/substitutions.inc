@@ -1,3 +1,0 @@
-.. |newpage| raw:: latex
-
-   \clearpage

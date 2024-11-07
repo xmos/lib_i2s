@@ -7,8 +7,6 @@
 #include <platform.h>
 #include <xs1.h>
 #include "i2s.h"
-#include <print.h>
-#include <stdlib.h>
 
 #define SAMPLE_FREQUENCY (192000)
 #define MASTER_CLOCK_FREQUENCY (24576000)
@@ -53,4 +51,3 @@ int main(void) {
   return 0;
 }
 
-// end

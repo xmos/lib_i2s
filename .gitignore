@@ -1,26 +1,42 @@
-**/.build*/*
-**/bin/*
-*.o
-*.xe
+# Tmp files & logs
+*.settings
+*.bin
+*.zip
+*.log
 *.vcd
-*.s
+*.swp
+*.*~
+*.xmt
+*.swo
+*.swn
+*~
+*.DS_Store
+
+# Python
+*.pyc
+**/*.egg-info/
+**/.venv*/
+
+# XMOS temp files
+**/*build*/*
+*/bin/*
+**/flash_bin_node*
+**/fw-*
+**/s2l-*
+**/spanning-xn-*
+**/target-xn*
 *.xi
+*.o
 *.i
 *.a
-**/_build/
-**/run_*.log
-**/pdf/*
-**/html/*
-**/.settings/*
-*.pyc
-*.log
-.*.swp
-test_results.csv
-**/.venv/**
-**/python/*.egg-info/**
-.python-version
+*.d
+*.decouple
+*.pca.xml
+**/CMakeFiles/*
 
-# waf build files
-.lock-waf_*
-.waf-*/
-build/
+# XMOS binaries
+*.xe
+
+# Built documentation
+doc/_build/pdf/*.pdf
+**/doc/pdf/*.pdf

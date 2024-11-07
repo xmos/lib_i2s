@@ -5,9 +5,9 @@ lib_i2s: I²S/TDM library
 ########################
 
 :vendor: XMOS
-:version: 6.0.0
+:version: 6.0.1
 :scope: General Use
-:description: I²S/TDM master and slave
+:description: I²S/TDM controller ("master") and target ("slave")
 :category: Audio
 :keywords: Audio, PCM
 :devices: xcore-200, xcore.ai
@@ -27,7 +27,8 @@ line, with each channel occupying specific time slots. This allows I²S to suppo
 audio, useful for applications like surround sound.
 
 ``lib_i2s`` allows interfacing to I²S or TDM (time division multiplexed) buses via `xcore` ports
-and can act either act as I²S master, TDM master or I²S slave.
+and can act either act as I²S controller (previously termed "master") or target (previously termed
+"slave") or TDM controller.
 
 .. [#] sometimes refered to as Bit Clock (`BCLK`)
 .. [#] sometimes refered to as Left/Right(`LRCLK`)
@@ -36,7 +37,7 @@ and can act either act as I²S master, TDM master or I²S slave.
 Features
 ********
 
- * I²S master, TDM master and I²S slave modes.
+ * I²S controller, TDM controller and I²S target modes.
  * Handles multiple input and output data lines.
  * Support for standard I²S, left justified or right justified data modes for I²S.
  * Support for multiple formats of TDM synchronisation signal.
@@ -47,7 +48,7 @@ Features
 Known issues
 ************
 
- * I²S slave cannot support > 96 kHz on a 4-bit port (`#141 <https://github.com/xmos/lib_i2s/issues/141>`_)
+ * I²S target cannot support > 96 kHz on a 4-bit port (`#141 <https://github.com/xmos/lib_i2s/issues/141>`_)
 
 ****************
 Development repo

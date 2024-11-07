@@ -1,8 +1,8 @@
 lib_i2s change log
 ==================
 
-UNRELEASED
-----------
+6.0.1
+-----
 
   * CHANGED: Documentation updated
 
@@ -14,7 +14,7 @@ UNRELEASED
 -----
 
   * REMOVED: Support for XS1 - Please design with xcore.ai for new projects
-  * REMOVED: I2S non "frame" API (superseded by more efficient frame versions)
+  * REMOVED: I²S non "frame" API (superseded by more efficient frame versions)
   * CHANGED: Use XCommon-CMake and use in examples/tests
   * CHANGED: Examples ported to XK-AUDIO-316-MC board (was XK-AUDIO-216-MC)
   * CHANGED: Examples use lib_board_support instead of custom hardware setup

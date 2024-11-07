@@ -1,18 +1,16 @@
 // Copyright 2015-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 #include <xs1.h>
-#include <print.h>
-#include <i2s.h>
-#include <i2c.h>
 #include <platform.h>
+#include "i2s.h"
+#include "i2c.h"
 #include "xk_audio_316_mc_ab/board.h"
 
-#define SAMPLE_FREQUENCY        48000
-#define MASTER_CLOCK_FREQUENCY  24576000
-#define DATA_BITS               32
-#define CHANS_PER_FRAME         8
-#define NUM_TDM_LINES           4
-
+#define SAMPLE_FREQUENCY        (48000)
+#define MASTER_CLOCK_FREQUENCY  (24576000)
+#define DATA_BITS               (32)
+#define CHANS_PER_FRAME         (8)
+#define NUM_TDM_LINES           (4)
 
 // TDM resources
 on tile[1]: in port p_mclk =                                PORT_MCLK_IN;
@@ -32,9 +30,6 @@ static const xk_audio_316_mc_ab_config_t hw_config = {
         DATA_BITS,
         CHANS_PER_FRAME
 };
-
-
-
 
 [[distributable]]
 void tdm_loopback(server tdm_callback_if tdm,
@@ -77,7 +72,7 @@ int main() {
   par {
     on tile[1]: {
       configure_clock_src_divide(bclk, p_mclk, 1);
-      configure_port_clock_output(p_bclk, bclk); 
+      configure_port_clock_output(p_bclk, bclk);
       tdm_master(i_tdm, p_fsync, p_dac, NUM_TDM_LINES, p_adc, NUM_TDM_LINES, bclk);
     }
 

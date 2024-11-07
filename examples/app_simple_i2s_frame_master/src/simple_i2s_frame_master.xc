@@ -7,12 +7,10 @@
 #include <platform.h>
 #include <xs1.h>
 #include "i2s.h"
-#include <print.h>
-#include <stdlib.h>
 
-#define SAMPLE_FREQUENCY (192000)
-#define MASTER_CLOCK_FREQUENCY (24576000)
-#define DATA_BITS (32)
+#define SAMPLE_FREQUENCY         (192000)
+#define MASTER_CLOCK_FREQUENCY   (24576000)
+#define DATA_BITS                (32)
 
 [[distributable]]
 void my_application(server i2s_frame_callback_if i_i2s) {
@@ -36,11 +34,10 @@ void my_application(server i2s_frame_callback_if i_i2s) {
     }
   }
 }
-
 out buffered port:32 p_dout[2] = {XS1_PORT_1D, XS1_PORT_1E};
 in buffered port:32 p_din[2] = {XS1_PORT_1I, XS1_PORT_1J};
-out port p_bclk = XS1_PORT_1M;
-out buffered port:32 p_lrclk = XS1_PORT_1A;
+out port p_sck = XS1_PORT_1M;
+out buffered port:32 p_ws = XS1_PORT_1A;
 in port p_mclk = XS1_PORT_1B;
 
 clock bclk = XS1_CLKBLK_1;
@@ -49,10 +46,8 @@ int main(void) {
   i2s_frame_callback_if i_i2s;
 
   par {
-    i2s_frame_master(i_i2s, p_dout, 2, p_din, 2, DATA_BITS, p_bclk, p_lrclk, p_mclk, bclk);
+    i2s_frame_master(i_i2s, p_dout, 2, p_din, 2, DATA_BITS, p_sck, p_ws, p_mclk, bclk);
     my_application(i_i2s);
   }
   return 0;
 }
-
-// end
