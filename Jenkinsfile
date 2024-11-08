@@ -143,9 +143,6 @@ pipeline {
                                 dir("${REPO}") {
                                     warnError("Documentation build failed") {
                                         buildDocs()
-                                        dir("examples/AN00162_i2s_loopback_demo") {
-                                            buildDocs()
-                                        }
                                     }
                                 }
                             }
