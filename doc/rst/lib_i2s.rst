@@ -7,7 +7,8 @@ Introduction
 ************
 
 ``lib_i2s`` allows interfacing to I²S or TDM (Time Division Multiplexed) buses via `xcore` ports
-and can act either act as I²S controller, TDM controller or I²S target.
+and can act either act as I²S `controller` (previously termed `master`) or `target` (previously termed
+`slave`) or TDM `controller`.
 
 I²S and TDM are digital data streaming interfaces particularly appropriate for transmission of audio
 data.
@@ -28,12 +29,12 @@ I²S is a protocol between two devices where one is the *controller* (or *master
      * - *SCK*
        - Serial clock (or "bit clock"). Clock line controlling data timing. Driven by the controller.
      * - *WS*
-       - Word select (or "left/right clock"). Channel synchronisation signal. This is driven by the controller.
+       - Word select (or "left/right clock"). Channel synchronisation signal. Driven by the controller.
      * - *SD*
-       - Serial Data, driven by one of the target or controller depending on the data direction.
+       - Serial Data, driven either the target or controller depending on the data direction.
          There may be several data lines in differing directions.
 
-The protocol may also include lines shown in :numref:`i2s_additonal_lines_table`.
+The protocol may also include additional lines shown in :numref:`i2s_additonal_lines_table`.
 
 .. _i2s_additonal_lines_table:
 
@@ -42,7 +43,7 @@ The protocol may also include lines shown in :numref:`i2s_additonal_lines_table`
      :widths: 20,50
 
      * - *MCLK*
-       - Master clock. (typically 256 x LRCLK); not part of the standard, but is commonly included
+       - Master clock. (typically 256 x `WS`); not part of the standard, but is commonly included
          for synchronising the internal operation of the analog/digital converters
 
 Key parameters of of a I²S protocol are shown in :numref:`i2s_signal_params`.
@@ -56,7 +57,7 @@ Key parameters of of a I²S protocol are shown in :numref:`i2s_signal_params`.
      * - *MCLK_BCLK_RATIO*
        - The fixed ratio between the master clock and the bit clock.
      * - *MODE*
-       - The mode - either I²S or left justified.
+       - The mode - the alignment of the data respective to `WS`
      * - *NUM_DATA_BITS*
        - The number of bits in a data word; this is usually 32, but can be
          adjusted to any value below 32 if required when using one bit ports for
@@ -70,9 +71,9 @@ I²S has several modes based on data alignment and channel configuration:
 
 .. note::
 
-    ``lib_i2s`` currenly only supports standard" and "left-justified" modes.
+    ``lib_i2s`` currently only supports standard" and "left-justified" modes.
 
-The controller signals data transfer should occur by a transition on the *WS* (*LRCLK*) line.
+The `controller` signals data transfer should occur by a transition on the *WS* (*LRCLK*) line.
 In *standard* mode (shown in :numref:`i2s_standard_mode_signal`) data is transferred on the second
 falling edge after the *WS* transitions.
 
@@ -104,7 +105,7 @@ All data is transmitted most significant bit first.
 
     *Right Justified* mode can be attained by setting the ``lib_i2s`` to  *Left Justified* mode to
     align data to the *WS* signal and then the data should be right shifted appropriately by the
-    application before being passed to ``lib_i2s``.
+    application before being provided to ``lib_i2s``.
 
 Resource usage
 ==============
@@ -128,28 +129,34 @@ with the same constraints as above.
 .. figure:: images/i2s_master_connect.*
    :width: 30%
 
-   I²S connection to the `xcore` device (`xcore` as I²S master)
+   I²S connection to the `xcore` device (`xcore` as I²S `controller`)
 
 .. _i2s_slave_xcore_connect:
 
 .. figure:: images/i2s_slave_connect.*
    :width: 30%
 
-   I²S connection to the `xcore` device (`xcore` as I²S slave)
+   I²S connection to the `xcore` device (`xcore` as I²S target)
 
-If only one data direction is required then the *DOUT* or *DIN* lines need not be connected.
+If only one data direction is required then the *DOUT* or *DIN* lines can be omitted.
+
+.. warning::
+
+    The use of four-bit ports over one-bit ports will lead to some restrictions in supported
+    frequencies.
+
 
 I²S controller speeds and performance
 =====================================
 
-The speed and number of data wires that can be driven by the I²S library running as I²S master
-depends on the speed of the thread that runs the code and the amount of processing that occurs in
-the user callbacks for handling the data from the library.
+The speed and number of data wires that can be driven by the ``lib_i2s`` running as a I²S `controller`
+(master) depends on the speed of the thread that runs the code and the amount of processing that
+occurs in the user callbacks for handling the data from the library.
 
-I²S master uses hardware clock dividers and an efficient callback interface to achieve high
+I²S `controller` uses hardware clock dividers and an efficient callback interface to achieve high
 throughputs. This also permits the use of non-32bit data word lengths if needed.
-:numref:`i2s_frame_master_62_5_speeds` shows the known working configurations when using a one-bit
-port:
+:numref:`i2s_frame_master_62_5_speeds` shows the known working configurations when using one-bit
+ports for the data lines:
 
 |beginfullwidth|
 
@@ -217,14 +224,14 @@ port:
 
 |endfullwidth|
 
-:numref:`i2s_frame_master_62_5_speeds_4bit` shows the known working configurations when using a
-four-bit port:
+:numref:`i2s_frame_master_62_5_speeds_4bit` shows the known working configurations when using
+four-bit ports for the data lines:
 
 |beginfullwidth|
 
 .. _i2s_frame_master_62_5_speeds_4bit:
 
-.. list-table:: Known working I²S controller configurations on a 62.5MHz core using four bit ports
+.. list-table:: Known working I²S `controller` configurations on a 62.5MHz core using four bit ports
      :class: vertical-borders horizontal-borders
      :header-rows: 1
      :widths: 15 28 7 27 10 13
@@ -332,8 +339,6 @@ Other configurations may be possible depending on performance:
 
     A master-clock input is not required when operating as an I²S `target`
 
-|newpage|
-
 ****************
 TDM fundamentals
 ****************
@@ -344,8 +349,8 @@ digital audio data transfer, with Time Division Multiplexing (TDM), which allows
 channels to be sent over a single data line.
 
 
-It is a protocol between devices where one is the *controller* (*master*) and one or more
-is the *targets* (*slaves*).
+It is a protocol between devices where one is the *controller* (*master*) and one or more are
+the *targets* (*slaves*).
 
 In I²S TDM mode, multiple channels (typically 8) are packed within each frame, with each channel
 assigned a specific time slot. By using TDM, audio systems can reduce the number of data lines
@@ -424,7 +429,7 @@ other used ports and are all on the same tile.
 
    TDM connection to the xCORE device
 
-If only one data direction is required then the *DOUT* or *DIN* lines need not be connected.
+If only one data direction is required then the *DOUT* or *DIN* lines can be omitted.
 
 TDM speeds and performance
 ==========================
@@ -471,8 +476,8 @@ Usage
 ``lib_i2s`` is intended to be used with `XCommon CMake <https://www.xmos.com/file/xcommon-cmake-documentation/?version=latest>`_,
 the `XMOS` application build and dependency management system.
 
-To use this library, include ``lib_i2s`` in the application's ``APP_DEPENDENT_MODULES`` list in
-`CMakeLists.txt`, for example::
+In order to use ``lib_i2s`` it needs to be added to the ``APP_DEPENDENT_MODULES`` list in the
+application `CMakeLists.txt` file, for example::
 
     set(APP_DEPENDENT_MODULES "lib_i2s")
 
@@ -481,9 +486,9 @@ Applications should then include the ``i2s.h`` header file.
 The callback interface
 =======================
 
-All major functions in the ``lib_i2s`` operate by controlling the I²S or TDM bus on its own thread on
-an `xcore` device. The library will then make callbacks to the application when it receives a sample
-or needs to send a sample.
+All major functions in the ``lib_i2s`` operate by controlling the I²S or TDM bus in a thread of
+a `xcore` device. The library will then make callbacks to the application when it receives a frame
+of samples or requires a frame of samples to send.
 
 .. figure:: images/i2s_generic_task_diag.*
 
@@ -495,16 +500,15 @@ the application.
 
 .. literalinclude:: ../../examples/app_simple_i2s_frame_master/src/simple_i2s_frame_master.xc
    :start-at: my_application
-   :end-before: in buffered
+   :end-before: out buffered
 
 The initialisation callback will provide configuration structures relevant to the communication bus
 being used. The application can set the parameters of the bus (*MCLK/BCLK* ratio, *WS* alignment
 etc.) at this point.
 
-The I²S `controller` task is instantiated as a parallel task that run in a ``par`` statement. The
+The I²S `controller` (`master`) task is instantiated as a parallel task that run in a ``par`` statement. The
 application can connect via the ``i2s_frame_callback_if`` interface connection. For example,
-the following code instantiates an I²S `controller` component and
-connects to it.
+the following code instantiates an I²S `controller` component and connects to it.
 
 .. literalinclude:: ../../examples/app_simple_i2s_frame_master/src/simple_i2s_frame_master.xc
    :start-at: int main
@@ -512,9 +516,9 @@ connects to it.
 I²S `target` usage
 ==================
 
-The I²S `target` task is instantiated as a parallel task that run in a ``par`` statement.
+The I²S `target` (`slave`) task is instantiated as a parallel task that runs in a ``par`` statement.
 The application can connect via the ``i2s_frame_callback_if``  interface connection. For example,
-the following code instantiates an I²S slave component and connects to it.
+the following code instantiates an I²S `target` component and connects to it.
 
 .. literalinclude:: ../../examples/app_simple_i2s_frame_slave/src/simple_i2s_frame_slave.xc
    :start-at: out buffered
@@ -527,7 +531,7 @@ edge. This option is useful with non-standard `controllers` that invert their bi
 TDM usage
 *********
 
-The TDM `controller` task is instantiated as a parallel task that run in a ``par`` statement.
+The TDM `controller` task is instantiated as a parallel task that runs in a ``par`` statement.
 The application can connect via the ``tdm_callback_if``  interface connection. For example,
 the following code instantiates a TDM `controller` component and connects to it.
 
@@ -542,10 +546,9 @@ callbacks. There is a fixed mapping from these channel indices to the physical i
 TDM channel numbering
 =====================
 
-The data words within TDM frames are assigned sequentially from the
-start of the frame. Each data line will have its channel numbers
-assigned in the order that the ports are provided in the
-data in and data out array arguments to the component.
+The data words within TDM frames are assigned sequentially from the start of the frame. Each data
+line will have its channel numbers assigned in the order that the ports are provided in the data in
+and data out array arguments to the component.
 
 For example, in a system with 2 data out ports and 2 data in ports declared as::
 
@@ -553,7 +556,7 @@ For example, in a system with 2 data out ports and 2 data in ports declared as::
   in buffered port:32 p_din[2] = {XS1_PORT_1E, XS1_PORT_1F};
 
 With the number of channels per frame as 4, the samples will be
-numbered as indicated in :ref:`tdm_chan_diag`:
+numbered as indicated in :numref:`tdm_chan_diag`:
 
 .. _tdm_chan_diag:
 
@@ -631,8 +634,9 @@ For more information on configuring clocks see the `XMOS XTC tools user guide <h
 Examples
 ********
 
-Various example example applications are provided along side the app that demonstrate usage. These
-are located in the ``examples`` directory.
+Various example example applications are provided along side the ``lib_i2s`` that demonstrate basic
+usage.
+These are located in the ``examples`` directory.
 
 **************
 Loopback demos
@@ -640,15 +644,14 @@ Loopback demos
 
 Two fully fledged demonstration applications are included in the accompanying examples that
 implement an audio loopback using I²S.
+One where `xcore` operates as a `controller` (or `master`) and another where the `xcore` operates
+as a `target` (or `slave`).
+These are ``app_i2s_frame_loopback_demo`` and ``app_i2s_frame_slave_loopback_demo`` respectively.
 
-Two applications are provided, one where `xcore` operates as a `controller` (or `master`) and
-another where the `xcore` operates as a `target` (or `slave`). These are
-``app_i2s_frame_loopback_demo`` and ``app_i2s_frame_slave_loopback_demo`` respectively.
+These example applications run on the `XMOS XU316 Multichannel Audio board` (`XK-AUDIO-316-MC`).
 
-These examples run on the `XMOS XU316 Multichannel Audio board` (`XK-AUDIO-316-MC`).
-
-This section documents ``app_i2s_frame_loopback`` in detail, much is shared with
-``app_i2s_frame_slave_loopback_demo``.
+This section documents ``app_i2s_frame_loopback`` in detail, however, much of the detail is shared
+with ``app_i2s_frame_slave_loopback_demo``.
 
 Block diagram
 =============
@@ -662,13 +665,13 @@ The main application fits within one thread with an additional remote I²C task 
 hardware to be configured remotely from the other tile. This required due to the IO arrangement of
 the `XK-AUDIO-316-MC` board.
 
-`lib_board_support <www.xmos.com/file/lib_board_support>`_ provides the code to configure the
- external audio DACs and ADCs of the `XK-AUDIO-316-MC` board.
+A board support library, `lib_board_support <www.xmos.com/file/lib_board_support>`_, provides the
+code to configure the external audio DACs and ADCs of the `XK-AUDIO-316-MC` board.
 
 .. note::
 
-   ``lib_board_support`` has the I²C library (`lib_i2c <www.xmos.com/file/lib_i2c>`_) as one of its
-   dependencies.
+   ``lib_board_support`` has the I²C library (`lib_i2c <www.xmos.com/file/lib_i2c>`_) in its
+   dependency list.
 
 The I²S task calls back to the ``i2s_loopback`` task and the processing in the ``i2s_loopback``
 task is performed in-between the I/O operations of I²S.
@@ -692,7 +695,7 @@ Includes
 ========
 
 Application typically need to include ``platform.h`` and ``xs1.h`` to gain access to `xcore` specific
-defines and functions.
+defines and functions. These are provided as part of the `XMOS` XTC tools.
 
 .. literalinclude:: ../../examples/app_i2s_frame_loopback_demo/src/main.xc
    :start-at: include <platform.h>
@@ -751,12 +754,12 @@ The rest of the ``main`` function starts all the tasks in parallel using the `XC
    :start-at: par {
    :end-before: return 0
 
-This code starts the I²S controller/target, the I²C master, the GPIO control and the loopback
+This code starts the I²S `controller`, the I²C master, the GPIO control and the loopback
 application task.
 
-Before the I²S master runs, the system configuration is run and the master clock is connected from
-the input port to the clock block and then started. The I²S master task then starts and consumes a
-thread on the `xcore` device.
+Before the I²S `controller` runs, the system configuration is run and the master clock is connected
+from the input port to the clock block and then started.
+The I²S `controller` task then starts and consumes a thread on the `xcore` device.
 
 The remaining ``i2s_loopback`` task in the ``par`` is marked with the ``[[distribute]]`` attribute.
 This means they will run on an existing thread if possible. In this case they will all share the
@@ -778,19 +781,19 @@ and::
     xk_audio_316_mc_ab_AudioHwConfig(i_i2c, hw_config, SAMPLE_FREQUENCY, MASTER_CLOCK_FREQUENCY, 0, DATA_BITS, DATA_BITS);
 
 The hardware configuration is set by ``hw_config`` which in this configuration sets up the `xcore`
-to be an I²S master with the following settings:
+to be an I²S `controller` with the following settings:
 
 .. literalinclude:: ../../examples/app_i2s_frame_loopback_demo/src/main.xc
    :start-at: #define SAMPLE_FREQUENCY
    :end-at: #define NUM_I2S_LINES
 
-See `lib_board_support`` documentation for further details and API details.
+See ``lib_board_support`` documentation for further details and API details.
 
 The i2s_loopback task
 =====================
 
-The I²S loopback task (``i2s_loopback()``) provides the function of a digital loopback so that all
-I²S samples received by the device will looped back out to I²S unmodified.
+The I²S loopback task (``i2s_loopback()``) provides the function of a digital loopback such that all
+samples received by the device will looped back out unmodified.
 
 The task itself is declared as a ``[[distributable]]`` function ensuring that it can share a thread
 with other tasks.
@@ -801,24 +804,24 @@ The ``i2s_loopback()`` function is listed below.
    :start-at: [[distributable]]
    :end-before: int main
 
-The interface to the I²S master is a callback interface that the I²S master will call over when
-it has received a frame data or requires a frame of data to send.
+The interface to the I²S `controller` is a callback interface that the I²S `controller` will call
+over when it has received a frame data or requires a frame of data to send.
 
 The I²C interface is used to configure the external audio hardware.
 
 The body of the loopback task handles the I²S interface calls.
 
-The I²S master library calls the ``init()`` method before it starts any data streaming. This allows
+The I²S `controller` library calls the ``init()`` method before it starts any data streaming. This allows
 the application to reset and configure audio hardware, for example when the sample rate changes.
 
-The ``receive()`` interface method is called when the master has received a frame of audio samples
-(all channels in one sample period). The samples are then stored in the ``samples`` array.
+The ``receive()`` interface method is called when the `controller` has received a frame of audio samples
+(all channels in one sample period). The samples are then store  in the ``samples`` array.
 
-The ``send()`` interface method is called when the master needs a new frame of samples to send. In
+The ``send()`` interface method is called when the `controller` needs a new frame of samples to send. In
 this case the application simply returns the frame of samples previously received.
 
-Finally, the ``restart_check()`` method is called by the I²S master once per frame and allows the
-application to control restart or shutdown of the I²S master. In this case the application continues
+Finally, the ``restart_check()`` method is called by the I²S `controller` once per frame and allows the
+application to control restart or shutdown of the I²S `controller`. In this case the application continues
 to run "forever" and so always returns ``I2S_NO_RESTART``.
 
 Running the examples
@@ -938,20 +941,23 @@ The TDM task instances
 Further reading
 ***************
 
- * XMOS Tools user guide
+ * `XMOS` tools user guide
 
    https://www.xmos.com/documentation/XM-014363-PC-9/html/
 
- * XMOS `xcore` programming guide
+ * `XMOS` `xcore` programming guide
 
    https://www.xmos.com/published/xmos-programming-guide
+
+ * `xcommon-cmake` build and dependency management system
+
+   https://www.xmos.com/documentation/XM-015090-PC/html/
 
  * I²S bus specification
 
    https://www.nxp.com/docs/en/user-manual/UM11732.pdf
 
- * XMOS XU316 multichannel audio board
+ * xcore.ai Multichannel Audio Platform hardware manual
 
-   https://www.xmos.com/download/XCORE_AI-Multichannel-Audio-Platform-1V1-Hardware-Manual(1V1).
-
+   https://www.xmos.com/file/xcore_ai-multichannel-audio-platform-1v1-hardware-manual/?version=latest
 

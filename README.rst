@@ -27,8 +27,8 @@ line, with each channel occupying specific time slots. This allows I²S to suppo
 audio, useful for applications like surround sound.
 
 ``lib_i2s`` allows interfacing to I²S or TDM (time division multiplexed) buses via `xcore` ports
-and can act either act as I²S controller (previously termed "master") or target (previously termed
-"slave") or TDM controller.
+and can act either act as I²S `controller` (previously termed `master`) or `target` (previously termed
+`slave`) or TDM `controller`.
 
 .. [#] sometimes refered to as Bit Clock (`BCLK`)
 .. [#] sometimes refered to as Left/Right(`LRCLK`)
@@ -37,11 +37,11 @@ and can act either act as I²S controller (previously termed "master") or target
 Features
 ********
 
- * I²S controller, TDM controller and I²S target modes.
- * Handles multiple input and output data lines.
- * Support for standard I²S, left justified or right justified data modes for I²S.
- * Support for multiple formats of TDM synchronisation signal.
- * Sample rate support up to 192kHz or 384kHz for I²S.
+ * I²S `controller`, TDM `controller` and I²S `target` modes.
+ * Supports multiple input and output data lines.
+ * standard I²S, left justified or right justified data modes for I²S.
+ * Multiple formats of TDM synchronisation signal supported.
+ * Sample rates up to 384 kHz (TDM limited to 192 kHz).
  * Up to 32 channels in/32 channels out (depending on sample rate and protocol).
 
 ************
@@ -74,7 +74,6 @@ Related application notes
 
 The following application notes use this library:
 
- * AN00162 - Using the I²S library
  * `AN02016: Integrating Audio Weaver (AWE) Core into USB Audio <https://www.xmos.com/file/an02016>`_
  * `AN02003: SPDIF/ADAT/I2S Receive to I²S Slave Bridge with ASRC <https://www.xmos.com/file/an02003>`_
 
