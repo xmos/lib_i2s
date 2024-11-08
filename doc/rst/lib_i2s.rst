@@ -537,7 +537,7 @@ the following code instantiates a TDM `controller` component and connects to it.
 .. _i2s_channel_map:
 
 The callback interface for TDM numbers the channels being sent/received for the send and receive
-callbacks. There is a fixed mapping from these channel indices to the physical interface begin used.
+callbacks. There is a fixed mapping from these channel indices to the physical interface being used.
 
 TDM channel numbering
 =====================
@@ -547,7 +547,7 @@ start of the frame. Each data line will have its channel numbers
 assigned in the order that the ports are provided in the
 data in and data out array arguments to the component.
 
-For example, in a system with 2 data out ports and 2 data in ports declared as::
+For example, a system with 2 data out ports and 2 data in ports is declared as::
 
   out buffered port:32 p_dout[2] = {XS1_PORT_1A, XS1_PORT_1B};
   in buffered port:32 p_din[2] = {XS1_PORT_1E, XS1_PORT_1F};
@@ -615,7 +615,7 @@ application to request a restart/shutdown of the data bus.
 Clock configuration
 ===================
 
-For the TDM components is it the application's
+For the TDM components it is the application's
 responsibility to set up and start the internal clock used for the master clock
 before calling the component.
 
@@ -691,7 +691,7 @@ that is also listed::
 Includes
 ========
 
-Application typically need to include ``platform.h`` and ``xs1.h`` to gain access to `xcore` specific
+Applications typically need to include ``platform.h`` and ``xs1.h`` to gain access to `xcore` specific
 defines and functions.
 
 .. literalinclude:: ../../examples/app_i2s_frame_loopback_demo/src/main.xc
