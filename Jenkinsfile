@@ -150,6 +150,12 @@ pipeline {
                                 }
                             }
                         }
+
+                        stage("Archive lib") {
+                            steps {
+                                archiveLib(REPO)
+                            }
+                        }
                     }
                     post {
                         cleanup {
