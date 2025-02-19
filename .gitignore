@@ -12,6 +12,10 @@
 *~
 *.DS_Store
 
+# Editor 
+**/.vscode/
+**/*.swp
+
 # Python
 *.pyc
 **/*.egg-info/
