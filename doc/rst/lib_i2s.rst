@@ -870,7 +870,7 @@ the following command::
     xrun bin/app_i2s_frame_loopback_demo.xe
 
 Audio presented on the analog input jacks will be looped back and audible on a speaker connected to the
-output jacks. Note that ``xrun`` will detach the session and wont print any message as it runs with default arguments. 
+output jacks. Note that ``xrun`` will detach the session and won't print any message as it runs with default arguments. 
 
 |newpage|
 
