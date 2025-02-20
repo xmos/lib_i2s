@@ -7,7 +7,7 @@ Introduction
 ************
 
 ``lib_i2s`` allows interfacing to I²S or TDM (Time Division Multiplexed) buses via `xcore` ports
-and can act either act as I²S `controller` (previously termed `master`) or `target` (previously termed
+and can act either as I²S `controller` (previously termed `master`) or `target` (previously termed
 `slave`) or TDM `controller`.
 
 I²S and TDM are digital data streaming interfaces particularly appropriate for transmission of audio
@@ -831,7 +831,7 @@ Building
 --------
 
 The following section assumes that the `XMOS XTC tools <https://www.xmos.com/software-tools/>`_ has
-been download and installed (see `README` for required version).
+been downloaded and installed (see `README` for required version).
 
 Installation instructions can be found `here <https://xmos.com/xtc-install-guide>`_. Particular
 attention should be paid to the section `Installation of required third-party tools
@@ -869,8 +869,8 @@ the following command::
 
     xrun bin/app_i2s_frame_loopback_demo.xe
 
-Audio presented on the analog input jacks will be looped back and audible on a speaker connected the
-output jacks.
+Audio presented on the analog input jacks will be looped back and audible on a speaker connected to the
+output jacks. Note that ``xrun`` will detach the session and won't print any message as it runs with default arguments. 
 
 |newpage|
 
@@ -960,4 +960,3 @@ Further reading
  * xcore.ai Multichannel Audio Platform hardware manual
 
    https://www.xmos.com/file/xcore_ai-multichannel-audio-platform-1v1-hardware-manual/?version=latest
-
