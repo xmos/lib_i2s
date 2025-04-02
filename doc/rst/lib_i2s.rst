@@ -638,9 +638,9 @@ Various example example applications are provided along side the ``lib_i2s`` tha
 usage.
 These are located in the ``examples`` directory.
 
-**************
-Loopback demos
-**************
+******************
+I²S Loopback demos
+******************
 
 Two fully fledged demonstration applications are included in the accompanying examples that
 implement an audio loopback using I²S.
@@ -827,6 +827,8 @@ to run "forever" and so always returns ``I2S_NO_RESTART``.
 Running the examples
 ====================
 
+.. _i2s_loopback_demo_build:
+
 Building
 --------
 
@@ -839,7 +841,7 @@ attention should be paid to the section `Installation of required third-party to
 
 The application uses the `XMOS` build and dependency system, `xcommon-cmake <https://www.xmos.com/file/xcommon-cmake-documentation/?version=latest>`_. `xcommon-cmake` is bundled with the `XMOS` XTC tools.
 
-To configure the build run the following from an XTC command prompt::
+To configure the build, run the following from an XTC command prompt::
 
     cd examples
     cd app_i2s_frame_loopback_demo
@@ -856,6 +858,10 @@ The application uses approximately 3 kB on Tile[0] and 7 kB on Tile[1] of 512 kB
 Hardware setup
 --------------
 
+ * Set the output jumpers on the `XK-AUDIO-316-MC` to the `I2S configuration 
+   <https://www.xmos.com/documentation/XM-014727-PC/html/doc/rst/index.html#id8>`_.
+ * Set the input jumpers on the `XK-AUDIO-316-MC` to the `I2S configuration 
+   <https://www.xmos.com/documentation/XM-014727-PC/html/doc/rst/index.html#id5>`_.
  * Connect a USB cable from a host computer to the DEBUG connector.
  * Connect a USB cable from a host computer to the USB DEVICE connector.
  * Connect a sound source to the 3.5mm line in. Channels 1-2, 3-4, 5-6 or 7-8 can be used.
@@ -871,6 +877,64 @@ the following command::
 
 Audio presented on the analog input jacks will be looped back and audible on a speaker connected to the
 output jacks. Note that ``xrun`` will detach the session and won't print any message as it runs with default arguments. 
+
+*****************
+TDM Loopback Demo
+*****************
+
+A demonstration application that implements an audio loopback using TDM is included in the examples.
+In this demo, the `xcore` operates as the TDM `controller` (or `master`). 
+
+This example application runs on the `XMOS XU316 Multichannel Audio board` (`XK-AUDIO-316-MC`).
+
+Other than the protocol, much of the detail is similar to the I²S loopback demos, so will not be
+covered here.
+
+Running the example
+===================
+
+Building
+--------
+
+The following section uses the same build tools as the :ref:`I²S Loopback Demo <i2s_loopback_demo_build>`.
+
+To configure the build, run the following from an XTC command prompt::
+
+    cd examples
+    cd app_tdm_loopback_demo
+    cmake -G "Unix Makefiles" -B build
+
+Any missing dependencies will be downloaded by the build system at this configure step.
+
+Finally, the application binaries can be built using ``xmake``::
+
+    xmake -j -C build
+
+The application uses approximately 3 kB on Tile[0] and 8 kB on Tile[1] of 512 kB on each.
+
+Hardware setup
+--------------
+
+ * Set the output jumpers on the `XK-AUDIO-316-MC` to the `TDM output from X_DAC_D0 configuration 
+   <https://www.xmos.com/documentation/XM-014727-PC/html/doc/rst/index.html#id8>`_.
+ * Set the input jumpers on the `XK-AUDIO-316-MC` to the `TDM input on X_ADC_D0 configuration 
+   <https://www.xmos.com/documentation/XM-014727-PC/html/doc/rst/index.html#id5>`_.
+ * Connect a USB cable from a host computer to the DEBUG connector.
+ * Connect a USB cable from a host computer to the USB DEVICE connector.
+ * Connect a sound source to the 3.5mm line in. Channels 1-2, 3-4, 5-6 or 7-8 can be used.
+ * Connect powered speakers to the corresponding line out.
+
+Running the application
+-----------------------
+
+To run the application return to the ``/examples/app_tdm_loopback_demo`` directory and run
+the following command::
+
+    xrun bin/app_tdm_loopback_demo.xe
+
+Audio presented on the analog input jacks will be looped back and audible on a speaker connected to the
+output jacks. Note that ``xrun`` will detach the session and won't print any message as it runs with default arguments. 
+
 
 |newpage|
 

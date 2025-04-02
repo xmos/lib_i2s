@@ -5,6 +5,7 @@
 #include "i2s.h"
 #include "i2c.h"
 #include "xk_audio_316_mc_ab/board.h"
+#include "debug_print.h"
 
 #define SAMPLE_FREQUENCY        (48000)
 #define MASTER_CLOCK_FREQUENCY  (24576000)
@@ -17,8 +18,9 @@ on tile[1]: in port p_mclk =                                PORT_MCLK_IN;
 on tile[1]: buffered out port:32 p_fsync =                  PORT_I2S_LRCLK;
 on tile[1]: out port p_bclk =                               PORT_I2S_BCLK;
 on tile[1]: buffered out port:32 p_dac[NUM_TDM_LINES] =     {PORT_I2S_DAC0, PORT_I2S_DAC1, PORT_I2S_DAC2, PORT_I2S_DAC3};
-on tile[1]: buffered in port:32 p_adc[NUM_TDM_LINES] =      {PORT_I2S_ADC0 ,PORT_I2S_ADC1, PORT_I2S_ADC2, PORT_I2S_ADC3};
+on tile[1]: buffered in port:32 p_adc[NUM_TDM_LINES] =      {PORT_I2S_ADC0, PORT_I2S_ADC1, PORT_I2S_ADC2, PORT_I2S_ADC3};
 on tile[1]: clock bclk =                                    XS1_CLKBLK_1;
+
 
 // Board configuration from lib_board_support
 static const xk_audio_316_mc_ab_config_t hw_config = {
@@ -39,13 +41,13 @@ void tdm_loopback(server tdm_callback_if tdm,
   // Config can be done remotely via i_i2c
   xk_audio_316_mc_ab_AudioHwInit(i2c, hw_config);
 
-  int32_t samples[32];
+  int32_t samples[32] = {0};
 
   while (1) {
     select {
     case tdm.init(i2s_config_t &?i2s_config, tdm_config_t &?tdm_config):
       tdm_config.offset = 0;
-      tdm_config.sync_len = DATA_BITS;
+      tdm_config.sync_len = 1; // for alternate TDM_LR_CLK mode use (DATA_BITS * CHANS_PER_FRAME / 2);
       tdm_config.channels_per_frame = CHANS_PER_FRAME;
 
       xk_audio_316_mc_ab_AudioHwConfig(i2c, hw_config, SAMPLE_FREQUENCY, MASTER_CLOCK_FREQUENCY, 0, DATA_BITS, DATA_BITS);
@@ -71,6 +73,7 @@ int main() {
   interface i2c_master_if i_i2c[1];
   par {
     on tile[1]: {
+      // divide clock by 2 to get 256*fs bclk
       configure_clock_src_divide(bclk, p_mclk, 1);
       configure_port_clock_output(p_bclk, bclk);
       tdm_master(i_tdm, p_fsync, p_dac, NUM_TDM_LINES, p_adc, NUM_TDM_LINES, bclk);
