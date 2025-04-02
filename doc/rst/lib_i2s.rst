@@ -841,7 +841,7 @@ attention should be paid to the section `Installation of required third-party to
 
 The application uses the `XMOS` build and dependency system, `xcommon-cmake <https://www.xmos.com/file/xcommon-cmake-documentation/?version=latest>`_. `xcommon-cmake` is bundled with the `XMOS` XTC tools.
 
-To configure the build run the following from an XTC command prompt::
+To configure the build, run the following from an XTC command prompt::
 
     cd examples
     cd app_i2s_frame_loopback_demo
@@ -885,9 +885,9 @@ TDM Loopback Demo
 A demonstration application that implements an audio loopback using TDM is included in the examples.
 In this demo, the `xcore` operates as the TDM `controller` (or `master`). 
 
-This example applications run on the `XMOS XU316 Multichannel Audio board` (`XK-AUDIO-316-MC`).
+This example application runs on the `XMOS XU316 Multichannel Audio board` (`XK-AUDIO-316-MC`).
 
-Other than the protocol, much of the detail is similar to the I2S loopback demos, so will not be
+Other than the protocol, much of the detail is similar to the I²S loopback demos, so will not be
 covered here.
 
 Running the example
@@ -898,7 +898,7 @@ Building
 
 The following section uses the same build tools as the :ref:`I²S Loopback Demo <i2s_loopback_demo_build>`.
 
-To configure the build run the following from an XTC command prompt::
+To configure the build, run the following from an XTC command prompt::
 
     cd examples
     cd app_tdm_loopback_demo
