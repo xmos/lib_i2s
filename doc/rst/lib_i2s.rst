@@ -156,7 +156,7 @@ occurs in the user callbacks for handling the data from the library.
 I²S `controller` uses hardware clock dividers and an efficient callback interface to achieve high
 throughputs. This also permits the use of non-32bit data word lengths if needed.
 :numref:`i2s_frame_master_62_5_speeds` shows the known working configurations when using one-bit
-ports for the data lines:
+ports for the data lines.
 
 |beginfullwidth|
 
@@ -225,7 +225,7 @@ ports for the data lines:
 |endfullwidth|
 
 :numref:`i2s_frame_master_62_5_speeds_4bit` shows the known working configurations when using
-four-bit ports for the data lines:
+four-bit ports for the data lines.
 
 |beginfullwidth|
 
@@ -275,7 +275,7 @@ the user callbacks for handling the data from the library.
 
 The table :numref:`i2s_frame_slave_62_5_speeds` shows the known working configurations when using a
 one-bit port.
-Other configurations may be possible depending on performance:
+Other configurations may be possible depending on performance.
 
 |beginfullwidth|
 
@@ -311,7 +311,7 @@ Other configurations may be possible depending on performance:
 
 The table :numref:`i2s_frame_slave_62_5_speeds_4bit` shows the known working configurations when
 using a four-bit port.
-Other configurations may be possible depending on performance:
+Other configurations may be possible depending on performance.
 
 |beginfullwidth|
 
@@ -337,7 +337,7 @@ Other configurations may be possible depending on performance:
 
 .. note::
 
-    A master-clock input is not required when operating as an I²S `target`
+    A master-clock input is not required when operating as an I²S `target`.
 
 ****************
 TDM fundamentals
@@ -358,18 +358,18 @@ required, consolidating multiple audio channels onto one I²S  bus.
 
 The protocol comprises three signals:
 
- * Bit clock (*BCLK*)
-    - The Bit Clock line provides the clock signal for each bit of data.
-    - It determines the speed at which bits are transmitted across the data line.
-    - Each cycle of BCLK corresponds to the transmission of one bit in the data stream.
- * Word Clock (*WS*) or Frame Sync (*FS*)
-    - The Word Select (sometimes called Frame Sync) line is used to mark the beginning of each frame in TDM.
-    - In standard I2S, this line is used to distinguish left and right channels. But in TDM, it signals the start of a frame that could contain multiple channels.
-    - Each complete WS cycle (high and low) represents a full frame of multiple audio channels.
- * Serial Data (*SD*) or Data Line
-    - The Serial Data line carries the actual audio data.
-    - In TDM, this data line contains time-division multiplexed data from multiple channels within each frame, with each channel assigned a specific time slot.
-    - Audio samples from each channel are transmitted sequentially in their designated slots within a frame.
+* Bit clock (*BCLK*)
+  - The Bit Clock line provides the clock signal for each bit of data.
+  - It determines the speed at which bits are transmitted across the data line.
+  - Each cycle of BCLK corresponds to the transmission of one bit in the data stream.
+* Word Clock (*WS*) or Frame Sync (*FS*)
+  - The Word Select (sometimes called Frame Sync) line is used to mark the beginning of each frame in TDM.
+  - In standard I2S, this line is used to distinguish left and right channels. But in TDM, it signals the start of a frame that could contain multiple channels.
+  - Each complete WS cycle (high and low) represents a full frame of multiple audio channels.
+* Serial Data (*SD*) or Data Line
+  - The Serial Data line carries the actual audio data.
+  - In TDM, this data line contains time-division multiplexed data from multiple channels within each frame, with each channel assigned a specific time slot.
+  - Audio samples from each channel are transmitted sequentially in their designated slots within a frame.
 
 Unlike I²S there is no formal specification for TDM and implementations vary between manufacturers.
 The configuration of a TDM signal depends on the parameters shown in :numref:`tdm_signal_params`.
@@ -556,7 +556,7 @@ For example, a system with 2 data out ports and 2 data in ports is declared as::
   in buffered port:32 p_din[2] = {XS1_PORT_1E, XS1_PORT_1F};
 
 With the number of channels per frame as 4, the samples will be
-numbered as indicated in :numref:`tdm_chan_diag`:
+numbered as indicated in :numref:`tdm_chan_diag`.
 
 .. _tdm_chan_diag:
 
